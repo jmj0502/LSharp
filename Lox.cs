@@ -3,7 +3,7 @@ using static System.Console;
 
 namespace LSharp
 {
-    class Program
+    class Lox
     {
         private static bool HadErrors = false;
 
@@ -69,7 +69,7 @@ namespace LSharp
         /// </summary>
         /// <param name="line">Line number where the error was found.</param>
         /// <param name="message">Message intended to notify a user about its errors.</param>
-        private static void Error(int line, string message)
+        public static void Error(int line, string message)
         {
             Report(line, "", message);
         }
