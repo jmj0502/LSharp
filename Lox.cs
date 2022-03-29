@@ -16,11 +16,11 @@ namespace LSharp
             }
             else if (args.Length == 1)
             {
-
+                RunFile(args[0]);
             }
             else
             {
-
+                RunPrompt();
             }
         }
 
@@ -56,10 +56,10 @@ namespace LSharp
         /// <param name="source">The string that represents the source code of our app. Not nullable.</param>
         private static void Run(string source)
         {
-            var scaner = new Scanner(source);
-            var tokens = scanner.ScanTokens;
+            var scaner = new LSharp.Scanner.Scanner(source);
+            var tokens = scaner.ScanTokens();
 
-            foreach (token in tokens)
+            foreach (var token in tokens)
                 WriteLine(token);
         }
 

@@ -12,6 +12,24 @@ namespace LSharp.Scanner
         private int start = 0;
         private int current = 0;
         private int line = 1;
+        private readonly Dictionary<string, TokenType> keywords = new Dictionary<string, TokenType>{
+            ["and"] = TokenType.AND,
+            ["class"] = TokenType.CLASS,
+            ["else"] = TokenType.ELSE,
+            ["false"] = TokenType.FALSE,
+            ["for"] = TokenType.FOR,
+            ["fun"] = TokenType.FUN,
+            ["if"] = TokenType.IF,
+            ["nil"] = TokenType.NIL,
+            ["or"] = TokenType.OR,
+            ["print"] = TokenType.PRINT,
+            ["return"] = TokenType.RETURN,
+            ["super"] = TokenType.SUPER,
+            ["this"] = TokenType.THIS,
+            ["true"] = TokenType.TRUE,
+            ["var"] = TokenType.VAR,
+            ["while"] = TokenType.WHILE
+        };
 
         public Scanner(string source)
         {
@@ -19,7 +37,7 @@ namespace LSharp.Scanner
         }
 
         /// <summary>
-        /// This method is intended to scan the different tokens lexemes and keep tract of their position on the source code.
+        /// This method is intended to scan the different token lexemes and keep tract of their position on the source code.
         /// It will allow us to produce Tokens aware of their value and location within the source code.
         /// </summary>
         public List<Token> ScanTokens()
@@ -65,11 +83,148 @@ namespace LSharp.Scanner
                 case '<':
                     addToken(match('=') ? TokenType.LESS_EQUAL : TokenType.LESS);
                     break;
+                case '/':
+                    if (match('/'))
+                    {
+                        //this case will allow us to check for comments. In this case we don't
+                        //add the commet into our token list (since they all should be ignored at runtime)
+                        //so, we call advance once we've reached the end of the line.
+                        while (peak() != '\n' && !isAtEnd()) advance();
+                    }
+                    else
+                    {
+                        //if there's no second character behing the /, that means division is being applyed, so 
+                        //we added to the list of tokens.
+                        addToken(TokenType.SLASH);
+                    }
+                    break;
+                //now we will check for all the whitespace characters in order to ignore them too (since they don't have 
+                //any kind of meaning other than visually representing separation between lexemes).
+                case ' ':
+                case '\r':
+                case '\t':
+                    break;
+                case '\n':
+                    line++;
+                    break;
+                    //Here we are deling with string literals.
+                case '"': literalString(); break;
                 default:
-                    Lox.Error(line, "Unexpected character.");
+                    if (isDigit(c))
+                    {
+                        literalNumber();
+                    }
+                    else if (isAlpha(c))
+                    {
+                        identifier();
+                    }
+                    else
+                    {
+                        Lox.Error(line, "Unexpected character.");
+                    }
                     break;
             }
 
+        }
+
+        private void identifier()
+        {
+            while (isAlphaNumeric(peak())) advance();
+            var keyword = source.Substring(start, current);
+            var type = keywords[keyword];
+            if (type == null) type = TokenType.IDENTIFIER;
+            addToken(type);
+        }
+
+        private bool isAlphaNumeric(char v)
+        {
+            return isAlpha(v) || isDigit(v);
+        }
+
+        /// <summary>
+        /// Verifies if the provided character is a valid alpha character, based on the language rules.
+        /// </summary>
+        /// <param name="c">The character to evaluate.</param>
+        private bool isAlpha(char c)
+        {
+            return (c >= 'a' && c <= 'z') ||
+                (c >= 'A' && c <= 'Z') ||
+                c == '_';
+        }
+
+        /// <summary>
+        /// Apply different validations in order to parse numeric literals (in this case lexemes that represents numbers) 
+        /// into tokens.
+        /// </summary>
+        private void literalNumber()
+        {
+            while (isDigit(peak())) advance();
+
+            //At this point we proceed to check 
+            if (peak() == '.' && isDigit(peakNext()))
+            {
+                //We actually consume the . character.
+                advance();
+
+                while (isDigit(peak())) advance();
+            }
+
+            addToken(TokenType.NUMBER, 
+                double.Parse(source.Substring(start, current)));
+
+        }
+
+        /// <summary>
+        /// Allow us to look two characters ahead of the current character.
+        /// </summary>
+        private char peakNext()
+        {
+            if (current + 1 >= source.Length) return '\0';
+            return source[current + 1];
+        }
+
+        /// <summary>
+        /// Checks if the provided character is a numerical character.
+        /// </summary>
+        /// <param name="c">Character to analize.</param>
+        private bool isDigit(char c)
+        {
+            return c >= '0' && c <= '9';
+        }
+
+        /// <summary>
+        /// Walks over a string literal. Is triggered if our scanner matches a " char. It performs different validations
+        /// and operations in order to find the end of the string or raise an error, if needed.
+        /// </summary>
+        private void literalString()
+        {
+            while(peak() != '"' && !isAtEnd())
+            {
+                if (peak() == '\n') line++;
+                advance();
+            }
+
+            if (isAtEnd())
+            {
+                Lox.Error(line, "Unterminated string.");
+                return;
+            }
+
+            //In case we find the second "
+            advance();
+
+            var value = source.Substring(start + 1, current - 1);
+            addToken(TokenType.STRING, value);
+        }
+
+        /// <summary>
+        /// A method intended to help us with the reading of long lexemes. Similar to advance, but it doesn't increment the 
+        /// number of analized characters when called.
+        /// </summary>
+        private char peak()
+        {
+            if (isAtEnd()) return '\0';
+            return source[current];
         }
 
         /// <summary>
