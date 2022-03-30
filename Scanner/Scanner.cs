@@ -130,9 +130,10 @@ namespace LSharp.Scanner
         private void identifier()
         {
             while (isAlphaNumeric(peak())) advance();
-            var keyword = source.Substring(start, current);
-            var type = keywords[keyword];
-            if (type == null) type = TokenType.IDENTIFIER;
+            var keyword = source.Substring(start, current - start);
+            TokenType type;
+            var exists = keywords.TryGetValue(keyword, out type);
+            if (!exists) type = TokenType.IDENTIFIER;
             addToken(type);
         }
 
@@ -170,7 +171,7 @@ namespace LSharp.Scanner
             }
 
             addToken(TokenType.NUMBER, 
-                double.Parse(source.Substring(start, current)));
+                double.Parse(source.Substring(start, current - start)));
 
         }
 
@@ -213,7 +214,7 @@ namespace LSharp.Scanner
             //In case we find the second "
             advance();
 
-            var value = source.Substring(start + 1, current - 1);
+            var value = source.Substring(start + 1, current - start - 1);
             addToken(TokenType.STRING, value);
         }
 
@@ -257,7 +258,7 @@ namespace LSharp.Scanner
         /// <param name="literal">The literal represented by the received token type.</param>
         private void addToken(TokenType type, object literal)
         {
-            var text = source.Substring(start, current);
+            var text = source.Substring(start, current - start);
             tokens.Add(new Token(type, text, null, line));
         }
 

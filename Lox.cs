@@ -83,6 +83,7 @@ namespace LSharp
         private static void Report(int line, string where, string message)
         {
             WriteLine($"[line {line}] Error {where}: {message}");
+            HadErrors = true;
         }
     }
 }
