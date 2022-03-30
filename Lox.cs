@@ -43,7 +43,7 @@ namespace LSharp
             {
                 Write(">");
                 var line = ReadLine();
-                if (line == null) break;
+                if (line == "exit") break;
                 Run(line);
                 HadErrors = false;
             }
