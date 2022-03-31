@@ -259,7 +259,7 @@ namespace LSharp.Scanner
         private void addToken(TokenType type, object literal)
         {
             var text = source.Substring(start, current - start);
-            tokens.Add(new Token(type, text, null, line));
+            tokens.Add(new Token(type, text, literal, line));
         }
 
         /// <summary>
