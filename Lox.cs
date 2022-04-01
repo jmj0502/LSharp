@@ -86,4 +86,19 @@ namespace LSharp
             HadErrors = true;
         }
     }
+
+    class Tester
+    {
+        static void Main(string[] args)
+        {
+            var expression = new Expression.Binary(
+                    new Expression.Unary(
+                        new Tokens.Token(Tokens.TokenType.MINNUS, "-", null, 1),
+                        new Expression.Literal(123)
+                ),
+                    new Expression.Grouping(new Expression.Literal(48.67)),
+                    new Tokens.Token(Tokens.TokenType.STAR, "*", null, 1));
+            WriteLine(new AstPrinter().Visit(expression));
+        }
+    }
 }

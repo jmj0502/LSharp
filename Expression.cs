@@ -18,21 +18,21 @@ namespace LSharp
             T Visit(Unary expression);
         }
 
-        public abstract T accept<T>(IVisitor<T> visitor);
+        public abstract T Accept<T>(IVisitor<T> visitor);
 
         //Member intended to represent variable declaration. EG: var identifierName = value;
         public class Assign : Expression
         {
             public readonly Token Name;
-            public readonly Expression value;
+            public readonly Expression Value;
 
             public Assign(Token name, Expression value)
             {
                 Name = name;
-                this.value = value;
+                Value = value;
             }
 
-            public override T accept<T>(IVisitor<T> visitor)
+            public override T Accept<T>(IVisitor<T> visitor)
             {
                 return visitor.Visit(this);
             }
@@ -52,7 +52,7 @@ namespace LSharp
             public readonly Expression Right;
             public readonly Token Operator;
 
-            public override T accept<T>(IVisitor<T> visitor)
+            public override T Accept<T>(IVisitor<T> visitor)
             {
                 return visitor.Visit(this);
             }
@@ -62,14 +62,14 @@ namespace LSharp
         //Member intended to represent grouping expressions. EG: (expression operator expression).
         public class Grouping : Expression
         {
-            public readonly Expression expression;
+            public readonly Expression Expression;
 
             public Grouping(Expression expression)
             {
-                this.expression = expression;
+                Expression = expression;
             }
 
-            public override T accept<T>(IVisitor<T> visitor)
+            public override T Accept<T>(IVisitor<T> visitor)
             {
                 return visitor.Visit(this);
             }
@@ -78,14 +78,14 @@ namespace LSharp
         //Member intended to represent literal expressions. EG: 1, false, true, nil, "string". 
         public class Literal : Expression
         {
-            public readonly Object value;
+            public readonly Object Value;
 
             public Literal(object value)
             {
-                this.value = value;
+                Value = value;
             }
 
-            public override T accept<T>(IVisitor<T> visitor)
+            public override T Accept<T>(IVisitor<T> visitor)
             {
                 return visitor.Visit(this);
             }
@@ -94,16 +94,16 @@ namespace LSharp
         //Member intended to represent unary expressions: EG: !true, -1, -(5+3).
         public class Unary : Expression
         {
-            public readonly Token operatr;
-            public readonly Expression right;
+            public readonly Token Operatr;
+            public readonly Expression Right;
 
             public Unary(Token operatr, Expression right)
             {
-                this.operatr = operatr;
-                this.right = right;
+                Operatr = operatr;
+                Right = right;
             }
 
-            public override T accept<T>(IVisitor<T> visitor)
+            public override T Accept<T>(IVisitor<T> visitor)
             {
                 return visitor.Visit(this);
             }
