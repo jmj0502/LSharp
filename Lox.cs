@@ -58,9 +58,12 @@ namespace LSharp
         {
             var scaner = new LSharp.Scanner.Scanner(source);
             var tokens = scaner.ScanTokens();
+            var parser = new LSharp.Parser.Parser(tokens);
+            Expression expression = parser.Parse();
 
-            foreach (var token in tokens)
-                WriteLine(token);
+            if (HadErrors) return;
+
+            WriteLine(new AstPrinter().Print(expression));
         }
 
         /// <summary>
@@ -84,6 +87,18 @@ namespace LSharp
         {
             WriteLine($"[line {line}] Error {where}: {message}");
             HadErrors = true;
+        }
+
+        public static void Error(Tokens.Token token, string message)
+        {
+            if (token.Type == Tokens.TokenType.EOF)
+            {
+                Report(token.Line, "at end", message);
+            }
+            else
+            {
+                Report(token.Line, $"at '{token.Lexeme}'", message);
+            }
         }
     }
 
