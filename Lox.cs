@@ -98,7 +98,25 @@ namespace LSharp
                 ),
                     new Expression.Grouping(new Expression.Literal(48.67)),
                     new Tokens.Token(Tokens.TokenType.STAR, "*", null, 1));
+            var expressionTwo = new Expression.Binary(
+                    new Expression.Grouping(
+                            new Expression.Binary(
+                                new Expression.Literal(1),
+                                new Expression.Literal(2),
+                                new Tokens.Token(Tokens.TokenType.PLUS, "+", null, 1)
+                                )
+                        ),
+                    new Expression.Grouping(
+                        new Expression.Binary(
+                            new Expression.Literal(4),
+                            new Expression.Literal(5),
+                            new Tokens.Token(Tokens.TokenType.MINNUS, "-", null, 1)
+                            )
+                        ),
+                    new Tokens.Token(Tokens.TokenType.STAR, "*", null, 1)
+                    );
             WriteLine(new AstPrinter().Visit(expression));
+            WriteLine(new RPNPrinter().Visit(expressionTwo));
         }
     }
 }

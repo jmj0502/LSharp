@@ -55,4 +55,32 @@ namespace LSharp
             return sb.ToString();
         }
     }
+
+    public class RPNPrinter : Expression.IVisitor<string>
+    {
+        public string Visit(Expression.Assign expression)
+        {
+            throw new NotImplementedException();
+        }
+
+        public string Visit(Expression.Binary expression)
+        {
+            return $"{expression.Left.Accept(this)} {expression.Right.Accept(this)} {expression.Operator.Lexeme} ";
+        }
+
+        public string Visit(Expression.Grouping expression)
+        {
+            return $"{expression.Expression.Accept(this)}";
+        }
+
+        public string Visit(Expression.Literal expression)
+        {
+            return $"{expression.Value}";
+        }
+
+        public string Visit(Expression.Unary expression)
+        {
+            return $"{expression.Right.Accept(this)}{expression.Operatr.Lexeme} ";
+        }
+    }
 }
