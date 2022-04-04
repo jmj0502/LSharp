@@ -37,6 +37,10 @@ namespace LSharp.Parser
         * ? -> if statement.
         */
 
+        /// <summary>
+        /// Base point, will start the top-to-down (recursive) parsing process invoking the rule for the expression production.
+        /// </summary>
+        /// <returns></returns>
         public Expression Parse()
         {
             try
@@ -49,11 +53,17 @@ namespace LSharp.Parser
             }
         }
 
+        /// <summary>
+        ///  Rule handler for the expression production (Non-terminal).
+        /// </summary>
         private Expression expression()
         {
             return equality();
         }
 
+        /// <summary>
+        /// Rule handler for the equality production (Non-terminal).
+        /// </summary>
         private Expression equality()
         {
             var expression = comparison();
@@ -67,6 +77,9 @@ namespace LSharp.Parser
             return expression;
         }
 
+        /// <summary>
+        /// Rule handler for the comparison production (Non-terminal).
+        /// </summary>
         private Expression comparison()
         {
             var expression = term();
@@ -79,6 +92,9 @@ namespace LSharp.Parser
             return expression;
         }
 
+        /// <summary>
+        /// Rule handler for the term production (Non-Terminal).
+        /// </summary>
         private Expression term()
         {
             var expression = factor();
@@ -91,6 +107,10 @@ namespace LSharp.Parser
             return expression;
         }
 
+        /// <summary>
+        /// Rule hadler for the factor term production (Non-terminal).
+        /// </summary>
+        /// <returns></returns>
         private Expression factor()
         {
             var expression = unary(); 
@@ -103,6 +123,9 @@ namespace LSharp.Parser
             return expression;
         }
 
+        /// <summary>
+        /// Rule handler for the unary production (Non-terminal).
+        /// </summary>
         private Expression unary()
         {
             if (match(TokenType.BANG, TokenType.MINNUS))
@@ -114,6 +137,10 @@ namespace LSharp.Parser
             return primary();
         }
 
+        /// <summary>
+        /// Rule handler for the primary production. It takes care of the terminal characters, an applies
+        /// recurssive parsing to group expressions.
+        /// </summary>
         private Expression primary()
         {
             if (match(TokenType.TRUE)) return new Expression.Literal(true);
@@ -136,7 +163,11 @@ namespace LSharp.Parser
             throw error(peek(), "Expected expression.");
         }
 
-
+        /// <summary>
+        /// Verifies if at least one of the provided Token Types is present on the current position of the tokens array.
+        /// If so, it consumes it, and returns true. Returns false otherwise.
+        /// </summary>
+        /// <param name="types">The array of Tokens to match againts.</param>
         private bool match(params TokenType[] types)
         {
             foreach (var type in types)
@@ -150,6 +181,15 @@ namespace LSharp.Parser
             return false;
         }
 
+        /// <summary>
+        /// Verifies if the provided Token is present on the current position of the tokens array.
+        /// If so, consumes it and then returns it. Throws and error that restarts the execution stack 
+        /// (turns the compiler into panic mode) otherwise.
+        /// </summary>
+        /// <param name="type">Type to match against.</param>
+        /// <param name="message">Error message in case the current position of the tokens array doesn't match
+        /// the provided token.
+        /// </param>
         private Token consume(TokenType type, string message)
         {
             if (check(type)) return advance();
@@ -157,40 +197,65 @@ namespace LSharp.Parser
             throw error(peek(), message);
         }
 
-
+        /// <summary>
+        /// Checks if the provided type is at the current position of the tokens array. Returns true if so. Returns false if the
+        /// end of the file is reached or if the current position of the tokens array doesn't match the provided type.
+        /// </summary>
+        /// <param name="type">Type to check on the tokens array.</param>
         private bool check(TokenType type)
         {
             if (isAtEnd()) return false;
             return peek().Type == type;
         }
 
+        /// <summary>
+        /// Moves increments the current pointer on the tokes array by one position in case it hasn't reached the end of the file. 
+        /// Returns the character on the position of the previous current pointer.
+        /// </summary>
         private Token advance()
         {
             if (!isAtEnd()) current++;
             return previous();
         }
 
+        /// <summary>
+        /// Checks if the end of the line's been reached. Returns true if so and flase otherwise.
+        /// </summary>
         private bool isAtEnd()
         {
             return peek().Type == TokenType.EOF;
         }
 
+        /// <summary>
+        /// Returns the token at the current position on the tokens array.
+        /// </summary>
         private Token peek()
         {
             return tokens[current];
         }
 
+        /// <summary>
+        /// Returns the current located one position before to the current position of the tokens array.
+        /// </summary>
         private Token previous()
         {
             return tokens[current - 1];
         }
 
+        /// <summary>
+        /// Invokes the error reporting method and returns a parse error.
+        /// </summary>
+        /// <param name="token">Token that caused a sintax error.</param>
+        /// <param name="message">Error message.</param>
         private ParseError error(Token token, string message)
         {
             Lox.Error(token, message);
             return new ParseError();
         }
 
+        /// <summary>
+        /// Synchronizes the parser by jumping right to the 'next' statement after a parse error has taken place.
+        /// </summary>
         private void synchronize()
         {
             advance();

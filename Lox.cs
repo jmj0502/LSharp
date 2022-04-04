@@ -89,6 +89,12 @@ namespace LSharp
             HadErrors = true;
         }
 
+        /// <summary>
+        /// Reports a syntax error. Returns a formatted message that includes the token that originated the error, alonside
+        /// the line number where the error was detected.
+        /// </summary>
+        /// <param name="token">Token that produced a syntax error.</param>
+        /// <param name="message">Message intended to describe the error.</param>
         public static void Error(Tokens.Token token, string message)
         {
             if (token.Type == Tokens.TokenType.EOF)
