@@ -1,11 +1,14 @@
 ﻿using System;
+using LSharp.Interpreter;
 using static System.Console;
 
 namespace LSharp
 {
     class Lox
     {
+        private static readonly Interpreter.Interpreter interpreter = new Interpreter.Interpreter();
         private static bool HadErrors = false;
+        private static bool HadRuntimeError = false;
 
         static void Main(string[] args)
         {
@@ -32,6 +35,7 @@ namespace LSharp
             var source = System.IO.File.ReadAllText(path);
             Run(source);
             if (HadErrors) Environment.Exit(1);
+            if (HadRuntimeError) Environment.Exit(1);
         }
 
         /// <summary>
@@ -63,7 +67,7 @@ namespace LSharp
 
             if (HadErrors) return;
 
-            WriteLine(new AstPrinter().Print(expression));
+            interpreter.Interpret(expression);
         }
 
         /// <summary>
@@ -75,6 +79,16 @@ namespace LSharp
         public static void Error(int line, string message)
         {
             Report(line, "", message);
+        }
+
+        /// <summary>
+        /// Reports a runtime error to the error.
+        /// </summary>
+        /// <param name="error">Runtime error produced by the interpreter.</param>
+        public static void RuntimeError(LSharp.Interpreter.RuntimeError error)
+        {
+            WriteLine($"{error.Message}\n[line {error.token.Line}]");
+            HadRuntimeError = true;
         }
 
         /// <summary>
