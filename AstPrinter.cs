@@ -40,6 +40,11 @@ namespace LSharp
             return parenthesize(expression.Operatr.Lexeme, expression.Right);
         }
 
+        public string Visit(Expression.Variable expression)
+        {
+            throw new NotImplementedException();
+        }
+
         private string parenthesize(string name, params Expression[] expressions)
         {
             var sb = new StringBuilder();
@@ -81,6 +86,11 @@ namespace LSharp
         public string Visit(Expression.Unary expression)
         {
             return $"{expression.Right.Accept(this)}{expression.Operatr.Lexeme} ";
+        }
+
+        public string Visit(Expression.Variable expression)
+        {
+            throw new NotImplementedException();
         }
     }
 }

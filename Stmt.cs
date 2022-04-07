@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using LSharp.Tokens;
 
 namespace LSharp
 {
@@ -12,6 +13,7 @@ namespace LSharp
         {
             T Visit(Expr stmt);
             T Visit(Print stmt);
+            T Visit(Var stmt);
         }
 
         public abstract T accept<T>(IVisitor<T> visitor);
@@ -38,6 +40,23 @@ namespace LSharp
             public Print(Expression expression)
             {
                 Expression = expression;
+            }
+
+            public override T accept<T>(IVisitor<T> visitor)
+            {
+                return visitor.Visit(this);
+            }
+        }
+
+        public class Var : Stmt
+        {
+            public readonly Token Name;
+            public readonly Expression Initializer;
+
+            public Var(Token name, Expression initializer)
+            {
+                Name = name;
+                Initializer = initializer;
             }
 
             public override T accept<T>(IVisitor<T> visitor)

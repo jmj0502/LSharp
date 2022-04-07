@@ -20,6 +20,8 @@ namespace LSharp.Interpreter
          * string -> string.
          */
 
+        private Enviroment.Enviroment enviroment = new Enviroment.Enviroment();
+
         /// <summary>
         /// Interprets a expression and produce the expected output to the user. In case the provided expression
         /// is invalid, a runtime error will be araised.
@@ -38,6 +40,10 @@ namespace LSharp.Interpreter
             }
         }
 
+        /// <summary>
+        /// Runs the visitor method on a specific statement.
+        /// </summary>
+        /// <param name="statement">Any instance of the stamement hierarchy.</param>
         private void execute(Stmt statement)
         {
             statement.accept(this);
@@ -229,6 +235,33 @@ namespace LSharp.Interpreter
             object value = evaluate(stmt.Expression);
             Console.WriteLine(stringify(value));
             return null;
+        }
+
+        /// <summary>
+        /// Proceeds to define a variable into the enviroment. If the provided statements contains an initialization,
+        /// the provided value is evaluated and the result is tied up to the variable name. Otherwise, nil is stored 
+        /// under such variable.
+        /// </summary>
+        /// <param name="stmt">Variable statement.</param>
+        public object Visit(Stmt.Var stmt)
+        {
+            object value = null;
+            if (stmt.Initializer != null)
+            {
+                value = evaluate(stmt.Initializer);
+            }
+
+            enviroment.Define(stmt.Name.Lexeme, value);
+            return null;
+        }
+
+        /// <summary>
+        /// Evaluates a Variable expression. Simply finds a variable on the enviroment and then returns it.
+        /// </summary>
+        /// <param name="expression">A expression variable.</param>
+        public object Visit(Expression.Variable expression)
+        {
+            return enviroment.Get(expression.Name);
         }
     }
 }

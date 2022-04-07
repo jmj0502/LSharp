@@ -23,17 +23,19 @@ namespace LSharp.Parser
         * From this point and on, we'll start translating every rule of Lox into C#.
         * The rules we're about to parse are defined as a variation of the EBNF (Extended Backus-Naur Form) 
         * expressed in Crafting Interpreter And Compilers. Those are:
-        * program -> expression* EOF; //Added on the chapter 8.
-        * statement -> exprStmt | printStmt; //Added on the chapter 8.
-        * exprStmt -> expression ";"; //Added on the chapter 8.
-        * printStmt -> "print" expression ";";
-        * expression -> equality;
+        * program -> declaration* EOF; //Added on chapter 8.
+        * declaration -> varDecl | statement; //Added on chapter 8.
+        * statement -> exprStmt | printStmt; //Added on chapter 8.
+        * varDecl -> "var" IDENTIFIER ("=" expression)? ";"; //Added on chapter 8.
+        * exprStmt -> expression ";"; //Added on chapter 8.
+        * printStmt -> "print" expression ";"; //Added on chapter 8.
+        * expression -> equality; //Added on chapter 8.
         * equality -> comparison (("!=" | "==") comparison)*;
         * comparison -> term ((">"|">="|"<"|"<=") term )*;
         * term -> factor (("-"|"+") factor )*;
         * factor -> unary (("/"|"*") unary)*;
         * unary -> ("!","-") unary | primary;
-        * primary -> NUMBER | STRING | "true" | "false" | "nil" | "(" expression ")";
+        * primary -> NUMBER | STRING | "true" | "false" | "nil" | "(" expression ")" | "IDENTIFIER";
         * This sintax will allow us to represent our productions in code as follows:
         * Terminal -> Code to match and consume a token.
         * Non-Terminal -> Call to that rule's function.
@@ -50,7 +52,7 @@ namespace LSharp.Parser
             var statements = new List<Stmt>();
             while(!isAtEnd())
             {
-                statements.Add(statement());
+                statements.Add(declaration());
             }
             return statements;
         }
@@ -63,6 +65,25 @@ namespace LSharp.Parser
             var value = expression();
             consume(TokenType.SEMICOLON, "Expect ; after value");
             return new Stmt.Print(value);
+        }
+
+        /// <summary>
+        /// Execute the varDeclaration rule. It consumes an identifier for a variable (raises an exception if it can 
+        /// find it) and then checks if the variable if defined by matching a EQUAL token to proceed and evaluate such expression.
+        /// If an EQUAL token wasn't provided, it defines a variable with no initialization (hence a variable with a nil value).
+        /// </summary>
+        private Stmt varDeclaration()
+        {
+            var name = consume(TokenType.IDENTIFIER, "Expect variable name.");
+
+            Expression initializer = null;
+            if (match(TokenType.EQUAL))
+            {
+                initializer = expression();
+            }
+
+            consume(TokenType.SEMICOLON, "Expect ';' after variable declaration.");
+            return new Stmt.Var(name, initializer);
         }
 
         /// <summary>
@@ -82,6 +103,25 @@ namespace LSharp.Parser
         {
             return equality();
         }
+
+        /// <summary>
+        /// Executes the parsing process on a declaration statment. It matches the start of a statement, if it contains
+        /// the var keyword at the beginning, it consumes it and executes the varDeclaration rules.
+        /// </summary>
+        private Stmt declaration()
+        {
+            try
+            {
+                if (match(TokenType.VAR)) return varDeclaration();
+                return statement();
+            }
+            catch (ParseError error)
+            {
+                synchronize();
+                return null;
+            }
+        }
+
 
         /// <summary>
         /// Executes the statement rules.
@@ -182,6 +222,11 @@ namespace LSharp.Parser
             {
                 var value = previous();
                 return new Expression.Literal(value.Literal);
+            }
+
+            if (match(TokenType.IDENTIFIER))
+            {
+                return new Expression.Variable(previous());
             }
 
             if (match(TokenType.LEFT_PAREN))
