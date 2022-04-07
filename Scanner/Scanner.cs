@@ -214,7 +214,7 @@ namespace LSharp.Scanner
             //In case we find the second "
             advance();
 
-            var value = source.Substring(start + 1, current - start - 1);
+            var value = source.Substring(start + 1, current - start - 2);
             addToken(TokenType.STRING, value);
         }
 

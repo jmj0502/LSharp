@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using LSharp.Interpreter;
 using static System.Console;
 
@@ -63,11 +64,11 @@ namespace LSharp
             var scaner = new LSharp.Scanner.Scanner(source);
             var tokens = scaner.ScanTokens();
             var parser = new LSharp.Parser.Parser(tokens);
-            Expression expression = parser.Parse();
+            var statements = parser.Parse();
 
             if (HadErrors) return;
 
-            interpreter.Interpret(expression);
+            interpreter.Interpret(statements);
         }
 
         /// <summary>

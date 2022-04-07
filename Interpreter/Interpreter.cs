@@ -7,7 +7,8 @@ using System.Threading.Tasks;
 
 namespace LSharp.Interpreter
 {
-    public class Interpreter : Expression.IVisitor<object>
+    public class Interpreter : Expression.IVisitor<object>,
+        Stmt.IVisitor<object>
     {
         /*
          * In order to represent lox's code (LS in this case) we're going to use the built-in C# types.
@@ -23,18 +24,23 @@ namespace LSharp.Interpreter
         /// Interprets a expression and produce the expected output to the user. In case the provided expression
         /// is invalid, a runtime error will be araised.
         /// </summary>
-        /// <param name="expression">Any valid lox expression.</param>
-        public void Interpret(Expression expression)
+        /// <param name="statments">The list of statements intedend to be interpreted.</param>
+        public void Interpret(List<Stmt> statments)
         {
             try
             {
-                object value = evaluate(expression);
-                Console.WriteLine(stringify(value));
+                foreach (var statement in statments)
+                    execute(statement);
             }
             catch (RuntimeError error)
             {
                 Lox.RuntimeError(error);
             }
+        }
+
+        private void execute(Stmt statement)
+        {
+            statement.accept(this);
         }
 
         /// <summary>
@@ -201,6 +207,28 @@ namespace LSharp.Interpreter
             if (obj == null) return false;
             if (obj is bool) return (bool) obj;
             return true;
+        }
+
+        /// <summary>
+        /// Interprets a Expression statement.
+        /// </summary>
+        /// <param name="stmt">The expression statement to be executed.</param>
+        public object Visit(Stmt.Expr stmt)
+        {
+            evaluate(stmt.Expression);
+            return null;
+        }
+
+        /// <summary>
+        /// Interprets a print statement. The process is pretty similar to the common expression statement
+        /// but it prints the value to stdout before discarting it.
+        /// </summary>
+        /// <param name="stmt">The print statement to be executed.</param>
+        public object Visit(Stmt.Print stmt)
+        {
+            object value = evaluate(stmt.Expression);
+            Console.WriteLine(stringify(value));
+            return null;
         }
     }
 }

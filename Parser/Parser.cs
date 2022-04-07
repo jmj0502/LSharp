@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using LSharp.Tokens;
 using LSharp;
+using LSharp;
 
 namespace LSharp.Parser
 {
@@ -22,6 +23,10 @@ namespace LSharp.Parser
         * From this point and on, we'll start translating every rule of Lox into C#.
         * The rules we're about to parse are defined as a variation of the EBNF (Extended Backus-Naur Form) 
         * expressed in Crafting Interpreter And Compilers. Those are:
+        * program -> expression* EOF; //Added on the chapter 8.
+        * statement -> exprStmt | printStmt; //Added on the chapter 8.
+        * exprStmt -> expression ";"; //Added on the chapter 8.
+        * printStmt -> "print" expression ";";
         * expression -> equality;
         * equality -> comparison (("!=" | "==") comparison)*;
         * comparison -> term ((">"|">="|"<"|"<=") term )*;
@@ -40,17 +45,34 @@ namespace LSharp.Parser
         /// <summary>
         /// Base point, will start the top-to-down (recursive) parsing process invoking the rule for the expression production.
         /// </summary>
-        /// <returns></returns>
-        public Expression Parse()
+        public List<Stmt> Parse()
         {
-            try
+            var statements = new List<Stmt>();
+            while(!isAtEnd())
             {
-                return expression();
+                statements.Add(statement());
             }
-            catch (ParseError error)
-            {
-                return null;
-            }
+            return statements;
+        }
+
+        /// <summary>
+        /// Rule handler for print statement production (Non-terminal).
+        /// </summary>
+        private Stmt printStatement()
+        {
+            var value = expression();
+            consume(TokenType.SEMICOLON, "Expect ; after value");
+            return new Stmt.Print(value);
+        }
+
+        /// <summary>
+        /// Rule handler for expression statament production (Non-terminal).
+        /// </summary>
+        private Stmt expressionStatement()
+        {
+            var value = expression();
+            consume(TokenType.SEMICOLON, "Expect ; after expression");
+            return new Stmt.Expr(value);
         }
 
         /// <summary>
@@ -59,6 +81,15 @@ namespace LSharp.Parser
         private Expression expression()
         {
             return equality();
+        }
+
+        /// <summary>
+        /// Executes the statement rules.
+        /// </summary>
+        private Stmt statement()
+        {
+            if (match(TokenType.PRINT)) return printStatement();
+            return expressionStatement();
         }
 
         /// <summary>
