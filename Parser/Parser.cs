@@ -25,11 +25,13 @@ namespace LSharp.Parser
         * expressed in Crafting Interpreter And Compilers. Those are:
         * program -> declaration* EOF; //Added on chapter 8.
         * declaration -> varDecl | statement; //Added on chapter 8.
-        * statement -> exprStmt | printStmt; //Added on chapter 8.
+        * statement -> exprStmt | printStmt | block; //Added on chapter 8.
+        * block -> "{" declaration* "}";
         * varDecl -> "var" IDENTIFIER ("=" expression)? ";"; //Added on chapter 8.
         * exprStmt -> expression ";"; //Added on chapter 8.
         * printStmt -> "print" expression ";"; //Added on chapter 8.
-        * expression -> equality; //Added on chapter 8.
+        * expression -> assignment; //Added on chapter 8.
+        * assignment -> IDENTIFIER "=" assignment | equality; //Added on chapter 8.
         * equality -> comparison (("!=" | "==") comparison)*;
         * comparison -> term ((">"|">="|"<"|"<=") term )*;
         * term -> factor (("-"|"+") factor )*;
@@ -97,12 +99,37 @@ namespace LSharp.Parser
         }
 
         /// <summary>
+        /// Rule handler for assignment expressions. It treats the right-hand side of the expression as if it were
+        /// a binary expression.
+        /// </summary>
+        private Expression assignment()
+        {
+            var expression = equality();
+            if (match(TokenType.EQUAL))
+            {
+                var equals = previous();
+                var value = assignment();
+
+                if (expression is Expression.Variable)
+                {
+                    var name = ((Expression.Variable)expression).Name;
+                    return new Expression.Assign(name, value);
+                }
+
+                error(equals, "Invalid assignment target.");
+            }
+
+            return expression;
+        }
+
+        /// <summary>
         ///  Rule handler for the expression production (Non-terminal).
         /// </summary>
         private Expression expression()
         {
-            return equality();
+            return assignment();
         }
+
 
         /// <summary>
         /// Executes the parsing process on a declaration statment. It matches the start of a statement, if it contains

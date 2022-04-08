@@ -79,7 +79,7 @@ namespace LSharp
         //Member intended to represent literal expressions. EG: 1, false, true, nil, "string". 
         public class Literal : Expression
         {
-            public readonly Object Value;
+            public readonly object Value;
 
             public Literal(object value)
             {

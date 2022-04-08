@@ -69,11 +69,17 @@ namespace LSharp.Interpreter
             return value.ToString();
         }
 
+        /// <summary>
+        /// Executes an assignment expression. If the name provided in the assignment expression is found, its value is updated.
+        /// Otherwise an undefined variable runtime exception is raised.
+        /// </summary>
+        /// <param name="expression">Any assignment expression.</param>
         public object Visit(Expression.Assign expression)
         {
-            throw new NotImplementedException();
+            object value = evaluate(expression.Value);
+            enviroment.Assign(expression.Name, value);
+            return value;
         }
-
 
         /// <summary>
         /// Converts a binary expression into a runtime value.
