@@ -14,6 +14,7 @@ namespace LSharp
             T Visit(Expr stmt);
             T Visit(Print stmt);
             T Visit(Var stmt);
+            T Visit(Block stmt);
         }
 
         public abstract T accept<T>(IVisitor<T> visitor);
@@ -57,6 +58,21 @@ namespace LSharp
             {
                 Name = name;
                 Initializer = initializer;
+            }
+
+            public override T accept<T>(IVisitor<T> visitor)
+            {
+                return visitor.Visit(this);
+            }
+        }
+
+        public class Block : Stmt
+        {
+            public readonly List<Stmt> Statements;
+
+            public Block(List<Stmt> statements)
+            {
+                Statements = statements;
             }
 
             public override T accept<T>(IVisitor<T> visitor)

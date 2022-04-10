@@ -50,6 +50,41 @@ namespace LSharp.Interpreter
         }
 
         /// <summary>
+        /// Turn the list of statements contained in a block into runtime variables. In order to take advantage of the 
+        /// existing execute method, we'll provide each statement as its parameter until every statement of the list
+        /// has been addressed.
+        /// </summary>
+        /// <param name="statements">The list of statement product of a block.</param>
+        /// <param name="enviroment">The enviroment that contains the List of statements.</param>
+        private void executeBlock(List<Stmt> statements, Enviroment.Enviroment enviroment)
+        {
+            var previous = this.enviroment;
+            try
+            {
+                this.enviroment = enviroment;
+                foreach (var statement in statements)
+                {
+                    execute(statement);
+                }
+            }
+            finally 
+            {
+                this.enviroment = previous;
+            }
+        }
+
+        /// <summary>
+        /// Performs the dispatch of the Block statement.
+        /// </summary>
+        /// <param name="stmt">Any block statement.</param>
+        public object Visit(Stmt.Block stmt)
+        {
+            executeBlock(stmt.Statements, new Enviroment.Enviroment(enviroment));
+            return null;
+        }
+
+
+        /// <summary>
         /// Turns C# values into loz values to print them.
         /// </summary>
         /// <param name="value">Any lox literal.</param>

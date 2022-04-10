@@ -99,6 +99,22 @@ namespace LSharp.Parser
         }
 
         /// <summary>
+        /// Turn the components of a block statement into RunTime values.
+        /// </summary>
+        private List<Stmt> block()
+        {
+            var statements = new List<Stmt>();
+            
+            while (!check(TokenType.RIGHT_BRACE) && !isAtEnd())
+            {
+                statements.Add(declaration());
+            }
+
+            consume(TokenType.RIGHT_BRACE, "Expect } after block.");
+            return statements;
+        }
+
+        /// <summary>
         /// Rule handler for assignment expressions. It treats the right-hand side of the expression as if it were
         /// a binary expression.
         /// </summary>
@@ -156,8 +172,10 @@ namespace LSharp.Parser
         private Stmt statement()
         {
             if (match(TokenType.PRINT)) return printStatement();
+            if (match(TokenType.LEFT_BRACE)) return new Stmt.Block(block());
             return expressionStatement();
         }
+
 
         /// <summary>
         /// Rule handler for the equality production (Non-terminal).
