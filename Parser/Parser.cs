@@ -25,7 +25,8 @@ namespace LSharp.Parser
         * expressed in Crafting Interpreter And Compilers. Those are:
         * program -> declaration* EOF; //Added on chapter 8.
         * declaration -> varDecl | statement; //Added on chapter 8.
-        * statement -> exprStmt | ifStmt | printStmt | block; //Added on chapter 8. ifStmt added on chapter 9.
+        * statement -> exprStmt | ifStmt | printStmt | whileStmt | block; //Added on chapter 8.
+        * whileStmt -> "while" "(" expression ")" statement; // Added on chapter 9.
         * ifStmt -> "if" "(" expression ")" statement ( "else" statement)?; //Added on chapter 9.
         * block -> "{" declaration* "}";
         * varDecl -> "var" IDENTIFIER ("=" expression)? ";"; //Added on chapter 8.
@@ -89,6 +90,19 @@ namespace LSharp.Parser
 
             consume(TokenType.SEMICOLON, "Expect ';' after variable declaration.");
             return new Stmt.Var(name, initializer);
+        }
+
+        /// <summary>
+        /// Executes the parsing rule for while statements.
+        /// </summary>
+        public Stmt whileStatement()
+        {
+            consume(TokenType.LEFT_BRACE, "Expect '(' after while.");
+            var condition = expression();
+            consume(TokenType.LEFT_BRACE, "Expect ')' after while condition.");
+            var body = statement();
+
+            return new Stmt.While(condition, body);
         }
 
         /// <summary>
@@ -211,6 +225,7 @@ namespace LSharp.Parser
         {
             if (match(TokenType.IF)) return ifStatement();
             if (match(TokenType.PRINT)) return printStatement();
+            if (match(TokenType.WHILE)) return whileStatement();
             if (match(TokenType.LEFT_BRACE)) return new Stmt.Block(block());
             return expressionStatement();
         }

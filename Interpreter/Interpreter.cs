@@ -323,6 +323,11 @@ namespace LSharp.Interpreter
             return null;
         }
 
+        /// <summary>
+        /// Evaluates the components of a logical expression and applies short circuit if posible. The short circuit evaluation
+        /// logic depends on the operator type of the expression.
+        /// </summary>
+        /// <param name="expression">Any logical expression.</param>
         public object Visit(Expression.Logical expression)
         {
             var left = evaluate(expression.Left);
@@ -337,6 +342,15 @@ namespace LSharp.Interpreter
             }
 
             return evaluate(expression.Right);
+        }
+
+        public object Visit(Stmt.While stmt)
+        {
+            while (isTruty(evaluate(stmt.Condition)))
+            {
+                execute(stmt.Body);
+            }
+            return null;
         }
     }
 }

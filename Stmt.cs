@@ -16,6 +16,7 @@ namespace LSharp
             T Visit(Var stmt);
             T Visit(Block stmt);
             T Visit(If stmt);
+            T Visit(While stmt);
         }
 
         public abstract T accept<T>(IVisitor<T> visitor);
@@ -93,6 +94,23 @@ namespace LSharp
                 Condition = condition;
                 ThenBranch = thenBranch;
                 ElseBranch = elseBranch;
+            }
+
+            public override T accept<T>(IVisitor<T> visitor)
+            {
+                return visitor.Visit(this);
+            }
+        }
+
+        public class While : Stmt
+        {
+            public readonly Expression Condition;
+            public readonly Stmt Body;
+
+            public While(Expression condition, Stmt body)
+            {
+                Condition = condition;
+                Body = body;
             }
 
             public override T accept<T>(IVisitor<T> visitor)
