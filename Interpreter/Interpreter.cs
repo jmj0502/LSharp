@@ -344,6 +344,10 @@ namespace LSharp.Interpreter
             return evaluate(expression.Right);
         }
 
+        /// <summary>
+        /// Executes a while statement using the built-in while. The loop will run until the provided condition is not truty anymore.
+        /// </summary>
+        /// <param name="stmt">Any while loop.</param>
         public object Visit(Stmt.While stmt)
         {
             while (isTruty(evaluate(stmt.Condition)))
