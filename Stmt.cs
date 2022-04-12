@@ -15,6 +15,7 @@ namespace LSharp
             T Visit(Print stmt);
             T Visit(Var stmt);
             T Visit(Block stmt);
+            T Visit(If stmt);
         }
 
         public abstract T accept<T>(IVisitor<T> visitor);
@@ -73,6 +74,25 @@ namespace LSharp
             public Block(List<Stmt> statements)
             {
                 Statements = statements;
+            }
+
+            public override T accept<T>(IVisitor<T> visitor)
+            {
+                return visitor.Visit(this);
+            }
+        }
+
+        public class If : Stmt
+        {
+            public readonly Expression Condition;
+            public readonly Stmt ThenBranch;
+            public readonly Stmt ElseBranch;
+
+            public If(Expression condition, Stmt thenBranch, Stmt elseBranch)
+            {
+                Condition = condition;
+                ThenBranch = thenBranch;
+                ElseBranch = elseBranch;
             }
 
             public override T accept<T>(IVisitor<T> visitor)

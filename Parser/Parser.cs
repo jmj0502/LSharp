@@ -25,7 +25,8 @@ namespace LSharp.Parser
         * expressed in Crafting Interpreter And Compilers. Those are:
         * program -> declaration* EOF; //Added on chapter 8.
         * declaration -> varDecl | statement; //Added on chapter 8.
-        * statement -> exprStmt | printStmt | block; //Added on chapter 8.
+        * statement -> exprStmt | ifStmt | printStmt | block; //Added on chapter 8. ifStmt added on chapter 9.
+        * ifStmt -> "if" "(" expression ")" statement ( "else" statement)?; //Added on chapter 9.
         * block -> "{" declaration* "}";
         * varDecl -> "var" IDENTIFIER ("=" expression)? ";"; //Added on chapter 8.
         * exprStmt -> expression ";"; //Added on chapter 8.
@@ -171,9 +172,29 @@ namespace LSharp.Parser
         /// </summary>
         private Stmt statement()
         {
+            if (match(TokenType.IF)) return ifStatement();
             if (match(TokenType.PRINT)) return printStatement();
             if (match(TokenType.LEFT_BRACE)) return new Stmt.Block(block());
             return expressionStatement();
+        }
+
+        /// <summary>
+        /// Executes the if statement rules.
+        /// </summary>
+        private Stmt ifStatement()
+        {
+            consume(TokenType.LEFT_PAREN, "Expect '(' after if.");
+            var condition = expression();
+            consume(TokenType.RIGHT_PAREN, "Expect ')' after if condition.");
+
+            var thenBranch = statement();
+            Stmt elseBranch = null;
+            if (match(TokenType.ELSE))
+            {
+                elseBranch = statement();
+            }
+
+            return new Stmt.If(condition, thenBranch, elseBranch);
         }
 
 

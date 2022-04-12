@@ -304,5 +304,23 @@ namespace LSharp.Interpreter
         {
             return enviroment.Get(expression.Name);
         }
+
+        /// <summary>
+        /// Evaluates an if stament using native DotNet if. If the provided condition is truty, we proceed to execute the 
+        /// then branch of the statement, otherwise we execute the else part of the statement (in case it was provided).
+        /// </summary>
+        /// <param name="stmt">The If statement to evaluate.</param>
+        public object Visit(Stmt.If stmt)
+        {
+            if (isTruty(evaluate(stmt.Condition)))
+            {
+                execute(stmt.ThenBranch);
+            }
+            else if (stmt.ElseBranch != null)
+            {
+                execute(stmt.ElseBranch);
+            }
+            return null;
+        }
     }
 }
