@@ -33,6 +33,8 @@ namespace LSharp.Parser
         * printStmt -> "print" expression ";"; //Added on chapter 8.
         * expression -> assignment; //Added on chapter 8.
         * assignment -> IDENTIFIER "=" assignment | equality; //Added on chapter 8.
+        * logical_or -> logical_and ("or" logical_and)*; //Added on chapter 9.
+        * logical_and -> equality ("and" equality)*; //Added on chapter 9.
         * equality -> comparison (("!=" | "==") comparison)*;
         * comparison -> term ((">"|">="|"<"|"<=") term )*;
         * term -> factor (("-"|"+") factor )*;
@@ -121,7 +123,7 @@ namespace LSharp.Parser
         /// </summary>
         private Expression assignment()
         {
-            var expression = equality();
+            var expression = or();
             if (match(TokenType.EQUAL))
             {
                 var equals = previous();
@@ -134,6 +136,41 @@ namespace LSharp.Parser
                 }
 
                 error(equals, "Invalid assignment target.");
+            }
+
+            return expression;
+        }
+
+        /// <summary>
+        /// Executes the parsing rule for the "or" operator. This code somehow mirrors the binary expression rule.
+        /// </summary>
+        private Expression or()
+        {
+            var expression = and();
+
+            while(match(TokenType.OR))
+            {
+                var operatr = previous();
+                var right = and();
+                return new Expression.Logical(expression, right, operatr);
+            }
+
+            return expression;
+        }
+
+
+        /// <summary>
+        /// Executes the parsing rule for the "or" operator. This code somehow mirrors the binary expression rule.
+        /// </summary>
+        private Expression and()
+        {
+            var expression = equality();
+
+            while(match(TokenType.AND))
+            {
+                var operatr = previous();
+                var right = equality();
+                return new Expression.Logical(expression, right, operatr);
             }
 
             return expression;

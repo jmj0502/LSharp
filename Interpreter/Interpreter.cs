@@ -322,5 +322,21 @@ namespace LSharp.Interpreter
             }
             return null;
         }
+
+        public object Visit(Expression.Logical expression)
+        {
+            var left = evaluate(expression.Left);
+
+            if (expression.Operatr.Type == TokenType.OR)
+            {
+                if (isTruty(left)) return left;
+            }
+            else
+            {
+                if (!isTruty(left)) return left;    
+            }
+
+            return evaluate(expression.Right);
+        }
     }
 }

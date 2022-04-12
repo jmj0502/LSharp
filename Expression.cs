@@ -17,6 +17,7 @@ namespace LSharp
             T Visit(Literal expression);
             T Visit(Unary expression);
             T Visit(Variable expression);
+            T Visit(Logical expression);
         }
 
         public abstract T Accept<T>(IVisitor<T> visitor);
@@ -117,6 +118,25 @@ namespace LSharp
             public Variable(Token name)
             {
                 Name = name;
+            }
+
+            public override T Accept<T>(IVisitor<T> visitor)
+            {
+                return visitor.Visit(this);
+            }
+        }
+
+        public class Logical : Expression
+        {
+            public readonly Expression Left;
+            public readonly Expression Right;
+            public readonly Token Operatr;
+
+            public Logical(Expression left, Expression right, Token operatr)
+            {
+                Left = left;
+                Right = right;
+                Operatr = operatr;
             }
 
             public override T Accept<T>(IVisitor<T> visitor)
