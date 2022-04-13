@@ -98,9 +98,9 @@ namespace LSharp.Parser
         /// </summary>
         public Stmt whileStatement()
         {
-            consume(TokenType.LEFT_BRACE, "Expect '(' after while.");
+            consume(TokenType.LEFT_PAREN, "Expect '(' after while.");
             var condition = expression();
-            consume(TokenType.LEFT_BRACE, "Expect ')' after while condition.");
+            consume(TokenType.RIGHT_PAREN, "Expect ')' after while condition.");
             var body = statement();
 
             return new Stmt.While(condition, body);
