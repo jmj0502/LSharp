@@ -1,4 +1,5 @@
 ﻿using LSharp.Tokens;
+using LSharp.GlobalFunctions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,8 +20,12 @@ namespace LSharp.Interpreter
          * number -> double.
          * string -> string.
          */
-
         private Enviroment.Enviroment enviroment = new Enviroment.Enviroment();
+
+        public Interpreter()
+        {
+            enviroment.Define("clock", new Clock());
+        } 
 
         /// <summary>
         /// Interprets a expression and produce the expected output to the user. In case the provided expression
@@ -93,7 +98,7 @@ namespace LSharp.Interpreter
             if (value == null) return "nil";
             if (value is double)
             {
-                var text = value.ToString(); 
+                var text = value.ToString();
                 if (text.EndsWith(".0"))
                 {
                     text = text.Substring(0, text.Length - 2);
@@ -162,6 +167,30 @@ namespace LSharp.Interpreter
             }
 
             return null;
+        }
+
+        /// <summary>
+        /// Turns a function call into a runtime value.
+        /// </summary>
+        /// <param name="expression">Any Call expression.</param>
+        public object Visit(Expression.Call expression)
+        {
+            var callee = evaluate(expression.Callee);
+
+            var arguments = new List<object>();
+            foreach (var argument in expression.Arguments)
+                arguments.Add(evaluate(argument));
+
+            if (!(callee is ICallable))
+                throw new RuntimeError(expression.Paren,
+                    "Can only call functions and classes.");
+
+            var function = (ICallable)callee;
+            if (arguments.Count != function.Arity())
+                throw new RuntimeError(expression.Paren,
+                    $"Expected {function.Arity()} parameters but got {arguments.Count}");
+            
+            return function.Call(this, arguments);
         }
 
         /// <summary>
@@ -356,5 +385,6 @@ namespace LSharp.Interpreter
             }
             return null;
         }
+
     }
 }

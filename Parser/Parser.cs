@@ -41,7 +41,9 @@ namespace LSharp.Parser
         * comparison -> term ((">"|">="|"<"|"<=") term )*;
         * term -> factor (("-"|"+") factor )*;
         * factor -> unary (("/"|"*") unary)*;
-        * unary -> ("!","-") unary | primary;
+        * unary -> ("!","-") unary | call;
+        * call -> primary ( "(" arguments? ")" )*;
+        * arguments -> expression ("," expression )*;
         * primary -> NUMBER | STRING | "true" | "false" | "nil" | "(" expression ")" | "IDENTIFIER";
         * This sintax will allow us to represent our productions in code as follows:
         * Terminal -> Code to match and consume a token.
@@ -386,7 +388,53 @@ namespace LSharp.Parser
                 var right = unary();
                 return new Expression.Unary(operatr, right);
             }
-            return primary();
+            return call();
+        }
+
+        /// <summary>
+        /// Helper function intended to detect the end of a function call.
+        /// </summary>
+        private Expression finishCall(Expression callee)
+        {
+            var arguments = new List<Expression>();
+
+            if (!check(TokenType.RIGHT_PAREN))
+            {
+                do
+                {
+                    if (arguments.Count >= 255)
+                    {
+                        error(peek(), "Can't have more than 255 arguments.");
+                    }
+                    arguments.Add(expression());
+                } 
+                while (match(TokenType.COMMA));
+            }
+
+            var closingParen = consume(TokenType.RIGHT_PAREN, "Expect ')' after arguments.");
+            return new Expression.Call(callee, closingParen, arguments);
+        }
+
+        /// <summary>
+        /// Rule handler for function calls (Non-Terminal).
+        /// </summary>
+        private Expression call()
+        {
+            var expression = primary();
+
+            while(true)
+            {
+                if (match(TokenType.LEFT_PAREN))
+                {
+                    expression = finishCall(expression);
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+            return expression;
         }
 
         /// <summary>

@@ -1,7 +1,8 @@
 {
   "profiles": {
     "LSharp": {
-      "commandName": "Project"
+      "commandName": "Project",
+      "commandLineArgs": "iterativeFib.ls"
     }
   }
 }

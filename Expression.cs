@@ -18,6 +18,7 @@ namespace LSharp
             T Visit(Unary expression);
             T Visit(Variable expression);
             T Visit(Logical expression);
+            T Visit(Call expression);
         }
 
         public abstract T Accept<T>(IVisitor<T> visitor);
@@ -111,6 +112,7 @@ namespace LSharp
             }
         }
 
+        //Member intended to present variable expressions (access).
         public class Variable : Expression
         {
             public readonly Token Name;
@@ -126,6 +128,7 @@ namespace LSharp
             }
         }
 
+        //Member intended to represent the structure of logical expressions (or, and).
         public class Logical : Expression
         {
             public readonly Expression Left;
@@ -137,6 +140,26 @@ namespace LSharp
                 Left = left;
                 Right = right;
                 Operatr = operatr;
+            }
+
+            public override T Accept<T>(IVisitor<T> visitor)
+            {
+                return visitor.Visit(this);
+            }
+        }
+
+        //Member intended to represent function calls.
+        public class Call : Expression
+        {
+            public readonly Expression Callee;
+            public readonly Token Paren;
+            public readonly List<Expression> Arguments;
+
+            public Call(Expression callee, Token paren, List<Expression> arguments)
+            {
+                Callee = callee;
+                Paren = paren;
+                Arguments = arguments;
             }
 
             public override T Accept<T>(IVisitor<T> visitor)
