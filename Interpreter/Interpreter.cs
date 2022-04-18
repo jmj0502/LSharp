@@ -321,6 +321,19 @@ namespace LSharp.Interpreter
         }
 
         /// <summary>
+        /// Interprets a return statement. It throws an exception to clean the call stack and provided the value that should
+        /// return from the function where it is contained within such exception.
+        /// </summary>
+        /// <param name="stmt">Any return statement.</param>
+        public object Visit(Stmt.Return stmt)
+        {
+            object value = null;
+            if (stmt.Value != null) value = evaluate(stmt.Value);
+
+            throw new Return(value);
+        }
+
+        /// <summary>
         /// Proceeds to define a variable into the enviroment. If the provided statements contains an initialization,
         /// the provided value is evaluated and the result is tied up to the variable name. Otherwise, nil is stored 
         /// under such variable.

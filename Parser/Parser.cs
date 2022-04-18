@@ -5,7 +5,6 @@ using System.Text;
 using System.Threading.Tasks;
 using LSharp.Tokens;
 using LSharp;
-using LSharp;
 
 namespace LSharp.Parser
 {
@@ -25,7 +24,8 @@ namespace LSharp.Parser
         * expressed in Crafting Interpreter And Compilers. Those are:
         * program -> declaration* EOF; //Added on chapter 8.
         * declaration -> funDecl | varDecl | statement; //Added on chapter 8.
-        * statement -> exprStmt | forStmt | ifStmt | printStmt | whileStmt | block; //Added on chapter 8.
+        * statement -> exprStmt | forStmt | ifStmt | printStmt | returnStmt | whileStmt | block; //Added on chapter 8.
+        * returnStmt -> "return" expression? ";" ;
         * forStmt -> "for" "(" (varDecl | exprStmt | ";" ) expression? ";" expression? ")" statement; //Added on chapter 9. 
         * whileStmt -> "while" "(" expression ")" statement; // Added on chapter 9.
         * ifStmt -> "if" "(" expression ")" statement ( "else" statement)?; //Added on chapter 9.
@@ -77,6 +77,21 @@ namespace LSharp.Parser
             var value = expression();
             consume(TokenType.SEMICOLON, "Expect ; after value");
             return new Stmt.Print(value);
+        }
+
+        /// <summary>
+        /// Rule handler for the return statement production (Non-terminal).
+        /// </summary>
+        private Stmt returnStatement()
+        {
+            var token = previous();
+            Expression value = null;
+            if (!check(TokenType.SEMICOLON))
+            {
+                value = expression();
+            }
+            consume(TokenType.SEMICOLON, "Expect ';' after return value.");
+            return new Stmt.Return(token, value);
         }
 
         /// <summary>
@@ -265,10 +280,12 @@ namespace LSharp.Parser
             if (match(TokenType.FOR)) return forStatement();
             if (match(TokenType.IF)) return ifStatement();
             if (match(TokenType.PRINT)) return printStatement();
+            if (match(TokenType.RETURN)) return returnStatement();
             if (match(TokenType.WHILE)) return whileStatement();
             if (match(TokenType.LEFT_BRACE)) return new Stmt.Block(block());
             return expressionStatement();
         }
+
 
         /// <summary>
         /// Method intended to parse the for statement rule. It takes advantage of different contructs of the langague to

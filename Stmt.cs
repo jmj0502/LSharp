@@ -18,6 +18,7 @@ namespace LSharp
             T Visit(If stmt);
             T Visit(While stmt);
             T Visit(Function stmt);
+            T Visit(Return stmt);
         }
 
         public abstract T accept<T>(IVisitor<T> visitor);
@@ -131,6 +132,23 @@ namespace LSharp
                 Name = name;
                 Parameters = parameters;
                 Body = body;
+            }
+
+            public override T accept<T>(IVisitor<T> visitor)
+            {
+                return visitor.Visit(this);
+            }
+        }
+
+        public class Return : Stmt
+        {
+            public readonly Token Keyword;
+            public readonly Expression Value;
+
+            public Return(Token keyword, Expression value)
+            {
+                Keyword = keyword;
+                Value = value;
             }
 
             public override T accept<T>(IVisitor<T> visitor)

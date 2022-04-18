@@ -28,7 +28,14 @@ namespace LSharp.Interpreter
                 enviroment.Define(declaration.Parameters[i].Lexeme, arguments[i]);
             }
 
-            interpreter.ExecuteBlock(declaration.Body, enviroment);
+            try
+            {
+                interpreter.ExecuteBlock(declaration.Body, enviroment);
+            }
+            catch (Return returnValue)
+            {
+                return returnValue.Value;
+            }
             return null;
         }
 
