@@ -24,13 +24,16 @@ namespace LSharp.Parser
         * The rules we're about to parse are defined as a variation of the EBNF (Extended Backus-Naur Form) 
         * expressed in Crafting Interpreter And Compilers. Those are:
         * program -> declaration* EOF; //Added on chapter 8.
-        * declaration -> varDecl | statement; //Added on chapter 8.
+        * declaration -> funDecl | varDecl | statement; //Added on chapter 8.
         * statement -> exprStmt | forStmt | ifStmt | printStmt | whileStmt | block; //Added on chapter 8.
         * forStmt -> "for" "(" (varDecl | exprStmt | ";" ) expression? ";" expression? ")" statement; //Added on chapter 9. 
         * whileStmt -> "while" "(" expression ")" statement; // Added on chapter 9.
         * ifStmt -> "if" "(" expression ")" statement ( "else" statement)?; //Added on chapter 9.
         * block -> "{" declaration* "}";
         * varDecl -> "var" IDENTIFIER ("=" expression)? ";"; //Added on chapter 8.
+        * funDecl -> "fun" function;
+        * function -> IDENTIFIER "(" parameters? ")" block;
+        * parameters -> IDENTIFIER ( "," IDENTIFIER )*;
         * exprStmt -> expression ";"; //Added on chapter 8.
         * printStmt -> "print" expression ";"; //Added on chapter 8.
         * expression -> assignment; //Added on chapter 8.
@@ -116,6 +119,37 @@ namespace LSharp.Parser
             var value = expression();
             consume(TokenType.SEMICOLON, "Expect ; after expression");
             return new Stmt.Expr(value);
+        }
+
+        /// <summary>
+        /// Rule handler to deal with the parsing of the function production (Non-terminal).
+        /// </summary>
+        /// <param name="kind">The kind of function to be parsed.</param>
+        private Stmt function(string kind)
+        {
+            var name = consume(TokenType.IDENTIFIER, $"Expect {kind} name.");
+            consume(TokenType.LEFT_PAREN, $"Expect '(' after {kind} name.");
+            var parameters = new List<Token>();
+            if (!check(TokenType.RIGHT_PAREN))
+            {
+                do
+                {
+                    if (parameters.Count >= 255)
+                    {
+                        error(peek(), "Can't have more than 255 parameters.");
+                    }
+
+                    parameters.Add(
+                        consume(TokenType.IDENTIFIER, "Expect parameter name."));
+                }
+                while (match(TokenType.COMMA));
+            }
+
+            consume(TokenType.RIGHT_PAREN, "Expect ')' after parameters.");
+
+            consume(TokenType.LEFT_BRACE, $"Expect '{{' before {kind} body.");
+            var body = block();
+            return new Stmt.Function(name, parameters, body);
         }
 
         /// <summary>
@@ -210,6 +244,7 @@ namespace LSharp.Parser
         {
             try
             {
+                if (match(TokenType.FUN)) return function("function");
                 if (match(TokenType.VAR)) return varDeclaration();
                 return statement();
             }
@@ -219,6 +254,7 @@ namespace LSharp.Parser
                 return null;
             }
         }
+
 
 
         /// <summary>

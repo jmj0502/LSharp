@@ -21,6 +21,7 @@ namespace LSharp.Interpreter
          * string -> string.
          */
         private Enviroment.Enviroment enviroment = new Enviroment.Enviroment();
+        public Enviroment.Enviroment Globals { get => enviroment; }
 
         public Interpreter()
         {
@@ -61,7 +62,7 @@ namespace LSharp.Interpreter
         /// </summary>
         /// <param name="statements">The list of statement product of a block.</param>
         /// <param name="enviroment">The enviroment that contains the List of statements.</param>
-        private void executeBlock(List<Stmt> statements, Enviroment.Enviroment enviroment)
+        public void ExecuteBlock(List<Stmt> statements, Enviroment.Enviroment enviroment)
         {
             var previous = this.enviroment;
             try
@@ -84,7 +85,7 @@ namespace LSharp.Interpreter
         /// <param name="stmt">Any block statement.</param>
         public object Visit(Stmt.Block stmt)
         {
-            executeBlock(stmt.Statements, new Enviroment.Enviroment(enviroment));
+            ExecuteBlock(stmt.Statements, new Enviroment.Enviroment(enviroment));
             return null;
         }
 
@@ -292,6 +293,18 @@ namespace LSharp.Interpreter
         public object Visit(Stmt.Expr stmt)
         {
             evaluate(stmt.Expression);
+            return null;
+        }
+
+        /// <summary>
+        /// Turns a function declaration into a set of runtime values that is dinamically allocated on a nested enviroment on each
+        /// call.
+        /// </summary>
+        /// <param name="stmt">Any function statement.</param>
+        public object Visit(Stmt.Function stmt)
+        {
+            var function = new LSFunction(stmt);
+            enviroment.Define(stmt.Name.Lexeme, function);
             return null;
         }
 

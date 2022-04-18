@@ -17,6 +17,7 @@ namespace LSharp
             T Visit(Block stmt);
             T Visit(If stmt);
             T Visit(While stmt);
+            T Visit(Function stmt);
         }
 
         public abstract T accept<T>(IVisitor<T> visitor);
@@ -110,6 +111,25 @@ namespace LSharp
             public While(Expression condition, Stmt body)
             {
                 Condition = condition;
+                Body = body;
+            }
+
+            public override T accept<T>(IVisitor<T> visitor)
+            {
+                return visitor.Visit(this);
+            }
+        }
+
+        public class Function : Stmt
+        {
+            public readonly Token Name;
+            public readonly List<Token> Parameters;
+            public readonly List<Stmt> Body;
+
+            public Function(Token name, List<Token> parameters, List<Stmt> body)
+            {
+                Name = name;
+                Parameters = parameters;
                 Body = body;
             }
 
