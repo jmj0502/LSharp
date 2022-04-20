@@ -303,7 +303,7 @@ namespace LSharp.Interpreter
         /// <param name="stmt">Any function statement.</param>
         public object Visit(Stmt.Function stmt)
         {
-            var function = new LSFunction(stmt);
+            var function = new LSFunction(stmt, enviroment);
             enviroment.Define(stmt.Name.Lexeme, function);
             return null;
         }
