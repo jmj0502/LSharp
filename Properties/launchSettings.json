@@ -2,7 +2,7 @@
   "profiles": {
     "LSharp": {
       "commandName": "Project",
-      "commandLineArgs": "closure.ls"
+      "commandLineArgs": "test3.ls"
     }
   }
 }
