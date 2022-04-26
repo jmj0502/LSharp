@@ -41,9 +41,7 @@ namespace LSharp.Enviroment
         /// <param name="name">The name of the value that should be resolved once every step has been taken.</param>
         public object GetAt(int distance, string name)
         {
-            object value;
-            Ancestor(distance).values.TryGetValue(name, out value);
-            return value;
+            return Ancestor(distance).values[name];
         }
 
         /// <summary>
