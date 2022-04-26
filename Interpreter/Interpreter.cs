@@ -21,6 +21,7 @@ namespace LSharp.Interpreter
          * string -> string.
          */
         private Enviroment.Enviroment enviroment = new Enviroment.Enviroment();
+        private readonly Dictionary<Expression, int> locals = new();
         public Enviroment.Enviroment Globals { get => enviroment; }
 
         public Interpreter()
@@ -53,6 +54,17 @@ namespace LSharp.Interpreter
         private void execute(Stmt statement)
         {
             statement.accept(this);
+        }
+
+        /// <summary>
+        /// Stores the resolution information (product of static analysis) in a locals map, so it can be used later
+        /// while defining variables or re-assigning them.
+        /// </summary>
+        /// <param name="expression">Any valid expression.</param>
+        /// <param name="depth">The depth of the scope that contains the expression.</param>
+        public void Resolve(Expression expression, int depth)
+        {
+            locals[expression] = depth;
         }
 
         /// <summary>
@@ -118,7 +130,19 @@ namespace LSharp.Interpreter
         public object Visit(Expression.Assign expression)
         {
             object value = evaluate(expression.Value);
-            enviroment.Assign(expression.Name, value);
+            int? distance = null;
+            if (locals.ContainsKey(expression))
+            {
+                distance = locals[expression];
+            }
+            if (distance != null)
+            {
+                enviroment.AssignAt(distance.Value, expression.Name, value);
+            }
+            else
+            {
+                Globals.Assign(expression.Name, value);
+            }
             return value;
         }
 
@@ -357,7 +381,28 @@ namespace LSharp.Interpreter
         /// <param name="expression">A expression variable.</param>
         public object Visit(Expression.Variable expression)
         {
-            return enviroment.Get(expression.Name);
+            return lookUpVariable(expression.Name, expression);
+        }
+
+        /// <summary>
+        /// Checks if variable is defined in our local scope. If it is, then we proceed to resolve its value from the local
+        /// enviroment. If the variable is not part of our local scope, it means that such variable is global, hence we 
+        /// resolve it dynamically from the global scope.
+        /// </summary>
+        /// <param name="name">Any identifier token.</param>
+        /// <param name="expression">Any valid expression.</param>
+        private object lookUpVariable(Token name, Expression expression)
+        {
+            int? distance = null; 
+            if (locals.ContainsKey(expression)) distance = locals[expression];
+            if (distance != null)
+            {
+                return enviroment.GetAt(distance.Value, name.Lexeme);
+            }
+            else
+            {
+                return Globals.Get(name);
+            }
         }
 
         /// <summary>

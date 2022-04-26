@@ -35,6 +35,43 @@ namespace LSharp.Enviroment
         }
 
         /// <summary>
+        /// Returns the value of a specific enviroment.
+        /// </summary>
+        /// <param name="distance">The number of steps our enviroment will have to take.</param>
+        /// <param name="name">The name of the value that should be resolved once every step has been taken.</param>
+        public object GetAt(int distance, string name)
+        {
+            object value;
+            Ancestor(distance).values.TryGetValue(name, out value);
+            return value;
+        }
+
+        /// <summary>
+        /// Sets the name of a variable at a fixed enviroment.
+        /// </summary>
+        /// <param name="distance">The number of steps to take to reach the target enviroment.</param>
+        /// <param name="name">The identifier token that holds the name of a variable.</param>
+        /// <param name="value">The value that will be asigned to the variable.</param>
+        public void AssignAt(int distance, Token name, object value)
+        {
+            Ancestor(distance).values[name.Lexeme] = value;
+        }
+
+        /// <summary>
+        /// Moves forward an arbitrary number of nested enviroments and then proceeds to return the inner most.
+        /// </summary>
+        /// <param name="distance">An integer that represents the number of "steps" our enviroment will take.</param>
+        public Enviroment Ancestor(int distance)
+        {
+            var enviroment = this;
+            for (int i = 0; i < distance; i++)
+            {
+                enviroment = enviroment.Enclosing;
+            }
+            return enviroment;
+        }
+
+        /// <summary>
         /// Returns a value from the dictionary that works as the program enviroment. If the variable 
         /// doesn't have an assigned value, it retuns null. If the variable is not defined, an runtime error
         /// is raised.

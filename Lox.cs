@@ -68,6 +68,11 @@ namespace LSharp
 
             if (HadErrors) return;
 
+            var resolver = new Resolver(interpreter);
+            resolver.Resolve(statements);
+
+            if (HadErrors) return;
+
             interpreter.Interpret(statements);
         }
 
