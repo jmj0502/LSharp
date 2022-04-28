@@ -26,12 +26,21 @@ namespace LSharp.Interpreter
             FUNCTION
         }
 
+        /// <summary>
+        /// Performs static analysis over a sequence of statements derived from our parser.
+        /// </summary>
+        /// <param name="statements">The list of statements to be resolved.</param>
         public void Resolve(List<Stmt> statements)
         {
             foreach (var statement in statements)
                 resolve(statement);
         }
 
+        /// <summary>
+        /// Performs static analysis on a block of code. It generates an new scope that will hold 
+        /// all the information resolved from its inner statements.
+        /// </summary>
+        /// <param name="stmt">The block statement to be resolved.</param>
         public object Visit(Stmt.Block stmt)
         {
             beginScope();
@@ -40,12 +49,21 @@ namespace LSharp.Interpreter
             return null;
         }
 
+        /// <summary>
+        /// Performs static analysis over a expression statement.
+        /// </summary>
+        /// <param name="stmt">The expression statement to be resolved.</param>
         public object Visit(Stmt.Expr stmt)
         {
             resolve(stmt.Expression);
             return null;
         }
 
+        /// <summary>
+        /// Performs static analysis on a function statement. Declares, defines and ties the resolved function body and parameters
+        /// with the function's name.
+        /// </summary>
+        /// <param name="stmt">The function statement to be resolved.</param>
         public object Visit(Stmt.Function stmt)
         {
             declare(stmt.Name);
@@ -55,6 +73,11 @@ namespace LSharp.Interpreter
             return null;
         }
 
+        /// <summary>
+        /// Performs static analysis on an if statement. In contrast with the logic intended to execute the if statement, 
+        /// this method performs resolution for the if condition and each branch of the statement (then and else).
+        /// </summary>
+        /// <param name="stmt">The if statement to be resolved.</param>
         public object Visit(Stmt.If stmt)
         {
             resolve(stmt.Condition);
@@ -63,12 +86,22 @@ namespace LSharp.Interpreter
             return null;
         }
 
+        /// <summary>
+        /// Performs static analysis on print statements. The resolution process somehow resembles the expresion statements
+        /// resolution.
+        /// </summary>
+        /// <param name="stmt">The print statement to be resolved.</param>
         public object Visit(Stmt.Print stmt)
         {
             resolve(stmt.Expression);
             return null;
         }
 
+        /// <summary>
+        /// Performs static analysis on a return statement. It resolves the value tied to the statement (if it isn't null).
+        /// Throws an error is resolved statement is not inside the body of a function.
+        /// </summary>
+        /// <param name="stmt">The return statement to be resolved.</param>
         public object Visit(Stmt.Return stmt)
         {
             if (currentFunction == FunctionType.NONE)
@@ -82,6 +115,11 @@ namespace LSharp.Interpreter
             return null;
         }
 
+        /// <summary>
+        /// Performs static analysis on var statements. It declares the variable, proceeds to resolve its initalizer value (if any) and 
+        /// the defines it.
+        /// </summary>
+        /// <param name="stmt">The statement variable to be resolved.</param>
         public object Visit(Stmt.Var stmt)
         {
             declare(stmt.Name);
@@ -91,6 +129,11 @@ namespace LSharp.Interpreter
             return null;
         }
 
+        /// <summary>
+        /// Performs static analysis on a while statement. Similar to what happends with if statements, it resolves the main 
+        /// condition of the loop and then proceeds to resolve its body exactly one time.
+        /// </summary>
+        /// <param name="stmt">The while statement to be resolved.</param>
         public object Visit(Stmt.While stmt)
         {
             resolve(stmt.Condition);
@@ -98,6 +141,11 @@ namespace LSharp.Interpreter
             return null;
         }
 
+        /// <summary>
+        /// Resolves a variable expression (adds its information to the enviroment). First verifies if the variable that belongs
+        /// to the scope being assigned to its own initializer; if so it throws an error, else proceeds to resolve it into the scope.
+        /// </summary>
+        /// <param name="expression">The variable expression to be resolved.</param>
         public object Visit(Expression.Variable expression)
         {
             if (scopes.Count > 0 &&
@@ -109,6 +157,11 @@ namespace LSharp.Interpreter
             return null;
         }
 
+        /// <summary>
+        /// Resolves an assignment expression. First resolves the value that will be assigned to the variable and then 
+        /// proceeds to resolve such variable in the local scope.
+        /// </summary>
+        /// <param name="expression">The assignment expression to be resolved.</param>
         public object Visit(Expression.Assign expression)
         {
             resolve(expression.Value);
@@ -116,6 +169,10 @@ namespace LSharp.Interpreter
             return null;
         }
 
+        /// <summary>
+        /// Resolves each component of a binary expression.
+        /// </summary>
+        /// <param name="expression">The binary expression to be resolved.</param>
         public object Visit(Expression.Binary expression)
         {
             resolve(expression.Left);
@@ -123,6 +180,10 @@ namespace LSharp.Interpreter
             return null;
         }
 
+        /// <summary>
+        /// Resolves the callee and each one argument its arguments out of a call expression.
+        /// </summary>
+        /// <param name="expression">The call expression to be resolved</param>
         public object Visit(Expression.Call expression)
         {
             resolve(expression.Callee);
@@ -133,17 +194,30 @@ namespace LSharp.Interpreter
             return null;
         }
 
+        /// <summary>
+        /// Resolves the inner member of a grouping expression.
+        /// </summary>
+        /// <param name="expression">the grouping expression to be resolved.</param>
         public object Visit(Expression.Grouping expression)
         {
             resolve(expression.Expression);
             return null;
         }
 
+        /// <summary>
+        /// Resolves a literal expression. Literall returns null, since there are no variables to be defined in any scope.
+        /// </summary>
+        /// <param name="expression">The literal expression to be resolved.</param>
         public object Visit(Expression.Literal expression)
         {
             return null;
         }
 
+        /// <summary>
+        /// Resolves the members of a logical expression. Since no logic at all is executed, any logical expression is basically
+        /// resolved as if it was a binary expression.
+        /// </summary>
+        /// <param name="expression">The logical expression to be resolved.</param>
         public object Visit(Expression.Logical expression)
         {
             resolve(expression.Left);
@@ -151,22 +225,41 @@ namespace LSharp.Interpreter
             return null;
         }
 
+        /// <summary>
+        /// Resolves the right member of a unary expression.
+        /// </summary>
+        /// <param name="expression">The unary expression to be resolved.</param>
         public object Visit(Expression.Unary expression)
         {
             resolve(expression.Right);
             return null;
         }
 
+        /// <summary>
+        /// Proceeds to call the accept method of the provided statement.
+        /// </summary>
+        /// <param name="statement">Any statement of our stmt tree.</param>
         private void resolve(Stmt statement)
         {
             statement.accept(this);
         }
 
+        /// <summary>
+        /// Proceeds to call the accept method of the provided expression.
+        /// </summary>
+        /// <param name="expression">Any expression of our expression tree.</param>
         private void resolve(Expression expression)
         {
             expression.Accept(this);
         }
 
+        /// <summary>
+        /// Resolves a function parameters and body. It also checks if the function in question 
+        /// is contained on another function; if it is, a return keyword wil be deamed valid 
+        /// once the body of the function is resolved (it will throw an error otherwise). 
+        /// </summary>
+        /// <param name="function">The function statement to be resolved.</param>
+        /// <param name="type">The type of the element that contains the function.</param>
         private void resolveFunction(Stmt.Function function,
             FunctionType type)
         {
@@ -183,16 +276,26 @@ namespace LSharp.Interpreter
             currentFunction = enclosingFunction;
         }
 
+        /// <summary>
+        /// Adds a new element on top of the scopes stack.
+        /// </summary>
         private void beginScope()
         {
             scopes.Push(new Dictionary<string, bool>());
         }
 
+        /// <summary>
+        /// Removes the top element from the scopes stack.
+        /// </summary>
         private void endScope()
         {
             scopes.Pop();
         }
 
+        /// <summary>
+        /// Initializes a variable on the map at the top level of the stack.
+        /// </summary>
+        /// <param name="name">The token that contains the identifier associated with a specific varible.</param>
         private void declare(Token name)
         {
             if (scopes.Count == 0) return;
@@ -206,12 +309,21 @@ namespace LSharp.Interpreter
             scope[name.Lexeme] = false;
         }
 
+        /// <summary>
+        /// Defines a variable on the top level of the stack by setting its initialization value to true.
+        /// </summary>
+        /// <param name="name">The token the represents the variable to be defined.</param>
         private void define(Token name)
         {
             if (scopes.Count == 0) return;
             scopes.Peek()[name.Lexeme] = true;
         }
 
+        /// <summary>
+        /// Goes through each element of the stack, in order to provide resolution information to the interpreter.
+        /// </summary>
+        /// <param name="expression">The expression that represents the value to be resolved into the interpreter.</param>
+        /// <param name="name">The tokens that carries the information of the variable to be resolved.</param>
         private void resolveLocal(Expression expression, Token name)
         {
             var orderedStack = scopes.ToArray().Reverse().ToList();
