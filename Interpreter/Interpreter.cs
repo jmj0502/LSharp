@@ -393,7 +393,10 @@ namespace LSharp.Interpreter
         /// <param name="expression">Any valid expression.</param>
         private object lookUpVariable(Token name, Expression expression)
         {
-            int? distance = null; 
+            int? distance = null;
+            int value;
+            var result = locals.TryGetValue(expression, out value);
+            if (result) distance = value;
             if (locals.ContainsKey(expression)) distance = locals[expression];
             if (distance != null)
             {
