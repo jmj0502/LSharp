@@ -101,6 +101,14 @@ namespace LSharp.Interpreter
             return null;
         }
 
+        public object Visit(Stmt.Class stmt)
+        {
+            enviroment.Define(stmt.Name.Lexeme, null);
+            var loxClass = new LSClass(stmt.Name.Lexeme);
+            enviroment.Assign(stmt.Name, loxClass);
+            return null;
+        }
+
 
         /// <summary>
         /// Turns C# values into loz values to print them.

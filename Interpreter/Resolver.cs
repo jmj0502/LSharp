@@ -49,6 +49,13 @@ namespace LSharp.Interpreter
             return null;
         }
 
+        public object Visit(Stmt.Class stmt)
+        {
+            declare(stmt.Name);
+            define(stmt.Name);
+            return null;
+        }
+
         /// <summary>
         /// Performs static analysis over a expression statement.
         /// </summary>

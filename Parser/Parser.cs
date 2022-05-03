@@ -24,7 +24,8 @@ namespace LSharp.Parser
         * expressed in Crafting Interpreter And Compilers. Those are:
         * program -> declaration* EOF; //Added on chapter 8.
         * declaration -> funDecl | varDecl | statement; //Added on chapter 8.
-        * statement -> exprStmt | forStmt | ifStmt | printStmt | returnStmt | whileStmt | block; //Added on chapter 8.
+        * statement -> classDecl | exprStmt | forStmt | ifStmt | printStmt | returnStmt | whileStmt | block; //Added on chapter 8.
+        * classDecl -> "class" IDENTIFIER "{" function* "}";
         * returnStmt -> "return" expression? ";" ;
         * forStmt -> "for" "(" (varDecl | exprStmt | ";" ) expression? ";" expression? ")" statement; //Added on chapter 9. 
         * whileStmt -> "while" "(" expression ")" statement; // Added on chapter 9.
@@ -259,6 +260,7 @@ namespace LSharp.Parser
         {
             try
             {
+                if (match(TokenType.CLASS)) return classDeclaration();
                 if (match(TokenType.FUN)) return function("function");
                 if (match(TokenType.VAR)) return varDeclaration();
                 return statement();
@@ -270,7 +272,19 @@ namespace LSharp.Parser
             }
         }
 
+        private Stmt classDeclaration()
+        {
+            var name = consume(TokenType.IDENTIFIER, "Expect class name before body.");
+            consume(TokenType.LEFT_BRACE, "Expect '{' before class body.");
+            var methods = new List<Stmt.Function>();
+            while (!check(TokenType.RIGHT_BRACE) && !isAtEnd())
+            {
+                methods.Add((Stmt.Function)function("method"));
+            }
 
+            consume(TokenType.RIGHT_BRACE, "Expect '}' after class body.");
+            return new Stmt.Class(name, methods);
+        }
 
         /// <summary>
         /// Executes the statement rules.

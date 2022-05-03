@@ -15,6 +15,7 @@ namespace LSharp
             T Visit(Print stmt);
             T Visit(Var stmt);
             T Visit(Block stmt);
+            T Visit(Class stmt);
             T Visit(If stmt);
             T Visit(While stmt);
             T Visit(Function stmt);
@@ -77,6 +78,23 @@ namespace LSharp
             public Block(List<Stmt> statements)
             {
                 Statements = statements;
+            }
+
+            public override T accept<T>(IVisitor<T> visitor)
+            {
+                return visitor.Visit(this);
+            }
+        }
+
+        public class Class : Stmt
+        {
+            public readonly Token Name;
+            public readonly List<Function> Methods;
+
+            public Class(Token name, List<Function> methods)
+            {
+                Name = name;
+                Methods = methods;
             }
 
             public override T accept<T>(IVisitor<T> visitor)
