@@ -201,6 +201,12 @@ namespace LSharp.Interpreter
             return null;
         }
 
+        public object Visit(Expression.Get expression)
+        {
+            resolve(expression.Object);
+            return null;
+        }
+
         /// <summary>
         /// Resolves the inner member of a grouping expression.
         /// </summary>
@@ -229,6 +235,13 @@ namespace LSharp.Interpreter
         {
             resolve(expression.Left);
             resolve(expression.Right);
+            return null;
+        }
+
+        public object Visit(Expression.Set expression)
+        {
+            resolve(expression.Value);
+            resolve(expression.Object);
             return null;
         }
 

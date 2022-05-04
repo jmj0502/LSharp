@@ -226,6 +226,18 @@ namespace LSharp.Interpreter
             return function.Call(this, arguments);
         }
 
+        public object Visit(Expression.Get expression)
+        {
+            object obj = evaluate(expression.Object);
+            if (obj is LSInstance)
+            {
+                return ((LSInstance)obj).Get(expression.Name);
+            }
+
+            throw new RuntimeError(expression.Name, 
+                "Only instances have properties.");
+        }
+
         /// <summary>
         /// Verifies if the operands to a binary expression are valid numbers.
         /// </summary>
@@ -453,6 +465,20 @@ namespace LSharp.Interpreter
             }
 
             return evaluate(expression.Right);
+        }
+
+        public object Visit(Expression.Set expression)
+        {
+            object obj = evaluate(expression.Object);
+            if (!(obj is LSInstance))
+            {
+                throw new RuntimeError(expression.Name, 
+                    "Only instances have fields.");
+            }
+
+            object value = evaluate(expression.Value);
+            ((LSInstance)obj).Set(expression.Name, value);
+            return value;
         }
 
         /// <summary>

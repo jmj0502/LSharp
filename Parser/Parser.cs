@@ -38,7 +38,7 @@ namespace LSharp.Parser
         * exprStmt -> expression ";"; //Added on chapter 8.
         * printStmt -> "print" expression ";"; //Added on chapter 8.
         * expression -> assignment; //Added on chapter 8.
-        * assignment -> IDENTIFIER "=" assignment | equality; //Added on chapter 8.
+        * assignment -> (call ".")? IDENTIFIER "=" assignment | logical_or; //Added on chapter 8.
         * logical_or -> logical_and ("or" logical_and)*; //Added on chapter 9.
         * logical_and -> equality ("and" equality)*; //Added on chapter 9.
         * equality -> comparison (("!=" | "==") comparison)*;
@@ -46,7 +46,7 @@ namespace LSharp.Parser
         * term -> factor (("-"|"+") factor )*;
         * factor -> unary (("/"|"*") unary)*;
         * unary -> ("!","-") unary | call;
-        * call -> primary ( "(" arguments? ")" )*;
+        * call -> primary ( "(" arguments? ")" | "." IDENTIFIER )*;
         * arguments -> expression ("," expression )*;
         * primary -> NUMBER | STRING | "true" | "false" | "nil" | "(" expression ")" | "IDENTIFIER";
         * This sintax will allow us to represent our productions in code as follows:
@@ -200,6 +200,11 @@ namespace LSharp.Parser
                 {
                     var name = ((Expression.Variable)expression).Name;
                     return new Expression.Assign(name, value);
+                }
+                else if (expression is Expression.Get)
+                {
+                    var get = (Expression.Get) expression;
+                    return new Expression.Set(get.Object, get.Name, value);
                 }
 
                 error(equals, "Invalid assignment target.");
@@ -494,6 +499,12 @@ namespace LSharp.Parser
                 if (match(TokenType.LEFT_PAREN))
                 {
                     expression = finishCall(expression);
+                }
+                else if (match(TokenType.DOT))
+                {
+                    var name = consume(TokenType.IDENTIFIER,
+                        "Expect property name after '.'.");
+                    expression = new Expression.Get(expression, name);
                 }
                 else
                 {

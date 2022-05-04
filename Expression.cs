@@ -19,6 +19,8 @@ namespace LSharp
             T Visit(Variable expression);
             T Visit(Logical expression);
             T Visit(Call expression);
+            T Visit(Get expression);
+            T Visit(Set expression);
         }
 
         public abstract T Accept<T>(IVisitor<T> visitor);
@@ -160,6 +162,42 @@ namespace LSharp
                 Callee = callee;
                 Paren = paren;
                 Arguments = arguments;
+            }
+
+            public override T Accept<T>(IVisitor<T> visitor)
+            {
+                return visitor.Visit(this);
+            }
+        }
+
+        public class Get : Expression
+        {
+            public readonly Expression Object;
+            public readonly Token Name;
+
+            public Get(Expression obj, Token name)
+            {
+                Object = obj;
+                Name = name;
+            }
+
+            public override T Accept<T>(IVisitor<T> visitor)
+            {
+                return visitor.Visit(this);
+            }
+        }
+
+        public class Set : Expression
+        {
+            public readonly Expression Object;
+            public readonly Token Name;
+            public readonly Expression Value;
+
+            public Set(Expression obj, Token name, Expression value)
+            {
+                Object = obj;
+                Name = name;
+                Value = value;
             }
 
             public override T Accept<T>(IVisitor<T> visitor)
