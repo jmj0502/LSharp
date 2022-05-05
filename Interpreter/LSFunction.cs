@@ -10,11 +10,22 @@ namespace LSharp.Interpreter
     {
         private readonly Stmt.Function declaration;
         private readonly Enviroment.Enviroment closure;
+        private readonly bool isInitializer;
 
-        public LSFunction(Stmt.Function declaration, Enviroment.Enviroment closure)
+        public LSFunction(Stmt.Function declaration, Enviroment.Enviroment closure, 
+            bool isInitializer)
         {
             this.declaration = declaration;
             this.closure = closure;
+            this.isInitializer = isInitializer;
+        }
+
+        public LSFunction Bind(LSInstance instance)
+        {
+            var enviroment = new Enviroment.Enviroment(closure);
+            enviroment.Define("this", instance);
+            return new LSFunction(declaration, enviroment, 
+                isInitializer);
         }
 
         public int Arity()
@@ -36,8 +47,12 @@ namespace LSharp.Interpreter
             }
             catch (Return returnValue)
             {
+                if (isInitializer) return closure.GetAt(0, "this");
+
                 return returnValue.Value;
             }
+
+            if (isInitializer) return closure.GetAt(0, "this");
             return null;
         }
 

@@ -21,6 +21,7 @@ namespace LSharp
             T Visit(Call expression);
             T Visit(Get expression);
             T Visit(Set expression);
+            T Visit(This expression);
         }
 
         public abstract T Accept<T>(IVisitor<T> visitor);
@@ -198,6 +199,21 @@ namespace LSharp
                 Object = obj;
                 Name = name;
                 Value = value;
+            }
+
+            public override T Accept<T>(IVisitor<T> visitor)
+            {
+                return visitor.Visit(this);
+            }
+        }
+
+        public class This : Expression
+        {
+            public readonly Token Keyword;
+
+            public This(Token keyword)
+            {
+                Keyword = keyword;
             }
 
             public override T Accept<T>(IVisitor<T> visitor)

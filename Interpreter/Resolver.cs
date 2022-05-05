@@ -24,8 +24,17 @@ namespace LSharp.Interpreter
         {
             NONE,
             FUNCTION,
+            INITIALIZER,
             METHOD
         }
+
+        private enum ClassType
+        {
+            NONE,
+            CLASS
+        }
+
+        private ClassType currentClass = ClassType.NONE;
 
         /// <summary>
         /// Performs static analysis over a sequence of statements derived from our parser.
@@ -52,15 +61,28 @@ namespace LSharp.Interpreter
 
         public object Visit(Stmt.Class stmt)
         {
+            var enclosingClass = currentClass;
+            currentClass = ClassType.CLASS;
+
             declare(stmt.Name);
             define(stmt.Name);
+
+            beginScope();
+            scopes.Peek()["this"] = true;
 
             foreach (var method in stmt.Methods)
             {
                 var declaration = FunctionType.METHOD;
+                if (method.Name.Lexeme.Equals("init"))
+                {
+                    declaration = FunctionType.INITIALIZER;
+                }
                 resolveFunction(method, declaration);
             }
 
+            endScope();
+
+            currentClass = enclosingClass;
             return null;
         }
 
@@ -126,7 +148,14 @@ namespace LSharp.Interpreter
             }
 
             if (stmt.Value != null)
+            {
+                if (currentFunction == FunctionType.INITIALIZER)
+                {
+                    Lox.Error(stmt.Keyword, 
+                        "Can't return a value from an initializer.");
+                }
                 resolve(stmt.Value);
+            }
             return null;
         }
 
@@ -250,6 +279,19 @@ namespace LSharp.Interpreter
         {
             resolve(expression.Value);
             resolve(expression.Object);
+            return null;
+        }
+
+        public object Visit(Expression.This expression)
+        {
+            if (currentClass == ClassType.NONE)
+            {
+                Lox.Error(expression.Keyword, 
+                    "Can't use 'this' outside a class.");
+                return null;
+            }
+
+            resolveLocal(expression, expression.Keyword);
             return null;
         }
 

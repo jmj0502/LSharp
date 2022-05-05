@@ -107,7 +107,8 @@ namespace LSharp.Interpreter
             var methods = new Dictionary<string, LSFunction>();
             foreach (Stmt.Function method in stmt.Methods)
             {
-                var function = new LSFunction(method, enviroment);
+                var function = new LSFunction(method, enviroment,
+                    method.Name.Lexeme.Equals("init"));
                 methods.Add(method.Name.Lexeme, function);
             }
             var loxClass = new LSClass(stmt.Name.Lexeme, methods);
@@ -353,7 +354,7 @@ namespace LSharp.Interpreter
         /// <param name="stmt">Any function statement.</param>
         public object Visit(Stmt.Function stmt)
         {
-            var function = new LSFunction(stmt, enviroment);
+            var function = new LSFunction(stmt, enviroment, false);
             enviroment.Define(stmt.Name.Lexeme, function);
             return null;
         }
@@ -485,6 +486,11 @@ namespace LSharp.Interpreter
             object value = evaluate(expression.Value);
             ((LSInstance)obj).Set(expression.Name, value);
             return value;
+        }
+
+        public object Visit(Expression.This expression)
+        {
+            return lookUpVariable(expression.Keyword, expression);
         }
 
         /// <summary>

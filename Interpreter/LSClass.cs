@@ -17,7 +17,7 @@ namespace LSharp.Interpreter
             this.methods = methods;
         }
 
-        public object FindMethod(string name)
+        public LSFunction FindMethod(string name)
         {
             if (methods.ContainsKey(name))
             {
@@ -31,12 +31,19 @@ namespace LSharp.Interpreter
             List<object> arguments)
         {
             var instance = new LSInstance(this);
+            var initializer = FindMethod("init");
+            if (initializer != null)
+            {
+                initializer.Bind(instance).Call(interpreter, arguments);
+            }
             return instance;
         }
 
         public int Arity()
         {
-            return 0;
+            var initializer = FindMethod("init");
+            if (initializer == null) return 0;
+            return initializer.Arity();
         }
 
         public override string ToString()

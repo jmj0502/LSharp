@@ -531,6 +531,8 @@ namespace LSharp.Parser
                 return new Expression.Literal(value.Literal);
             }
 
+            if (match(TokenType.THIS)) return new Expression.This(previous());
+
             if (match(TokenType.IDENTIFIER))
             {
                 return new Expression.Variable(previous());
