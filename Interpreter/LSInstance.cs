@@ -24,6 +24,9 @@ namespace LSharp.Interpreter
                 return fields[name.Lexeme];
             }
 
+            var method = lsClass.FindMethod(name.Lexeme);
+            if (method != null) return method;
+
             throw new RuntimeError(name, 
                 $"Undefined property '{name.Lexeme}'.");
         }

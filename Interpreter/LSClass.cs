@@ -9,10 +9,22 @@ namespace LSharp.Interpreter
     public class LSClass : ICallable
     {
         public readonly string Name;
+        public readonly Dictionary<string, LSFunction> methods = new();
 
-        public LSClass(string name)
+        public LSClass(string name, Dictionary<string, LSFunction> methods)
         {
             Name = name;
+            this.methods = methods;
+        }
+
+        public object FindMethod(string name)
+        {
+            if (methods.ContainsKey(name))
+            {
+                return methods[name];
+            }
+
+            return null;
         }
 
         public object Call(Interpreter interpreter,

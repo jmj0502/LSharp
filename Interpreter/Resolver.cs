@@ -23,7 +23,8 @@ namespace LSharp.Interpreter
         private enum FunctionType
         {
             NONE,
-            FUNCTION
+            FUNCTION,
+            METHOD
         }
 
         /// <summary>
@@ -53,6 +54,13 @@ namespace LSharp.Interpreter
         {
             declare(stmt.Name);
             define(stmt.Name);
+
+            foreach (var method in stmt.Methods)
+            {
+                var declaration = FunctionType.METHOD;
+                resolveFunction(method, declaration);
+            }
+
             return null;
         }
 

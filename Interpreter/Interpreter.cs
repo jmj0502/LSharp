@@ -104,7 +104,13 @@ namespace LSharp.Interpreter
         public object Visit(Stmt.Class stmt)
         {
             enviroment.Define(stmt.Name.Lexeme, null);
-            var loxClass = new LSClass(stmt.Name.Lexeme);
+            var methods = new Dictionary<string, LSFunction>();
+            foreach (Stmt.Function method in stmt.Methods)
+            {
+                var function = new LSFunction(method, enviroment);
+                methods.Add(method.Name.Lexeme, function);
+            }
+            var loxClass = new LSClass(stmt.Name.Lexeme, methods);
             enviroment.Assign(stmt.Name, loxClass);
             return null;
         }
