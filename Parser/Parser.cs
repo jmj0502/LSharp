@@ -277,6 +277,10 @@ namespace LSharp.Parser
             }
         }
 
+        /// <summary>
+        /// Performs the parsing of a class statement. To do so, it checks the structure of the class and
+        /// the methods that compose it.
+        /// </summary>
         private Stmt classDeclaration()
         {
             var name = consume(TokenType.IDENTIFIER, "Expect class name before body.");

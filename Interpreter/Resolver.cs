@@ -59,6 +59,13 @@ namespace LSharp.Interpreter
             return null;
         }
 
+        /// <summary>
+        /// Performs static analysis on a class statement. To do so, we first store the current class scope (so we can re-establish it
+        /// once we're done parsing this class), then we proceed to declare and define the name of the class and create a new scope
+        /// that will contain the definition of the 'this' keyword that belongs to this specific class; once that's done, it proceeds to
+        /// resolve each method of the class (including its constructor)  and then resolves back to the outer scope.
+        /// </summary>
+        /// <param name="stmt">The class stmt to be resolved.</param>
         public object Visit(Stmt.Class stmt)
         {
             var enclosingClass = currentClass;

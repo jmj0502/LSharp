@@ -101,6 +101,13 @@ namespace LSharp.Interpreter
             return null;
         }
 
+        /// <summary>
+        /// Turns a Stmt.Class node into a runtime representation. It proceeds to define the name of the class on the current enviroment
+        /// and then proceeds to turns its respective methods into runtime representations too (taking advantage of the existing 
+        /// function representation), in order to gather the information of the class into a LSClass instance and then assign it to
+        /// the class name.
+        /// </summary>
+        /// <param name="stmt">Any Stmt.Class node.</param>
         public object Visit(Stmt.Class stmt)
         {
             enviroment.Define(stmt.Name.Lexeme, null);
