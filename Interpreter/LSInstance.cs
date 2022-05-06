@@ -22,7 +22,7 @@ namespace LSharp.Interpreter
         /// If the field is resolved as property, then its value is returned; otherwise it proceeds to check 
         /// if there's a method in the class with the given identifier, if so, proceeds to bind the method to the instance
         /// and return it, otherwise a runtime error is thrown, since Lox doesn't allow call on non-existing members.
-        /// NOTE: based on this configuration, fields foreshadow methods.
+        /// NOTE: based on this configuration, fields shadow methods.
         /// </summary>
         /// <param name="name">The token that holds the name of the property/method to be resolved.</param>
         public object Get(Token name)
