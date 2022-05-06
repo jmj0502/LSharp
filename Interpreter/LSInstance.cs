@@ -17,6 +17,14 @@ namespace LSharp.Interpreter
             this.lsClass = lsClass;
         }
 
+        /// <summary>
+        /// Performs a look up on the instance fields based on the identifier called on a get expression. 
+        /// If the field is resolved as property, then its value is returned; otherwise it proceeds to check 
+        /// if there's a method in the class with the given identifier, if so, proceeds to bind the method to the instance
+        /// and return it, otherwise a runtime error is thrown, since Lox doesn't allow call on non-existing members.
+        /// NOTE: based on this configuration, fields foreshadow methods.
+        /// </summary>
+        /// <param name="name">The token that holds the name of the property/method to be resolved.</param>
         public object Get(Token name)
         {
             if (fields.ContainsKey(name.Lexeme))
@@ -31,6 +39,11 @@ namespace LSharp.Interpreter
                 $"Undefined property '{name.Lexeme}'.");
         }
 
+        /// <summary>
+        /// Creates a new property on the instance (in case the property didn't exist) or updates an existing one.
+        /// </summary>
+        /// <param name="name">The token that holds the name of the property to be created/updated.</param>
+        /// <param name="value">The value that such property will hold.</param>
         public void Set(Token name, object value)
         {
             fields[name.Lexeme] = value;

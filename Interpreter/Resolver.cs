@@ -245,6 +245,10 @@ namespace LSharp.Interpreter
             return null;
         }
 
+        /// <summary>
+        /// Resolves the value of the provided get expression.
+        /// </summary>
+        /// <param name="expression">The Get expression to be resolved.</param>
         public object Visit(Expression.Get expression)
         {
             resolve(expression.Object);
@@ -282,6 +286,11 @@ namespace LSharp.Interpreter
             return null;
         }
 
+        /// <summary>
+        /// Performs static analysis on Set expression. In order to do so, the value of that will be assigned to the expression and the
+        /// value of the expression itself are resolved.
+        /// </summary>
+        /// <param name="expression">Any valid set expression.</param>
         public object Visit(Expression.Set expression)
         {
             resolve(expression.Value);

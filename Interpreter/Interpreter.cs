@@ -240,6 +240,12 @@ namespace LSharp.Interpreter
             return function.Call(this, arguments);
         }
 
+        /// <summary>
+        /// Turns a get expression (dot call EJ: test.test) into a runtime representation. It checks to determine if the object
+        /// that's been called is an actual instance, if so, it proceeds to resolve the field from its respective list of fields;
+        /// it raises a runtime error otherwise.
+        /// </summary>
+        /// <param name="expression">Any valid Get expression.</param>
         public object Visit(Expression.Get expression)
         {
             object obj = evaluate(expression.Object);
@@ -481,6 +487,12 @@ namespace LSharp.Interpreter
             return evaluate(expression.Right);
         }
 
+        /// <summary>
+        /// Turns an set expression into a runtime representation. Performs a check similar to the one performed on get expressions,
+        /// in order to determine if the object attached to the expression is an instance of a class. If so, it resolves the value
+        /// that will be assigned to such instance and adds/updates it on the fields map of said instance.
+        /// </summary>
+        /// <param name="expression">Any valid set expression.</param>
         public object Visit(Expression.Set expression)
         {
             object obj = evaluate(expression.Object);
