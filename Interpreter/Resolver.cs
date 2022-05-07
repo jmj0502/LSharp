@@ -298,6 +298,11 @@ namespace LSharp.Interpreter
             return null;
         }
 
+        /// <summary>
+        /// Performs static analysis on a this expression. Verifies if the this 'expression' is being used on the right enviroment
+        /// (inside a class) and then proceeds to resolve it as any other variable.
+        /// </summary>
+        /// <param name="expression">The This expression to be resolved.</param>
         public object Visit(Expression.This expression)
         {
             if (currentClass == ClassType.NONE)
