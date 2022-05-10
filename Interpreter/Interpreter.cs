@@ -110,7 +110,18 @@ namespace LSharp.Interpreter
         /// <param name="stmt">Any Stmt.Class node.</param>
         public object Visit(Stmt.Class stmt)
         {
+            object superclass = null;
+            if (stmt.Superclass != null) 
+            {
+                superclass = evaluate(stmt.Superclass);
+                if (!(superclass is LSClass))
+                {
+                    throw new RuntimeError(stmt.Superclass.Name, 
+                        "Superclass must be a class.");
+                }
+            }
             enviroment.Define(stmt.Name.Lexeme, null);
+
             var methods = new Dictionary<string, LSFunction>();
             foreach (Stmt.Function method in stmt.Methods)
             {
@@ -118,7 +129,10 @@ namespace LSharp.Interpreter
                     method.Name.Lexeme.Equals("init"));
                 methods.Add(method.Name.Lexeme, function);
             }
-            var loxClass = new LSClass(stmt.Name.Lexeme, methods);
+
+            var loxClass = new LSClass(stmt.Name.Lexeme, 
+                methods, (LSClass)superclass);
+
             enviroment.Assign(stmt.Name, loxClass);
             return null;
         }

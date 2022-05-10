@@ -74,6 +74,18 @@ namespace LSharp.Interpreter
             declare(stmt.Name);
             define(stmt.Name);
 
+            if (stmt.Superclass != null
+                && stmt.Name.Lexeme.Equals(stmt.Superclass.Name.Lexeme))
+            {
+                Lox.Error(stmt.Superclass.Name, 
+                    "A class can inherit from itself.");
+            }
+
+            if (stmt.Superclass != null)
+            {
+                resolve(stmt.Superclass);
+            }
+
             beginScope();
             scopes.Peek()["this"] = true;
 

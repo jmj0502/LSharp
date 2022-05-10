@@ -25,7 +25,7 @@ namespace LSharp.Parser
         * program -> declaration* EOF; //Added on chapter 8.
         * declaration -> funDecl | varDecl | statement; //Added on chapter 8.
         * statement -> classDecl | exprStmt | forStmt | ifStmt | printStmt | returnStmt | whileStmt | block; //Added on chapter 8.
-        * classDecl -> "class" IDENTIFIER "{" function* "}";
+        * classDecl -> "class" IDENTIFIER ("<" IDENTIFIER)? "{" function* "}";
         * returnStmt -> "return" expression? ";" ;
         * forStmt -> "for" "(" (varDecl | exprStmt | ";" ) expression? ";" expression? ")" statement; //Added on chapter 9. 
         * whileStmt -> "while" "(" expression ")" statement; // Added on chapter 9.
@@ -284,6 +284,12 @@ namespace LSharp.Parser
         private Stmt classDeclaration()
         {
             var name = consume(TokenType.IDENTIFIER, "Expect class name before body.");
+            Expression.Variable superclass = null;
+            if (match(TokenType.LESS))
+            {
+                consume(TokenType.IDENTIFIER, "Expect superclass name.");
+                superclass = new Expression.Variable(previous());
+            }
             consume(TokenType.LEFT_BRACE, "Expect '{' before class body.");
             var methods = new List<Stmt.Function>();
             while (!check(TokenType.RIGHT_BRACE) && !isAtEnd())
@@ -292,7 +298,7 @@ namespace LSharp.Parser
             }
 
             consume(TokenType.RIGHT_BRACE, "Expect '}' after class body.");
-            return new Stmt.Class(name, methods);
+            return new Stmt.Class(name, methods, superclass);
         }
 
         /// <summary>

@@ -89,12 +89,14 @@ namespace LSharp
         public class Class : Stmt
         {
             public readonly Token Name;
+            public readonly Expression.Variable Superclass;
             public readonly List<Function> Methods;
 
-            public Class(Token name, List<Function> methods)
+            public Class(Token name, List<Function> methods, Expression.Variable superclass)
             {
                 Name = name;
                 Methods = methods;
+                Superclass = superclass;
             }
 
             public override T accept<T>(IVisitor<T> visitor)

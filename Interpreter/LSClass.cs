@@ -9,12 +9,14 @@ namespace LSharp.Interpreter
     public class LSClass : ICallable
     {
         public readonly string Name;
+        public readonly LSClass Superclass;
         public readonly Dictionary<string, LSFunction> methods = new();
 
-        public LSClass(string name, Dictionary<string, LSFunction> methods)
+        public LSClass(string name, Dictionary<string, LSFunction> methods, LSClass superclass)
         {
             Name = name;
             this.methods = methods;
+            Superclass = superclass;
         }
 
         /// <summary>
@@ -26,6 +28,11 @@ namespace LSharp.Interpreter
             if (methods.ContainsKey(name))
             {
                 return methods[name];
+            }
+
+            if (Superclass != null)
+            {
+                return Superclass.FindMethod(name);
             }
 
             return null;
