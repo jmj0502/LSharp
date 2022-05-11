@@ -48,7 +48,8 @@ namespace LSharp.Parser
         * unary -> ("!","-") unary | call;
         * call -> primary ( "(" arguments? ")" | "." IDENTIFIER )*;
         * arguments -> expression ("," expression )*;
-        * primary -> NUMBER | STRING | "true" | "false" | "nil" | "(" expression ")" | "IDENTIFIER";
+        * primary -> NUMBER | STRING | "true" | "false" | "nil" | "(" expression ")" | "IDENTIFIER"
+        * | "super" "." IDENTIFIER;
         * This sintax will allow us to represent our productions in code as follows:
         * Terminal -> Code to match and consume a token.
         * Non-Terminal -> Call to that rule's function.
@@ -539,6 +540,15 @@ namespace LSharp.Parser
             {
                 var value = previous();
                 return new Expression.Literal(value.Literal);
+            }
+
+            if (match(TokenType.SUPER))
+            {
+                var keyword = previous();
+                consume(TokenType.DOT, "Expect '.' after super.");
+                var method = consume(TokenType.IDENTIFIER, 
+                    "Expect superclass method name.");
+                return new Expression.Super(keyword, method);
             }
 
             if (match(TokenType.THIS)) return new Expression.This(previous());

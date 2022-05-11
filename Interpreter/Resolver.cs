@@ -31,7 +31,8 @@ namespace LSharp.Interpreter
         private enum ClassType
         {
             NONE,
-            CLASS
+            CLASS,
+            SUBCLASS
         }
 
         private ClassType currentClass = ClassType.NONE;
@@ -83,7 +84,14 @@ namespace LSharp.Interpreter
 
             if (stmt.Superclass != null)
             {
+                currentClass = ClassType.SUBCLASS;
                 resolve(stmt.Superclass);
+            }
+
+            if (stmt.Superclass != null)
+            {
+                beginScope();
+                scopes.Peek()["super"] = true;
             }
 
             beginScope();
@@ -100,6 +108,8 @@ namespace LSharp.Interpreter
             }
 
             endScope();
+
+            if (stmt.Superclass != null) endScope();
 
             currentClass = enclosingClass;
             return null;
@@ -307,6 +317,28 @@ namespace LSharp.Interpreter
         {
             resolve(expression.Value);
             resolve(expression.Object);
+            return null;
+        }
+
+        /// <summary>
+        /// Performs static analysis on a Super expression. To do so, it first checks if the Super call was performed in a 
+        /// valid context in reference to the gramar, if so everything is resolved correctly; a runtime error is raised otherwise.
+        /// </summary>
+        /// <param name="expression">The super expression to resolve.</param>
+        public object Visit(Expression.Super expression)
+        {
+            if (currentClass == ClassType.NONE)
+            {
+                Lox.Error(expression.Keyword, 
+                    "Can't use 'super' outside a class.");
+            }
+
+            if (currentClass != ClassType.SUBCLASS)
+            {
+                Lox.Error(expression.Keyword,
+                    "Can't use 'super' in a class with no superclass.");
+            }
+            resolveLocal(expression, expression.Keyword);
             return null;
         }
 

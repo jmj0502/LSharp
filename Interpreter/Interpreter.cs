@@ -122,6 +122,12 @@ namespace LSharp.Interpreter
             }
             enviroment.Define(stmt.Name.Lexeme, null);
 
+            if (stmt.Superclass != null)
+            {
+                enviroment = new Enviroment.Enviroment(enviroment);
+                enviroment.Define("super", superclass);
+            }
+
             var methods = new Dictionary<string, LSFunction>();
             foreach (Stmt.Function method in stmt.Methods)
             {
@@ -132,6 +138,11 @@ namespace LSharp.Interpreter
 
             var loxClass = new LSClass(stmt.Name.Lexeme, 
                 methods, (LSClass)superclass);
+
+            if (stmt.Superclass != null)
+            {
+                enviroment = enviroment.Enclosing;
+            }
 
             enviroment.Assign(stmt.Name, loxClass);
             return null;
@@ -521,6 +532,30 @@ namespace LSharp.Interpreter
             return value;
         }
 
+        /// <summary>
+        /// Turns a super expression into a runtime representation. To do so checks if the expression is contained
+        /// in the local enviroment, if so proceeds to get its value in order to bind it to the instance of its respective
+        /// subclass and resolve methods called on the highest element of the class hierarchy.
+        /// </summary>
+        /// <param name="expression">The super expression to be resolved.</param>
+        public object Visit(Expression.Super expression)
+        {
+            var distance = locals[expression];
+            var superclass = (LSClass)enviroment.GetAt(distance, "super");
+            var instance = (LSInstance)enviroment.GetAt(distance - 1, "this");
+            var method = superclass.FindMethod(expression.Method.Lexeme);
+            if (method == null)
+            {
+                throw new RuntimeError(expression.Method, 
+                    $"Undefined property '{expression.Method.Lexeme}'.");
+            }
+            return method.Bind(instance);
+        }
+
+        /// <summary>
+        /// Turns a this expression into a runtime representation. 
+        /// </summary>
+        /// <param name="expression">Any this expression.</param>
         public object Visit(Expression.This expression)
         {
             return lookUpVariable(expression.Keyword, expression);
