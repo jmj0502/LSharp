@@ -91,6 +91,10 @@ namespace LSharp.Scanner
                         //so, we call advance once we've reached the end of the line.
                         while (peak() != '\n' && !isAtEnd()) advance();
                     }
+                    else if (match('*'))
+                    {
+                        multilineComment();
+                    }
                     else
                     {
                         //if there's no second character behing the /, that means division is being applyed, so 
@@ -216,6 +220,28 @@ namespace LSharp.Scanner
 
             var value = source.Substring(start + 1, current - start - 2);
             addToken(TokenType.STRING, value);
+        }
+
+        /// <summary>
+        /// Walks over a multiline comment, it increments the line number each time a new line break is found and ignores
+        /// every sequence of characters contained in the comment. The common execution of the scanner takes place
+        /// once the '*/' characters are found. If a multiline comment doesn't have it's corresponding closing characters
+        /// an error is thrown.
+        /// </summary>
+        private void multilineComment()
+        {
+            while (!isAtEnd())
+            {
+                if (peak() == '\n') line++;
+                if (match('*') && peak() == '/')
+                {
+                    advance();
+                    return;
+                }
+                advance();
+            }
+
+            Lox.Error(line, "Expect '*/' to close multiline comment.");
         }
 
         /// <summary>
