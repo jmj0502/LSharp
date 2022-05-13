@@ -491,6 +491,11 @@ namespace LSharp.Interpreter
             return null;
         }
 
+        /// <summary>
+        /// Turns a ternary expression into a runtime representation. This is one of the cases where the underline implementation
+        /// mirrors the semantics of the language.
+        /// </summary>
+        /// <param name="expression">The ternary expression to evaluate.</param>
         public object Visit(Expression.Ternary expression)
         {
             return isTruty(evaluate(expression.Condition)) ? evaluate(expression.Left) : evaluate(expression.Right); 
