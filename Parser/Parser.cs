@@ -217,7 +217,7 @@ namespace LSharp.Parser
 
         /// <summary>
         /// Executes the parsing rule for the "ternary" expression. This is the only expression composed by three subexpressions
-        /// (as in most programming languages), also, this is one of the few right associative parsing rules.
+        /// (as in most programming languages); also, this is one of the few right associative parsing rules.
         /// </summary>
         private Expression ternary()
         {
