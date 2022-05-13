@@ -39,6 +39,7 @@ namespace LSharp.Parser
         * printStmt -> "print" expression ";"; //Added on chapter 8.
         * expression -> assignment; //Added on chapter 8.
         * assignment -> (call ".")? IDENTIFIER "=" assignment | logical_or; //Added on chapter 8.
+        * ternaryEx -> comparison "?" logical_or ":" ( logical_or | ternary_expression );
         * logical_or -> logical_and ("or" logical_and)*; //Added on chapter 9.
         * logical_and -> equality ("and" equality)*; //Added on chapter 9.
         * equality -> comparison (("!=" | "==") comparison)*;
@@ -191,7 +192,7 @@ namespace LSharp.Parser
         /// </summary>
         private Expression assignment()
         {
-            var expression = or();
+            var expression = ternary();
             if (match(TokenType.EQUAL))
             {
                 var equals = previous();
@@ -209,6 +210,26 @@ namespace LSharp.Parser
                 }
 
                 error(equals, "Invalid assignment target.");
+            }
+
+            return expression;
+        }
+
+        /// <summary>
+        /// Executes the parsing rule for the "ternary" expression. This is the only expression composed by three subexpressions
+        /// (as in most programming languages), also, this is one of the few right associative parsing rules.
+        /// </summary>
+        private Expression ternary()
+        {
+            var expression = or();
+
+            while(match(TokenType.QUESTION))
+            {
+                var questionOp = previous();
+                var left = or();
+                var colonOp = consume(TokenType.COLON, "Expect ':' after 'then' result in ternary expression.");
+                var right = ternary();
+                expression = new Expression.Ternary(expression, questionOp, left, colonOp, right);
             }
 
             return expression;

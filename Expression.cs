@@ -23,6 +23,7 @@ namespace LSharp
             T Visit(Set expression);
             T Visit(This expression);
             T Visit(Super expression);
+            T Visit(Ternary expression);
         }
 
         public abstract T Accept<T>(IVisitor<T> visitor);
@@ -232,6 +233,29 @@ namespace LSharp
             public This(Token keyword)
             {
                 Keyword = keyword;
+            }
+
+            public override T Accept<T>(IVisitor<T> visitor)
+            {
+                return visitor.Visit(this);
+            }
+        }
+
+        public class Ternary : Expression
+        {
+            public readonly Expression Condition;
+            public readonly Token ConditionOp;
+            public readonly Expression Left;
+            public readonly Token Colon;
+            public readonly Expression Right;
+
+            public Ternary(Expression condition, Token conditionOp, Expression left, Token colon, Expression right)
+            {
+                Condition = condition;
+                ConditionOp = conditionOp;
+                Left = left;
+                Colon = colon;
+                Right = right;
             }
 
             public override T Accept<T>(IVisitor<T> visitor)

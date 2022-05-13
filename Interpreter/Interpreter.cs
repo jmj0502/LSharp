@@ -491,6 +491,11 @@ namespace LSharp.Interpreter
             return null;
         }
 
+        public object Visit(Expression.Ternary expression)
+        {
+            return isTruty(evaluate(expression.Condition)) ? evaluate(expression.Left) : evaluate(expression.Right); 
+        }
+
         /// <summary>
         /// Evaluates the components of a logical expression and applies short circuit if posible. The short circuit evaluation
         /// logic depends on the operator type of the expression.
