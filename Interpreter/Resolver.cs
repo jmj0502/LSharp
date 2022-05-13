@@ -297,6 +297,18 @@ namespace LSharp.Interpreter
         }
 
         /// <summary>
+        /// Resolves a ternary expression. Since no logic is executed each expression contained on the ternary is resolved.
+        /// </summary>
+        /// <param name="expression">Any ternary expression.</param>
+        public object Visit(Expression.Ternary expression)
+        {
+            resolve(expression.Condition);
+            resolve(expression.Left);
+            resolve(expression.Right);
+            return null; 
+        }
+
+        /// <summary>
         /// Resolves the members of a logical expression. Since no logic at all is executed, any logical expression is basically
         /// resolved as if it was a binary expression.
         /// </summary>
