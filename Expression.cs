@@ -244,17 +244,13 @@ namespace LSharp
         public class Ternary : Expression
         {
             public readonly Expression Condition;
-            public readonly Token ConditionOp;
             public readonly Expression Left;
-            public readonly Token Colon;
             public readonly Expression Right;
 
-            public Ternary(Expression condition, Token conditionOp, Expression left, Token colon, Expression right)
+            public Ternary(Expression condition, Expression left, Expression right)
             {
                 Condition = condition;
-                ConditionOp = conditionOp;
                 Left = left;
-                Colon = colon;
                 Right = right;
             }
 

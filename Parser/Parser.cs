@@ -225,11 +225,10 @@ namespace LSharp.Parser
 
             while(match(TokenType.QUESTION))
             {
-                var questionOp = previous();
                 var left = or();
-                var colonOp = consume(TokenType.COLON, "Expect ':' after 'then' result in ternary expression.");
+                consume(TokenType.COLON, "Expect ':' after 'then' result in ternary expression.");
                 var right = ternary();
-                expression = new Expression.Ternary(expression, questionOp, left, colonOp, right);
+                expression = new Expression.Ternary(expression, left, right);
             }
 
             return expression;
