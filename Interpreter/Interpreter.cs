@@ -82,7 +82,14 @@ namespace LSharp.Interpreter
                 this.enviroment = enviroment;
                 foreach (var statement in statements)
                 {
-                    execute(statement);
+                    try
+                    {
+                        execute(statement);
+                    }
+                    catch(ContinueException ex)
+                    {
+                        break;
+                    }
                 }
             }
             finally 
@@ -579,9 +586,36 @@ namespace LSharp.Interpreter
         {
             while (isTruty(evaluate(stmt.Condition)))
             {
-                execute(stmt.Body);
+                try
+                {
+                    execute(stmt.Body);
+                }
+                catch(BreakException ex)
+                {
+                    break;
+                }
             }
             return null;
+        }
+
+        /// <summary>
+        /// Turns a break stmt into a runtime representation. Since break is intended to jump out of the context of the loop where it's
+        /// called, it must be handled as an exception so it can move one step back on DotNet's execution stack.
+        /// </summary>
+        /// <param name="stmt">The break statement that should be turn into a runtime value.</param>
+        public object Visit(Stmt.Break stmt)
+        {
+            throw new BreakException();
+        }
+
+        /// <summary>
+        /// Turns a continue stmt into a runtime representation. It works faily similar to the break statement, so it's also implemented
+        /// using exceptions.
+        /// </summary>
+        /// <param name="stmt">The continue statement intended to be interpreted.</param>
+        public object Visit(Stmt.Continue stmt)
+        {
+            throw new ContinueException();
         }
 
     }
