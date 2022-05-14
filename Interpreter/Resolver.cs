@@ -218,6 +218,11 @@ namespace LSharp.Interpreter
             return null;
         }
 
+        /// <summary>
+        /// Performs static analisys on a break statement (since there isn't anything to resolve, it basically checks if the 
+        /// statement was used correctly).
+        /// </summary>
+        /// <param name="stmt">Any break statement.</param>
         public object Visit(Stmt.Break stmt)
         {
             if (!isExecutingLoop)
@@ -228,6 +233,11 @@ namespace LSharp.Interpreter
             return null;
         }
 
+        /// <summary>
+        /// Performs static analisys on a break statement (since there isn't anything to resolve, it basically checks if the 
+        /// statement was used correctly).
+        /// </summary>
+        /// <param name="stmt">Any continue statement.</param>
         public object Visit(Stmt.Continue stmt)
         {
             if (!isExecutingLoop)

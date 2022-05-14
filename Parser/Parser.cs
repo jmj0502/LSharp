@@ -189,6 +189,9 @@ namespace LSharp.Parser
             return statements;
         }
 
+        /// <summary>
+        /// Run handler for break statment. It basically gathers the statement keyword and checks for terminal semicolon.
+        /// </summary>
         private Stmt breakStatement()
         {
             var token = previous();
@@ -196,6 +199,9 @@ namespace LSharp.Parser
             return new Stmt.Break(token);
         }
 
+        /// <summary>
+        /// Run handler for continue statment. It basically gathers the statement keyword and checks for terminal semicolon.
+        /// </summary>
         private Stmt continueStatement()
         {
             var token = previous();
