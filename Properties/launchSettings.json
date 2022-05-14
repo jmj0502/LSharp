@@ -2,7 +2,7 @@
   "profiles": {
     "LSharp": {
       "commandName": "Project",
-      "commandLineArgs": "inheritance.ls"
+      "commandLineArgs": "newFeatures.ls"
     }
   }
 }

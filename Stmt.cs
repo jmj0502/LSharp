@@ -20,6 +20,8 @@ namespace LSharp
             T Visit(While stmt);
             T Visit(Function stmt);
             T Visit(Return stmt);
+            T Visit(Break stmt);
+            T Visit(Continue stmt);
         }
 
         public abstract T accept<T>(IVisitor<T> visitor);
@@ -169,6 +171,36 @@ namespace LSharp
             {
                 Keyword = keyword;
                 Value = value;
+            }
+
+            public override T accept<T>(IVisitor<T> visitor)
+            {
+                return visitor.Visit(this);
+            }
+        }
+
+        public class Break : Stmt
+        {
+            public readonly Token Keyword;
+
+            public Break(Token keyword)
+            {
+                Keyword = keyword;
+            }
+
+            public override T accept<T>(IVisitor<T> visitor)
+            {
+                return visitor.Visit(this);
+            }
+        }
+
+        public class Continue : Stmt
+        {
+            public Token Keyword;
+
+            public Continue(Token keyword)
+            {
+                Keyword = keyword;
             }
 
             public override T accept<T>(IVisitor<T> visitor)

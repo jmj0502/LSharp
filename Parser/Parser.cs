@@ -24,9 +24,12 @@ namespace LSharp.Parser
         * expressed in Crafting Interpreter And Compilers. Those are:
         * program -> declaration* EOF; //Added on chapter 8.
         * declaration -> funDecl | varDecl | statement; //Added on chapter 8.
-        * statement -> classDecl | exprStmt | forStmt | ifStmt | printStmt | returnStmt | whileStmt | block; //Added on chapter 8.
+        * statement -> classDecl | exprStmt | forStmt | ifStmt | printStmt | returnStmt | whileStmt | block
+        * | continueStmt | breakStmt; //Added on chapter 8.
         * classDecl -> "class" IDENTIFIER ("<" IDENTIFIER)? "{" function* "}";
         * returnStmt -> "return" expression? ";" ;
+        * breakStmt -> "break" ";";
+        * continueStmt -> "continue" ";";
         * forStmt -> "for" "(" (varDecl | exprStmt | ";" ) expression? ";" expression? ")" statement; //Added on chapter 9. 
         * whileStmt -> "while" "(" expression ")" statement; // Added on chapter 9.
         * ifStmt -> "if" "(" expression ")" statement ( "else" statement)?; //Added on chapter 9.
@@ -187,6 +190,26 @@ namespace LSharp.Parser
         }
 
         /// <summary>
+        /// Run handler for break statment. It basically gathers the statement keyword and checks for terminal semicolon.
+        /// </summary>
+        private Stmt breakStatement()
+        {
+            var token = previous();
+            consume(TokenType.SEMICOLON, "Expect ';' after 'break'.");
+            return new Stmt.Break(token);
+        }
+
+        /// <summary>
+        /// Run handler for continue statment. It basically gathers the statement keyword and checks for terminal semicolon.
+        /// </summary>
+        private Stmt continueStatement()
+        {
+            var token = previous();
+            consume(TokenType.SEMICOLON, "Expect ';' after 'continue'.");
+            return new Stmt.Continue(token);
+        }
+
+        /// <summary>
         /// Rule handler for assignment expressions. It treats the right-hand side of the expression as if it were
         /// a binary expression.
         /// </summary>
@@ -328,6 +351,8 @@ namespace LSharp.Parser
         private Stmt statement()
         {
             if (match(TokenType.FOR)) return forStatement();
+            if (match(TokenType.BREAK)) return breakStatement();
+            if (match(TokenType.CONTINUE)) return continueStatement();
             if (match(TokenType.IF)) return ifStatement();
             if (match(TokenType.PRINT)) return printStatement();
             if (match(TokenType.RETURN)) return returnStatement();

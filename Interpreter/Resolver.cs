@@ -36,6 +36,7 @@ namespace LSharp.Interpreter
         }
 
         private ClassType currentClass = ClassType.NONE;
+        private bool isExecutingLoop = false;
 
         /// <summary>
         /// Performs static analysis over a sequence of statements derived from our parser.
@@ -210,7 +211,40 @@ namespace LSharp.Interpreter
         public object Visit(Stmt.While stmt)
         {
             resolve(stmt.Condition);
+            var currentLoop = isExecutingLoop;
+            isExecutingLoop = true;
             resolve(stmt.Body);
+            isExecutingLoop = currentLoop;
+            return null;
+        }
+
+        /// <summary>
+        /// Performs static analisys on a break statement (since there isn't anything to resolve, it basically checks if the 
+        /// statement was used correctly).
+        /// </summary>
+        /// <param name="stmt">Any break statement.</param>
+        public object Visit(Stmt.Break stmt)
+        {
+            if (!isExecutingLoop)
+            {
+                Lox.Error(stmt.Keyword, 
+                    "Can't use 'break' out of a loop.");
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Performs static analisys on a break statement (since there isn't anything to resolve, it basically checks if the 
+        /// statement was used correctly).
+        /// </summary>
+        /// <param name="stmt">Any continue statement.</param>
+        public object Visit(Stmt.Continue stmt)
+        {
+            if (!isExecutingLoop)
+            {
+                Lox.Error(stmt.Keyword, 
+                    "Can't use 'continue' out of a loop.");
+            }
             return null;
         }
 
