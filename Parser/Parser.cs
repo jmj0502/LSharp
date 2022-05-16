@@ -41,8 +41,8 @@ namespace LSharp.Parser
         * exprStmt -> expression ";"; //Added on chapter 8.
         * printStmt -> "print" expression ";"; //Added on chapter 8.
         * expression -> assignment; //Added on chapter 8.
-        * assignment -> (call ".")? IDENTIFIER "=" assignment | logical_or; //Added on chapter 8.
-        * ternaryEx -> comparison "?" logical_or ":" ( logical_or | ternary_expression );
+        * assignment -> (call ".")? IDENTIFIER "=" assignment | ternaryEx; //Added on chapter 8.
+        * ternaryEx -> comparison "?" logical_or ":" ( logical_or | ternary_expression ) | logical_or;
         * logical_or -> logical_and ("or" logical_and)*; //Added on chapter 9.
         * logical_and -> equality ("and" equality)*; //Added on chapter 9.
         * equality -> comparison (("!=" | "==") comparison)*;
@@ -53,7 +53,8 @@ namespace LSharp.Parser
         * call -> primary ( "(" arguments? ")" | "." IDENTIFIER )*;
         * arguments -> expression ("," expression )*;
         * primary -> NUMBER | STRING | "true" | "false" | "nil" | "(" expression ")" | "IDENTIFIER"
-        * | "super" "." IDENTIFIER;
+        * | "super" "." IDENTIFIER | funExpression;
+        * funExpression -> "fun" "(" parameters? ")" block;
         * This sintax will allow us to represent our productions in code as follows:
         * Terminal -> Code to match and consume a token.
         * Non-Terminal -> Call to that rule's function.
@@ -148,8 +149,21 @@ namespace LSharp.Parser
         /// <param name="kind">The kind of function to be parsed.</param>
         private Stmt function(string kind)
         {
+            if (kind != "method")
+                advance();
             var name = consume(TokenType.IDENTIFIER, $"Expect {kind} name.");
             consume(TokenType.LEFT_PAREN, $"Expect '(' after {kind} name.");
+            var parameters = getFuntionParameters();
+            consume(TokenType.LEFT_BRACE, $"Expect '{{' before {kind} body.");
+            var body = block();
+            return new Stmt.Function(name, parameters, body);
+        }
+
+        /// <summary>
+        /// Helper function intended to parse the parameters of a function statement/expression.
+        /// </summary>
+        private List<Token> getFuntionParameters()
+        {
             var parameters = new List<Token>();
             if (!check(TokenType.RIGHT_PAREN))
             {
@@ -167,10 +181,7 @@ namespace LSharp.Parser
             }
 
             consume(TokenType.RIGHT_PAREN, "Expect ')' after parameters.");
-
-            consume(TokenType.LEFT_BRACE, $"Expect '{{' before {kind} body.");
-            var body = block();
-            return new Stmt.Function(name, parameters, body);
+            return parameters;
         }
 
         /// <summary>
@@ -310,7 +321,7 @@ namespace LSharp.Parser
             try
             {
                 if (match(TokenType.CLASS)) return classDeclaration();
-                if (match(TokenType.FUN)) return function("function");
+                if (check(TokenType.FUN, TokenType.IDENTIFIER)) return function("function");
                 if (match(TokenType.VAR)) return varDeclaration();
                 return statement();
             }
@@ -587,6 +598,15 @@ namespace LSharp.Parser
                 return new Expression.Literal(value.Literal);
             }
 
+            if (match(TokenType.FUN))
+            {
+                consume(TokenType.LEFT_PAREN, "Expect '(' after 'fun' expression.");
+                var parameters = getFuntionParameters();
+                consume(TokenType.LEFT_BRACE, "Expect '{' after 'parameter list.");
+                var body = block();
+                return new Expression.Function(parameters, body);
+            }
+
             if (match(TokenType.SUPER))
             {
                 var keyword = previous();
@@ -656,6 +676,32 @@ namespace LSharp.Parser
         {
             if (isAtEnd()) return false;
             return peek().Type == type;
+        }
+
+        /// <summary>
+        /// Check overload. Checks if the provided types are in the specified order in the tokens array.
+        /// </summary>
+        /// <param name="types">Token types intended to check.</param>
+        private bool check(params TokenType[] types)
+        {
+            if (isAtEnd()) return false;
+            int lookAheadChars = 0;
+            foreach (var type in types)
+            {
+                if (lookAhead(lookAheadChars).Type == type)
+                {
+                    lookAheadChars++;
+                    continue;
+                }
+
+                return false;
+            }
+            return true;
+        }
+
+        private Token lookAhead(int numberOfChars)
+        {
+            return tokens[current + numberOfChars];
         }
 
         /// <summary>

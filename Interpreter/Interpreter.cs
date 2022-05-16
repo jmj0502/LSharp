@@ -138,7 +138,9 @@ namespace LSharp.Interpreter
             var methods = new Dictionary<string, LSFunction>();
             foreach (Stmt.Function method in stmt.Methods)
             {
-                var function = new LSFunction(method, enviroment,
+                var functionExpression = new Expression.Function(
+                    method.Parameters, method.Body);
+                var function = new LSFunction(functionExpression, method.Name.Lexeme, enviroment,
                     method.Name.Lexeme.Equals("init"));
                 methods.Add(method.Name.Lexeme, function);
             }
@@ -361,6 +363,15 @@ namespace LSharp.Interpreter
         }
 
         /// <summary>
+        /// Turns a function expression into a runtime representation.
+        /// </summary>
+        /// <param name="expression">The function expression that will be evaluated.</param>
+        public object Visit(Expression.Function expression)
+        {
+            return new LSFunction(expression, "anonymous", enviroment, false); 
+        }
+
+        /// <summary>
         /// Checks if the provided object is a valid number.
         /// </summary>
         /// <param name="operatr">The unary operator that will take effect over the operand.</param>
@@ -399,7 +410,8 @@ namespace LSharp.Interpreter
         /// <param name="stmt">Any function statement.</param>
         public object Visit(Stmt.Function stmt)
         {
-            var function = new LSFunction(stmt, enviroment, false);
+            var functionExpression = new Expression.Function(stmt.Parameters, stmt.Body);
+            var function = new LSFunction(functionExpression, stmt.Name.Lexeme, enviroment, false);
             enviroment.Define(stmt.Name.Lexeme, function);
             return null;
         }
