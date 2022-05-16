@@ -362,6 +362,10 @@ namespace LSharp.Interpreter
             return null;
         }
 
+        /// <summary>
+        /// Turns a function expression into a runtime representation.
+        /// </summary>
+        /// <param name="expression">The function expression that will be evaluated.</param>
         public object Visit(Expression.Function expression)
         {
             return new LSFunction(expression, "anonymous", enviroment, false); 
