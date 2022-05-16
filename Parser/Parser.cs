@@ -149,7 +149,8 @@ namespace LSharp.Parser
         /// <param name="kind">The kind of function to be parsed.</param>
         private Stmt function(string kind)
         {
-            advance();
+            if (kind != "method")
+                advance();
             var name = consume(TokenType.IDENTIFIER, $"Expect {kind} name.");
             consume(TokenType.LEFT_PAREN, $"Expect '(' after {kind} name.");
             var parameters = getFuntionParameters();

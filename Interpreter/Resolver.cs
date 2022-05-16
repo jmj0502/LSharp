@@ -105,7 +105,8 @@ namespace LSharp.Interpreter
                 {
                     declaration = FunctionType.INITIALIZER;
                 }
-                resolveFunction(method, declaration);
+                var expression = new Expression.Function(method.Parameters, method.Body);
+                resolveFunction(expression, declaration);
             }
 
             endScope();
@@ -136,7 +137,8 @@ namespace LSharp.Interpreter
             declare(stmt.Name);
             define(stmt.Name);
 
-            resolveFunction(stmt, FunctionType.FUNCTION);
+            var expression = new Expression.Function(stmt.Parameters, stmt.Body);
+            resolveFunction(expression, FunctionType.FUNCTION);
             return null;
         }
 
@@ -417,6 +419,16 @@ namespace LSharp.Interpreter
         }
 
         /// <summary>
+        /// Resolves a function expression. To do so, it takes advantage of the resolveFunction method.
+        /// </summary>
+        /// <param name="expression">The function expression to be resolved.</param>
+        public object Visit(Expression.Function expression)
+        {
+            resolveFunction(expression, FunctionType.FUNCTION);
+            return null;
+        }
+
+        /// <summary>
         /// Proceeds to call the accept method of the provided statement.
         /// </summary>
         /// <param name="statement">Any statement of our stmt tree.</param>
@@ -441,7 +453,7 @@ namespace LSharp.Interpreter
         /// </summary>
         /// <param name="function">The function statement to be resolved.</param>
         /// <param name="type">The type of the element that contains the function.</param>
-        private void resolveFunction(Stmt.Function function,
+        private void resolveFunction(Expression.Function function,
             FunctionType type)
         {
             var enclosingFunction = currentFunction;

@@ -8,14 +8,16 @@ namespace LSharp.Interpreter
 {
     public class LSFunction : ICallable
     {
-        private readonly Stmt.Function declaration;
+        private readonly Expression.Function declaration;
+        private readonly string name;
         private readonly Enviroment.Enviroment closure;
         private readonly bool isInitializer;
 
-        public LSFunction(Stmt.Function declaration, Enviroment.Enviroment closure, 
+        public LSFunction(Expression.Function declaration, string name, Enviroment.Enviroment closure, 
             bool isInitializer)
         {
             this.declaration = declaration;
+            this.name = name;
             this.closure = closure;
             this.isInitializer = isInitializer;
         }
@@ -24,7 +26,7 @@ namespace LSharp.Interpreter
         {
             var enviroment = new Enviroment.Enviroment(closure);
             enviroment.Define("this", instance);
-            return new LSFunction(declaration, enviroment, 
+            return new LSFunction(declaration, "this", enviroment, 
                 isInitializer);
         }
 
@@ -58,7 +60,7 @@ namespace LSharp.Interpreter
 
         public override string ToString()
         {
-            return $"<fn {declaration.Name}>";
+            return $"<fn {name}>";
         }
     }
 }
