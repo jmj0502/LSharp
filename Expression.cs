@@ -24,6 +24,7 @@ namespace LSharp
             T Visit(This expression);
             T Visit(Super expression);
             T Visit(Ternary expression);
+            T Visit(Function expression);
         }
 
         public abstract T Accept<T>(IVisitor<T> visitor);
@@ -252,6 +253,23 @@ namespace LSharp
                 Condition = condition;
                 Left = left;
                 Right = right;
+            }
+
+            public override T Accept<T>(IVisitor<T> visitor)
+            {
+                return visitor.Visit(this);
+            }
+        }
+
+        public class Function : Expression
+        {
+            public readonly List<Token> Parameters;
+            public readonly List<Stmt> Body;
+
+            public Function(List<Token> parameters, List<Stmt> body)
+            {
+                Parameters = parameters;
+                Body = body;
             }
 
             public override T Accept<T>(IVisitor<T> visitor)
