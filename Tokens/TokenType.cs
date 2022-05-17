@@ -29,6 +29,8 @@ namespace LSharp.Tokens
         LESS_EQUAL,
         COLON,
         QUESTION,
+        PLUS_PLUS,
+        MINNUS_MINNUS,
 
         //Literals
         IDENTIFIER,

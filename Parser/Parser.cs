@@ -48,8 +48,10 @@ namespace LSharp.Parser
         * equality -> comparison (("!=" | "==") comparison)*;
         * comparison -> term ((">"|">="|"<"|"<=") term )*;
         * term -> factor (("-"|"+") factor )*;
-        * factor -> unary (("/"|"*") unary)*;
+        * factor -> prefix (("/"|"*") prefix)*;
+        * prefix -> ("++" | "--") unary | unary;
         * unary -> ("!","-") unary | call;
+        * postfix -> call ("++" | "--") | call;
         * call -> primary ( "(" arguments? ")" | "." IDENTIFIER )*;
         * arguments -> expression ("," expression )*;
         * primary -> NUMBER | STRING | "true" | "false" | "nil" | "(" expression ")" | "IDENTIFIER"
@@ -506,14 +508,26 @@ namespace LSharp.Parser
         /// <returns></returns>
         private Expression factor()
         {
-            var expression = unary(); 
+            var expression = prefix(); 
             while(match(TokenType.SLASH, TokenType.STAR))
             {
                 var operatr = previous();
-                var right = unary();
+                var right = prefix();
                 expression = new Expression.Binary(expression, right, operatr);
             }
             return expression;
+        }
+
+        private Expression prefix()
+        {
+            if (match(TokenType.PLUS_PLUS, TokenType.MINNUS_MINNUS))
+            {
+                var operatr = previous();
+                var right = primary();
+                return new Expression.Unary(operatr, right); 
+            }
+
+            return unary();
         }
 
         /// <summary>
@@ -526,6 +540,17 @@ namespace LSharp.Parser
                 var operatr  = previous();
                 var right = unary();
                 return new Expression.Unary(operatr, right);
+            }
+            return postfix();
+        }
+
+        private Expression postfix()
+        {
+            if (matchNext(TokenType.PLUS_PLUS, TokenType.MINNUS_MINNUS))
+            {
+                var value = primary();
+                var operatr = advance();
+                return new Expression.Unary(operatr, value);
             }
             return call();
         }
@@ -650,6 +675,18 @@ namespace LSharp.Parser
             }
             return false;
         }
+        
+        private bool matchNext(params TokenType[] types)
+        {
+            foreach (var type in types)
+            {
+                if (checkNext(type))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
 
         /// <summary>
         /// Verifies if the provided Token is present on the current position of the tokens array.
@@ -678,6 +715,7 @@ namespace LSharp.Parser
             return peek().Type == type;
         }
 
+
         /// <summary>
         /// Check overload. Checks if the provided types are in the specified order in the tokens array.
         /// </summary>
@@ -697,6 +735,12 @@ namespace LSharp.Parser
                 return false;
             }
             return true;
+        }
+
+        private bool checkNext(TokenType type)
+        {
+            if (isAtEnd()) return false;
+            return lookAhead(1).Type == type;
         }
 
         private Token lookAhead(int numberOfChars)

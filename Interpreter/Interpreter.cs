@@ -352,11 +352,27 @@ namespace LSharp.Interpreter
 
             switch (expression.Operatr.Type)
             {
-                case Tokens.TokenType.BANG:
+                case TokenType.BANG:
                     return !isTruty(right);
-                case Tokens.TokenType.MINNUS:
+                case TokenType.MINNUS:
                     checkNumberOperand(expression.Operatr, right);
                     return -(double) right;
+                case TokenType.PLUS_PLUS:
+                case TokenType.MINNUS_MINNUS:
+                    if (expression.Right == null)
+                        throw new RuntimeError(expression.Operatr, 
+                            "Can't apply a prefix operator on a 'nil' value.");
+
+                    if (!(expression.Right is Expression.Variable))
+                        throw new RuntimeError(expression.Operatr, 
+                            "Invalid left-hand side operator in prefix operation.");
+
+                    var varExpression = (Expression.Variable)expression.Right;
+                    checkNumberOperand(expression.Operatr, right);
+                    var value = (double) right;
+                    enviroment.Assign(varExpression.Name, 
+                        expression.Operatr.Type == TokenType.PLUS_PLUS ? value + 1 : value - 1);
+                    return value;
             }
 
             return null;
