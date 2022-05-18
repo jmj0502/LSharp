@@ -550,7 +550,7 @@ namespace LSharp.Parser
             {
                 var value = primary();
                 var operatr = advance();
-                return new Expression.Unary(operatr, value);
+                return new Expression.Unary(operatr, value, true);
             }
             return call();
         }

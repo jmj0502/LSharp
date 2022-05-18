@@ -105,11 +105,13 @@ namespace LSharp
         {
             public readonly Token Operatr;
             public readonly Expression Right;
+            public readonly bool Postfix;
 
-            public Unary(Token operatr, Expression right)
+            public Unary(Token operatr, Expression right, bool postfix = false)
             {
                 Operatr = operatr;
                 Right = right;
+                Postfix = postfix;
             }
 
             public override T Accept<T>(IVisitor<T> visitor)

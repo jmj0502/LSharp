@@ -364,8 +364,11 @@ namespace LSharp.Interpreter
                             "Can't apply a prefix operator on a 'nil' value.");
 
                     if (!(expression.Right is Expression.Variable))
-                        throw new RuntimeError(expression.Operatr, 
-                            "Invalid left-hand side operator in prefix operation.");
+                    {
+                        var expressionType = expression.Postfix ? "postfix" : "prefix";
+                        throw new RuntimeError(expression.Operatr,
+                            $"Invalid left hand side operator in {expressionType} operation.");
+                    }
 
                     var varExpression = (Expression.Variable)expression.Right;
                     checkNumberOperand(expression.Operatr, right);
