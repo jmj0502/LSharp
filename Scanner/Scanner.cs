@@ -69,8 +69,12 @@ namespace LSharp.Scanner
                 case '}': addToken(TokenType.RIGHT_BRACE); break;
                 case ',': addToken(TokenType.COMMA); break;
                 case '.': addToken(TokenType.DOT); break;
-                case '-': addToken(TokenType.MINNUS); break;
-                case '+': addToken(TokenType.PLUS); break;
+                case '-': 
+                    addToken(match('-') ? TokenType.MINNUS_MINNUS : TokenType.MINNUS); 
+                    break;
+                case '+': 
+                    addToken(match('+') ? TokenType.PLUS_PLUS : TokenType.PLUS); 
+                    break;
                 case ';': addToken(TokenType.SEMICOLON); break;
                 case '*': addToken(TokenType.STAR); break;
                 case '?': addToken(TokenType.QUESTION); break;
