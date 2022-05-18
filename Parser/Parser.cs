@@ -505,7 +505,6 @@ namespace LSharp.Parser
         /// <summary>
         /// Rule hadler for the factor term production (Non-terminal).
         /// </summary>
-        /// <returns></returns>
         private Expression factor()
         {
             var expression = prefix(); 
@@ -518,6 +517,9 @@ namespace LSharp.Parser
             return expression;
         }
 
+        /// <summary>
+        /// Rule handler for the prefix production (Non-terminal).
+        /// </summary>
         private Expression prefix()
         {
             if (match(TokenType.PLUS_PLUS, TokenType.MINNUS_MINNUS))
@@ -544,6 +546,9 @@ namespace LSharp.Parser
             return postfix();
         }
 
+        /// <summary>
+        /// Rule handle for the postfix production (Non-terminal).
+        /// </summary>
         private Expression postfix()
         {
             if (matchNext(TokenType.PLUS_PLUS, TokenType.MINNUS_MINNUS))
@@ -676,6 +681,10 @@ namespace LSharp.Parser
             return false;
         }
         
+        /// <summary>
+        /// Checks if the token located on the next position matches at least one of the provided types. 
+        /// </summary>
+        /// <param name="types">A sequence of types to evaluate.</param>
         private bool matchNext(params TokenType[] types)
         {
             foreach (var type in types)
@@ -737,12 +746,20 @@ namespace LSharp.Parser
             return true;
         }
 
+        /// <summary>
+        /// Checks if the token on the next position has the same type as the provided one.
+        /// </summary>
+        /// <param name="type">The type that will use as a validation.</param>
         private bool checkNext(TokenType type)
         {
             if (isAtEnd()) return false;
             return lookAhead(1).Type == type;
         }
 
+        /// <summary>
+        /// Returns the token located a fixed number of positions away from the current one.
+        /// </summary>
+        /// <param name="numberOfChars">The number of positions to advance.</param>
         private Token lookAhead(int numberOfChars)
         {
             return tokens[current + numberOfChars];
