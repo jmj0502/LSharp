@@ -26,6 +26,7 @@ namespace LSharp.Parser
         * declaration -> funDecl | varDecl | statement; //Added on chapter 8.
         * statement -> classDecl | exprStmt | forStmt | ifStmt | printStmt | returnStmt | whileStmt | block
         * | continueStmt | breakStmt; //Added on chapter 8.
+        * moduleDecl -> "module" IDENTIFIER "{" statement* "}";
         * classDecl -> "class" IDENTIFIER ("<" IDENTIFIER)? "{" function* "}";
         * returnStmt -> "return" expression? ";" ;
         * breakStmt -> "break" ";";
@@ -322,6 +323,7 @@ namespace LSharp.Parser
         {
             try
             {
+                if (match(TokenType.MODULE)) return moduleDeclaration();
                 if (match(TokenType.CLASS)) return classDeclaration();
                 if (check(TokenType.FUN, TokenType.IDENTIFIER)) return function("function");
                 if (match(TokenType.VAR)) return varDeclaration();
@@ -356,6 +358,15 @@ namespace LSharp.Parser
 
             consume(TokenType.RIGHT_BRACE, "Expect '}' after class body.");
             return new Stmt.Class(name, methods, superclass);
+        }
+
+        private Stmt moduleDeclaration()
+        {
+            var name = consume(TokenType.IDENTIFIER, "Expect module name before body.");
+            consume(TokenType.LEFT_BRACE, "Expect '{' before module body.");
+            var body = block();
+            return new Stmt.Module(name, body);
+            
         }
 
         /// <summary>

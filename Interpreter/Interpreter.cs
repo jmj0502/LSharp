@@ -157,6 +157,28 @@ namespace LSharp.Interpreter
             return null;
         }
 
+        public object Visit(Stmt.Module stmt)
+        {
+            enviroment.Define(stmt.Name.Lexeme, null);
+            var bodyEnv = resolveModuleBody(stmt.Body);
+            var module = new LSModule(bodyEnv, stmt.Name.Lexeme);
+            enviroment.Assign(stmt.Name, module);
+            return null;
+        }
+
+        private Enviroment.Enviroment resolveModuleBody(List<Stmt> stmts)
+        {
+            var previous = enviroment;
+            enviroment = new Enviroment.Enviroment();
+            foreach (var stmt in stmts)
+            {
+                execute(stmt);
+            }
+            var bodyEnvironment = enviroment;
+            enviroment = previous;
+            return bodyEnvironment;
+        }
+
 
         /// <summary>
         /// Turns C# values into loz values to print them.
@@ -286,6 +308,10 @@ namespace LSharp.Interpreter
             if (obj is LSInstance)
             {
                 return ((LSInstance)obj).Get(expression.Name);
+            }
+            else if (obj is LSModule)
+            {
+                return ((LSModule)obj).Get(expression.Name);
             }
 
             throw new RuntimeError(expression.Name, 

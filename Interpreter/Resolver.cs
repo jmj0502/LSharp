@@ -117,6 +117,16 @@ namespace LSharp.Interpreter
             return null;
         }
 
+        public object Visit(Stmt.Module module)
+        {
+            declare(module.Name);
+            define(module.Name);
+            beginScope();
+            Resolve(module.Body);
+            endScope();
+            return null;
+        }
+
         /// <summary>
         /// Performs static analysis over a expression statement.
         /// </summary>
