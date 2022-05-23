@@ -157,6 +157,10 @@ namespace LSharp.Interpreter
             return null;
         }
 
+        /// <summary>
+        /// Turns a module stmt into a runtime representation.
+        /// </summary>
+        /// <param name="stmt">Any valid module stmt.</param>
         public object Visit(Stmt.Module stmt)
         {
             enviroment.Define(stmt.Name.Lexeme, null);
@@ -166,6 +170,13 @@ namespace LSharp.Interpreter
             return null;
         }
 
+        /// <summary>
+        /// Helper method intended to resolve the module's body. In order to achieve such task, it keeps the 
+        /// current enviroment on a temporal variable, and then proceeds to generate a new statement that holds 
+        /// each declaration available on the on said module's body. Once the module's body is fully resolved, the environment
+        /// takes its previous value and the module's environment is returned.
+        /// </summary>
+        /// <param name="stmts">A list of statements.</param>
         private Enviroment.Enviroment resolveModuleBody(List<Stmt> stmts)
         {
             var previous = enviroment;
@@ -181,7 +192,7 @@ namespace LSharp.Interpreter
 
 
         /// <summary>
-        /// Turns C# values into loz values to print them.
+        /// Turns C# values into lox values in order to print them.
         /// </summary>
         /// <param name="value">Any lox literal.</param>
         private string stringify(object value)

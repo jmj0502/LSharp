@@ -360,6 +360,10 @@ namespace LSharp.Parser
             return new Stmt.Class(name, methods, superclass);
         }
 
+        /// <summary>
+        /// Handles the module stmt production. A module is represented by a name (that will be used to add it into the 
+        /// enviroment) and a body (literally a list of statements, since any element of the lang can be part of a module).
+        /// </summary>
         private Stmt moduleDeclaration()
         {
             var name = consume(TokenType.IDENTIFIER, "Expect module name before body.");
