@@ -31,6 +31,7 @@ namespace LSharp.Scanner
             ["while"] = TokenType.WHILE,
             ["continue"] = TokenType.CONTINUE,
             ["break"] = TokenType.BREAK,
+            ["module"] = TokenType.MODULE
         };
 
         public Scanner(string source)

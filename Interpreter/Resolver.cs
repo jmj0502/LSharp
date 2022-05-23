@@ -118,6 +118,21 @@ namespace LSharp.Interpreter
         }
 
         /// <summary>
+        /// Performs static analysis on a module statement. It basically defines the module in the scope and then proceeds to 
+        /// resolve the different statements that conform the module body.
+        /// </summary>
+        /// <param name="module">The module statement that will be resolved.</param>
+        public object Visit(Stmt.Module module)
+        {
+            declare(module.Name);
+            define(module.Name);
+            beginScope();
+            Resolve(module.Body);
+            endScope();
+            return null;
+        }
+
+        /// <summary>
         /// Performs static analysis over a expression statement.
         /// </summary>
         /// <param name="stmt">The expression statement to be resolved.</param>

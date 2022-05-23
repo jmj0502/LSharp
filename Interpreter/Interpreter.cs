@@ -157,9 +157,42 @@ namespace LSharp.Interpreter
             return null;
         }
 
+        /// <summary>
+        /// Turns a module stmt into a runtime representation.
+        /// </summary>
+        /// <param name="stmt">Any valid module stmt.</param>
+        public object Visit(Stmt.Module stmt)
+        {
+            enviroment.Define(stmt.Name.Lexeme, null);
+            var bodyEnv = resolveModuleBody(stmt.Body);
+            var module = new LSModule(bodyEnv, stmt.Name.Lexeme);
+            enviroment.Assign(stmt.Name, module);
+            return null;
+        }
 
         /// <summary>
-        /// Turns C# values into loz values to print them.
+        /// Helper method intended to resolve the module's body. In order to achieve such task, it keeps the 
+        /// current enviroment on a temporal variable, and then proceeds to generate a new statement that holds 
+        /// each declaration available on the on said module's body. Once the module's body is fully resolved, the environment
+        /// takes its previous value and the module's environment is returned.
+        /// </summary>
+        /// <param name="stmts">A list of statements.</param>
+        private Enviroment.Enviroment resolveModuleBody(List<Stmt> stmts)
+        {
+            var previous = enviroment;
+            enviroment = new Enviroment.Enviroment();
+            foreach (var stmt in stmts)
+            {
+                execute(stmt);
+            }
+            var bodyEnvironment = enviroment;
+            enviroment = previous;
+            return bodyEnvironment;
+        }
+
+
+        /// <summary>
+        /// Turns C# values into lox values in order to print them.
         /// </summary>
         /// <param name="value">Any lox literal.</param>
         private string stringify(object value)
@@ -286,6 +319,10 @@ namespace LSharp.Interpreter
             if (obj is LSInstance)
             {
                 return ((LSInstance)obj).Get(expression.Name);
+            }
+            else if (obj is LSModule)
+            {
+                return ((LSModule)obj).Get(expression.Name);
             }
 
             throw new RuntimeError(expression.Name, 

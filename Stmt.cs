@@ -22,6 +22,7 @@ namespace LSharp
             T Visit(Return stmt);
             T Visit(Break stmt);
             T Visit(Continue stmt);
+            T Visit(Module stmt);
         }
 
         public abstract T accept<T>(IVisitor<T> visitor);
@@ -201,6 +202,23 @@ namespace LSharp
             public Continue(Token keyword)
             {
                 Keyword = keyword;
+            }
+
+            public override T accept<T>(IVisitor<T> visitor)
+            {
+                return visitor.Visit(this);
+            }
+        }
+
+        public class Module : Stmt
+        {
+            public Token Name;
+            public List<Stmt> Body;
+
+            public Module(Token name, List<Stmt> body)
+            {
+                Name = name;
+                Body = body;
             }
 
             public override T accept<T>(IVisitor<T> visitor)
