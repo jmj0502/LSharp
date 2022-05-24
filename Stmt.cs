@@ -23,6 +23,7 @@ namespace LSharp
             T Visit(Break stmt);
             T Visit(Continue stmt);
             T Visit(Module stmt);
+            T Visit(Using stmt);
         }
 
         public abstract T accept<T>(IVisitor<T> visitor);
@@ -220,6 +221,17 @@ namespace LSharp
                 Name = name;
                 Body = body;
             }
+
+            public override T accept<T>(IVisitor<T> visitor)
+            {
+                return visitor.Visit(this);
+            }
+        }
+
+        public class Using : Stmt
+        {
+            public readonly Token Keyword;
+            public readonly string Path;
 
             public override T accept<T>(IVisitor<T> visitor)
             {
