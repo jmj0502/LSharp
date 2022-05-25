@@ -2,6 +2,7 @@
 using LSharp.GlobalFunctions;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -21,6 +22,7 @@ namespace LSharp.Interpreter
          * string -> string.
          */
         private Enviroment.Enviroment enviroment = new Enviroment.Enviroment();
+        private Dictionary<string, bool> imports = new();
         private readonly Dictionary<Expression, int> locals = new();
         public Enviroment.Enviroment Globals { get => enviroment; }
 
@@ -170,6 +172,7 @@ namespace LSharp.Interpreter
             return null;
         }
 
+
         /// <summary>
         /// Helper method intended to resolve the module's body. In order to achieve such task, it keeps the 
         /// current enviroment on a temporal variable, and then proceeds to generate a new statement that holds 
@@ -190,6 +193,33 @@ namespace LSharp.Interpreter
             return bodyEnvironment;
         }
 
+        public object Visit(Stmt.Using stmt)
+        {
+            var filePath = Path.GetFullPath(stmt.Path.Replace("/", "\\"));
+            if (!File.Exists(filePath))
+            {
+                throw new RuntimeError(stmt.Keyword, 
+                    "Couldn't find a module on the specified path.");
+            }
+            if (imports.ContainsKey(filePath)) return null;
+            var resolvedFile = Lox.ResolveFile(filePath);
+            if (resolvedFile == null)
+            {
+                throw new RuntimeError(stmt.Keyword, 
+                    "Couldn't resolved the specified module.");
+            }
+            imports[filePath] = true;
+            resolveUsingStatement(resolvedFile);
+            return null;
+        }
+
+        public void resolveUsingStatement(List<Stmt> stmts)
+        {
+            foreach (var stmt in stmts)
+            {
+                execute(stmt);
+            }
+        }
 
         /// <summary>
         /// Turns C# values into lox values in order to print them.

@@ -132,6 +132,11 @@ namespace LSharp.Interpreter
             return null;
         }
 
+        public object Visit(Stmt.Using stmt)
+        {
+            return null;
+        }
+
         /// <summary>
         /// Performs static analysis over a expression statement.
         /// </summary>

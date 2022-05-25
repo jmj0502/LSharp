@@ -233,6 +233,12 @@ namespace LSharp
             public readonly Token Keyword;
             public readonly string Path;
 
+            public Using(Token keyword, string path)
+            {
+                Keyword = keyword;
+                Path = path;
+            }
+
             public override T accept<T>(IVisitor<T> visitor)
             {
                 return visitor.Visit(this);

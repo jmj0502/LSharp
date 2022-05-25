@@ -28,6 +28,25 @@ namespace LSharp
             }
         }
 
+        public static List<Stmt> ResolveFile(string path)
+        {
+
+            var source = System.IO.File.ReadAllText(path);
+            var scaner = new LSharp.Scanner.Scanner(source);
+            var tokens = scaner.ScanTokens();
+            var parser = new LSharp.Parser.Parser(tokens);
+            var statements = parser.Parse();
+
+            if (HadErrors) return null;
+
+            var resolver = new Resolver(interpreter);
+            resolver.Resolve(statements);
+
+            if (HadErrors) return null;
+
+            return statements;
+        }
+
         ///<summary>
         /// Method intended to parse a file if LS is executed with a path to a lox file as a parameter.
         ///</summary>
