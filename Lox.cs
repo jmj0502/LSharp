@@ -28,6 +28,11 @@ namespace LSharp
             }
         }
 
+        /// <summary>
+        /// Reads the content of a LS or Lox file and proceeds to apply the scanning, parsing and 
+        /// static analysis on the code. Returns a list of tokens ready to be executed by the interpreter.
+        /// </summary>
+        /// <param name="path">The path of the file to be resolved.</param>
         public static List<Stmt> ResolveFile(string path)
         {
 
