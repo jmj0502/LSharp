@@ -372,7 +372,6 @@ namespace LSharp.Parser
             consume(TokenType.LEFT_BRACE, "Expect '{' before module body.");
             var body = block();
             return new Stmt.Module(name, body);
-            
         }
 
         /// <summary>
