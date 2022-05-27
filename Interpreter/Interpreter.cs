@@ -198,6 +198,7 @@ namespace LSharp.Interpreter
         /// is added to the imports cache with a value of true (that will avoid multiple imports of the same file
         /// and recursive imports). 
         /// </summary>
+        /// <param name="stmt">The using statement that will be turned into a runtime representation.</param>
         public object Visit(Stmt.Using stmt)
         {
             var separator = Path.DirectorySeparatorChar;
