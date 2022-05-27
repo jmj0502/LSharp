@@ -382,7 +382,8 @@ namespace LSharp.Parser
         private Stmt usingStatement()
         {
             var keyword = previous();
-            var path = consume(TokenType.STRING, "Expect 'path' after using statement.");
+            var path = consume(TokenType.STRING, "Expect 'path' after 'using' statement.");
+            consume(TokenType.SEMICOLON, "Expect ';' to close 'using' statement.");
             return new Stmt.Using(keyword, (string)path.Literal);
         }
 

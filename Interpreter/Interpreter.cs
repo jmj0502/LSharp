@@ -200,10 +200,8 @@ namespace LSharp.Interpreter
         /// </summary>
         public object Visit(Stmt.Using stmt)
         {
-            //The file path format is updated in order to meet Windows paths standard.
-            //TODO: Check the current platform; if the platform is a unix derived one, the 
-            //path can be used as provided by the front-end, else replace the / with \.
-            var filePath = Path.GetFullPath(stmt.Path.Replace("/", "\\"));
+            var separator = Path.DirectorySeparatorChar;
+            var filePath = Path.GetFullPath(stmt.Path.Replace("/", $"{separator}"));
             if (!File.Exists(filePath))
             {
                 throw new RuntimeError(stmt.Keyword, 
