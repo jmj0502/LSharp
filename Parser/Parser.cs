@@ -375,6 +375,10 @@ namespace LSharp.Parser
             
         }
 
+        /// <summary>
+        /// Handles the using stmt production. A using statement can be represented by the using keyword an a string
+        /// that represents the path to another ls file.
+        /// </summary>
         private Stmt usingStatement()
         {
             var keyword = previous();

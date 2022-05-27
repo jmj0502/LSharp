@@ -172,7 +172,6 @@ namespace LSharp.Interpreter
             return null;
         }
 
-
         /// <summary>
         /// Helper method intended to resolve the module's body. In order to achieve such task, it keeps the 
         /// current enviroment on a temporal variable, and then proceeds to generate a new statement that holds 
@@ -183,7 +182,7 @@ namespace LSharp.Interpreter
         private Enviroment.Enviroment resolveModuleBody(List<Stmt> stmts)
         {
             var previous = enviroment;
-            enviroment = new Enviroment.Enviroment();
+            enviroment = new Enviroment.Enviroment(previous);
             foreach (var stmt in stmts)
             {
                 execute(stmt);
@@ -193,8 +192,17 @@ namespace LSharp.Interpreter
             return bodyEnvironment;
         }
 
+        /// <summary>
+        /// Turns a using stmt into a runtime representation. It checks if a file exists at the provided path,
+        /// if so, the file is resolved and its content is push to the global environment. The path of the file
+        /// is added to the imports cache with a value of true (that will avoid multiple imports of the same file
+        /// and recursive imports). 
+        /// </summary>
         public object Visit(Stmt.Using stmt)
         {
+            //The file path format is updated in order to meet Windows paths standard.
+            //TODO: Check the current platform; if the platform is a unix derived one, the 
+            //path can be used as provided by the front-end, else replace the / with \.
             var filePath = Path.GetFullPath(stmt.Path.Replace("/", "\\"));
             if (!File.Exists(filePath))
             {
@@ -213,6 +221,9 @@ namespace LSharp.Interpreter
             return null;
         }
 
+        /// <summary>
+        /// Executes a list of statements.
+        /// </summary>
         public void resolveUsingStatement(List<Stmt> stmts)
         {
             foreach (var stmt in stmts)
