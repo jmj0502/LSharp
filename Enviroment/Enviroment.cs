@@ -31,7 +31,7 @@ namespace LSharp.Enviroment
         /// <param name="value">Value tied to the variable. Nil, if no value is provided.</param>
         public void Define(string name, object value)
         {
-            values.Add(name, value);
+            values[name] = value;
         }
 
         /// <summary>
