@@ -26,6 +26,8 @@ namespace LSharp.Parser
         * declaration -> funDecl | varDecl | statement; //Added on chapter 8.
         * statement -> classDecl | exprStmt | forStmt | ifStmt | printStmt | returnStmt | whileStmt | block
         * | continueStmt | breakStmt; //Added on chapter 8.
+        * usingStmt -> "using" path;
+        * path -> STRING;
         * moduleDecl -> "module" IDENTIFIER "{" statement* "}";
         * classDecl -> "class" IDENTIFIER ("<" IDENTIFIER)? "{" function* "}";
         * returnStmt -> "return" expression? ";" ;
@@ -370,7 +372,18 @@ namespace LSharp.Parser
             consume(TokenType.LEFT_BRACE, "Expect '{' before module body.");
             var body = block();
             return new Stmt.Module(name, body);
-            
+        }
+
+        /// <summary>
+        /// Handles the using stmt production. A using statement can be represented by the using keyword an a string
+        /// that represents the path to another ls file.
+        /// </summary>
+        private Stmt usingStatement()
+        {
+            var keyword = previous();
+            var path = consume(TokenType.STRING, "Expect 'path' after 'using' statement.");
+            consume(TokenType.SEMICOLON, "Expect ';' to close 'using' statement.");
+            return new Stmt.Using(keyword, (string)path.Literal);
         }
 
         /// <summary>
@@ -378,6 +391,7 @@ namespace LSharp.Parser
         /// </summary>
         private Stmt statement()
         {
+            if (match(TokenType.USING)) return usingStatement();
             if (match(TokenType.FOR)) return forStatement();
             if (match(TokenType.BREAK)) return breakStatement();
             if (match(TokenType.CONTINUE)) return continueStatement();

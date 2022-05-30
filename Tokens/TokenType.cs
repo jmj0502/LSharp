@@ -57,6 +57,7 @@ namespace LSharp.Tokens
         CONTINUE,
         BREAK,
         MODULE,
+        USING,
 
         EOF
     }

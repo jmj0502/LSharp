@@ -133,6 +133,17 @@ namespace LSharp.Interpreter
         }
 
         /// <summary>
+        /// Performs static analysis on a using stmt. Since there's really nothing to evaluate at this stage
+        /// (My assumptions may be wrong. For example, the existence the specified path could be checked here)
+        /// it just returns null.
+        /// </summary>
+        /// <param name="stmt"></param>
+        public object Visit(Stmt.Using stmt)
+        {
+            return null;
+        }
+
+        /// <summary>
         /// Performs static analysis over a expression statement.
         /// </summary>
         /// <param name="stmt">The expression statement to be resolved.</param>

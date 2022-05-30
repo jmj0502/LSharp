@@ -2,6 +2,7 @@
 using LSharp.GlobalFunctions;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -21,6 +22,7 @@ namespace LSharp.Interpreter
          * string -> string.
          */
         private Enviroment.Enviroment enviroment = new Enviroment.Enviroment();
+        private Dictionary<string, bool> imports = new();
         private readonly Dictionary<Expression, int> locals = new();
         public Enviroment.Enviroment Globals { get => enviroment; }
 
@@ -180,7 +182,7 @@ namespace LSharp.Interpreter
         private Enviroment.Enviroment resolveModuleBody(List<Stmt> stmts)
         {
             var previous = enviroment;
-            enviroment = new Enviroment.Enviroment();
+            enviroment = new Enviroment.Enviroment(previous);
             foreach (var stmt in stmts)
             {
                 execute(stmt);
@@ -190,6 +192,44 @@ namespace LSharp.Interpreter
             return bodyEnvironment;
         }
 
+        /// <summary>
+        /// Turns a using stmt into a runtime representation. It checks if a file exists at the provided path,
+        /// if so, the file is resolved and its content is push to the global environment. The path of the file
+        /// is added to the imports cache with a value of true (that will avoid multiple imports of the same file
+        /// and recursive imports). 
+        /// </summary>
+        /// <param name="stmt">The using statement that will be turned into a runtime representation.</param>
+        public object Visit(Stmt.Using stmt)
+        {
+            var separator = Path.DirectorySeparatorChar;
+            var filePath = Path.GetFullPath(stmt.Path.Replace("/", $"{separator}"));
+            if (!File.Exists(filePath))
+            {
+                throw new RuntimeError(stmt.Keyword, 
+                    "Couldn't find a module on the specified path.");
+            }
+            if (imports.ContainsKey(filePath)) return null;
+            var resolvedFile = Lox.ResolveFile(filePath);
+            if (resolvedFile == null)
+            {
+                throw new RuntimeError(stmt.Keyword, 
+                    "Couldn't resolved the specified module.");
+            }
+            imports[filePath] = true;
+            resolveUsingStatement(resolvedFile);
+            return null;
+        }
+
+        /// <summary>
+        /// Executes a list of statements.
+        /// </summary>
+        public void resolveUsingStatement(List<Stmt> stmts)
+        {
+            foreach (var stmt in stmts)
+            {
+                execute(stmt);
+            }
+        }
 
         /// <summary>
         /// Turns C# values into lox values in order to print them.
