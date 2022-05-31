@@ -24,10 +24,11 @@ namespace LSharp.Interpreter
         private Enviroment.Enviroment enviroment = new Enviroment.Enviroment();
         private Dictionary<string, bool> imports = new();
         private readonly Dictionary<Expression, int> locals = new();
-        public Enviroment.Enviroment Globals { get => enviroment; }
+        public Enviroment.Enviroment Globals;
 
         public Interpreter()
         {
+            Globals = enviroment;
             enviroment.Define("clock", new Clock());
         } 
 
@@ -573,14 +574,9 @@ namespace LSharp.Interpreter
         /// <param name="expression">Any valid expression.</param>
         private object lookUpVariable(Token name, Expression expression)
         {
-            int? distance = null;
-            int value;
-            var result = locals.TryGetValue(expression, out value);
-            if (result) distance = value;
-            if (locals.ContainsKey(expression)) distance = locals[expression];
-            if (distance != null)
+            if (locals.TryGetValue(expression, out int distance))
             {
-                return enviroment.GetAt(distance.Value, name.Lexeme);
+                return enviroment.GetAt(distance, name.Lexeme);
             }
             else
             {
