@@ -613,6 +613,10 @@ namespace LSharp.Parser
             return new Expression.Call(callee, closingParen, arguments);
         }
 
+        private Expression listAccess()
+        {
+        }
+
         /// <summary>
         /// Rule handler for function calls (Non-Terminal).
         /// </summary>
@@ -631,6 +635,10 @@ namespace LSharp.Parser
                     var name = consume(TokenType.IDENTIFIER,
                         "Expect property name after '.'.");
                     expression = new Expression.Get(expression, name);
+                }
+                else if (match(TokenType.LEFT_BRACKET))
+                {
+                    expression = listAccess();
                 }
                 else
                 {
