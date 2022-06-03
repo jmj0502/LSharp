@@ -645,7 +645,7 @@ namespace LSharp.Parser
                 }
                 else if (match(TokenType.LEFT_BRACKET))
                 {
-                    expression = listAccess();
+                    expression = listAccess(expression);
                 }
                 else
                 {
