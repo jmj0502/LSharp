@@ -641,6 +641,23 @@ namespace LSharp.Parser
             return expression;
         }
 
+        private Expression list()
+        {
+            var elements = new List<Expression>();
+
+            if (!check(TokenType.RIGHT_BRACKET))
+            {
+                do
+                {
+                    if (check(TokenType.RIGHT_BRACKET)) break;
+                    elements.Add(or());
+                } while (match(TokenType.COMMA));
+            }
+
+            consume(TokenType.RIGHT_BRACKET, "Expect ']' to close a list.");
+            return new Expression.List(elements);
+        }
+
         /// <summary>
         /// Rule handler for the primary production. It takes care of the terminal characters, an applies
         /// recurssive parsing to group expressions.
@@ -687,6 +704,11 @@ namespace LSharp.Parser
                 var expression = this.expression();
                 consume(TokenType.RIGHT_PAREN, "Expected ')' after expression.");
                 return new Expression.Grouping(expression);
+            }
+
+            if (match(TokenType.LEFT_BRACKET))
+            {
+                return list();
             }
 
             throw error(peek(), "Expected expression.");

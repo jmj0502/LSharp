@@ -248,6 +248,22 @@ namespace LSharp.Interpreter
                     return text;
                 }
             }
+            if (value is List<object>)
+            {
+                var sb = new StringBuilder();
+                var list = (List<object>)value;
+                sb.Append("[");
+                foreach (var el in list)
+                {
+                    sb.Append(el);
+                    if (!object.Equals(el, list[list.Count - 1]))
+                    {
+                        sb.Append(" ");
+                    }
+                }
+                sb.Append("]");
+                return sb.ToString();
+            }
 
             return value.ToString();
         }
@@ -466,6 +482,16 @@ namespace LSharp.Interpreter
         public object Visit(Expression.Function expression)
         {
             return new LSFunction(expression, "anonymous", enviroment, false); 
+        }
+
+        public object Visit(Expression.List expression)
+        {
+            var list = new List<object>();
+            foreach (var expr in expression.Elements)
+            {
+                list.Add(evaluate(expr));
+            }
+            return list;
         }
 
         /// <summary>

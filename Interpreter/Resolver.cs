@@ -454,6 +454,15 @@ namespace LSharp.Interpreter
             return null;
         }
 
+        public object Visit(Expression.List expression)
+        {
+            foreach (var expr in expression.Elements)
+            {
+                resolve(expr);
+            }
+            return null;
+        }
+
         /// <summary>
         /// Proceeds to call the accept method of the provided statement.
         /// </summary>
