@@ -613,8 +613,15 @@ namespace LSharp.Parser
             return new Expression.Call(callee, closingParen, arguments);
         }
 
-        private Expression listAccess()
+        private Expression listAccess(Expression list)
         {
+            if (check(TokenType.NUMBER))
+            {
+                var index = primary();
+                consume(TokenType.RIGHT_BRACKET, "Expect ']' after accessing a collection.");
+                return new Expression.Access(list, index);
+            }
+            throw error(peek(), "Invalid index provided.");
         }
 
         /// <summary>
