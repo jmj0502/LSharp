@@ -300,11 +300,13 @@ namespace LSharp
         public class Access : Expression
         {
             public Expression Member;
-            public Expression Index;
+            public Expression Accessor;
+            public Token Index; 
 
-            public Access(Expression member, Expression index)
+            public Access(Expression member, Expression accessor, Token index)
             {
                 Member = member;
+                Accessor = accessor;
                 Index = index;
             }
 

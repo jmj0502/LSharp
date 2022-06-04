@@ -463,6 +463,13 @@ namespace LSharp.Interpreter
             return null;
         }
 
+        public object Visit(Expression.Access expression)
+        {
+            resolve(expression.Member);
+            resolve(expression.Accessor);
+            return null;
+        }
+
         /// <summary>
         /// Proceeds to call the accept method of the provided statement.
         /// </summary>

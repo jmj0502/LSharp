@@ -494,6 +494,33 @@ namespace LSharp.Interpreter
             return list;
         }
 
+        public object Visit(Expression.Access expression)
+        {
+            try
+            {
+                var list = evaluate(expression.Member);
+                var accessor = evaluate(expression.Accessor);
+                if ((list is List<object>))
+                {
+                    var literalList = (List<object>)list;
+                    var listIndex = (double)accessor;
+                    return literalList[(int)listIndex];
+                }
+                else
+                {
+                    throw new RuntimeError(expression.Index, "Only lists can be accessed by index.");
+                }
+            }
+            catch (ArgumentOutOfRangeException e)
+            {
+                throw new RuntimeError(expression.Index, "Index out of range.");
+            }
+            catch (InvalidCastException e)
+            {
+                throw new RuntimeError(expression.Index, "Only integers can be used as accessors.");
+            }
+        }
+
         /// <summary>
         /// Checks if the provided object is a valid number.
         /// </summary>
