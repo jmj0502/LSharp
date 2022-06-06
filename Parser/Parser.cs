@@ -244,8 +244,13 @@ namespace LSharp.Parser
                 }
                 else if (expression is Expression.Get)
                 {
-                    var get = (Expression.Get) expression;
+                    var get = (Expression.Get)expression;
                     return new Expression.Set(get.Object, get.Name, value);
+                }
+                else if (expression is Expression.Access)
+                {
+                    var access = (Expression.Access)expression;
+                    return new Expression.Set(access.Member, access.Index, value);
                 }
 
                 error(equals, "Invalid assignment target.");

@@ -695,6 +695,28 @@ namespace LSharp.Interpreter
         public object Visit(Expression.Set expression)
         {
             object obj = evaluate(expression.Object);
+            if (obj is List<object>)
+            {
+                try
+                {
+                    var accesor = expression.Name.Literal;
+                    var index = (double)accesor;
+                    var newValue = evaluate(expression.Value);
+                    var list = (List<object>)obj;
+                    list[(int)index] = newValue;
+                    return newValue;
+                } 
+                catch(InvalidCastException e)
+                {
+                    throw new RuntimeError(expression.Name, 
+                        "Only integers can be used as lists indexes.");
+                }
+                catch(ArgumentOutOfRangeException e)
+                {
+                    throw new RuntimeError(expression.Name,
+                        "Index out of range.");
+                }
+            }
             if (!(obj is LSInstance))
             {
                 throw new RuntimeError(expression.Name, 
