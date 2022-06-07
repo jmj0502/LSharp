@@ -44,7 +44,7 @@ namespace LSharp.Parser
         * exprStmt -> expression ";"; //Added on chapter 8.
         * printStmt -> "print" expression ";"; //Added on chapter 8.
         * expression -> assignment; //Added on chapter 8.
-        * assignment -> (call ".")? IDENTIFIER "=" assignment | ternaryEx; //Added on chapter 8.
+        * assignment -> (call ".")? IDENTIFIER (access)? "=" assignment | ternaryEx; //Added on chapter 8.
         * ternaryEx -> comparison "?" logical_or ":" ( logical_or | ternary_expression ) | logical_or;
         * logical_or -> logical_and ("or" logical_and)*; //Added on chapter 9.
         * logical_and -> equality ("and" equality)*; //Added on chapter 9.
@@ -56,10 +56,12 @@ namespace LSharp.Parser
         * unary -> ("!","-") unary | call;
         * postfix -> call ("++" | "--") | call;
         * call -> primary ( "(" arguments? ")" | "." IDENTIFIER )*;
+        * access -> primary "[" primary "]";
         * arguments -> expression ("," expression )*;
         * primary -> NUMBER | STRING | "true" | "false" | "nil" | "(" expression ")" | "IDENTIFIER"
-        * | "super" "." IDENTIFIER | funExpression;
+        * | "super" "." IDENTIFIER | funExpression | list;
         * funExpression -> "fun" "(" parameters? ")" block;
+        * list -> "[" primary ("," primary | IDENTIFIER)* "]";
         * This sintax will allow us to represent our productions in code as follows:
         * Terminal -> Code to match and consume a token.
         * Non-Terminal -> Call to that rule's function.
@@ -618,6 +620,11 @@ namespace LSharp.Parser
             return new Expression.Call(callee, closingParen, arguments);
         }
 
+        /// <summary>
+        /// Rule handling for access expressions. 
+        /// </summary>
+        /// <param name="list"></param>
+        /// <returns></returns>
         private Expression listAccess(Expression list)
         {
             var index = peek();
@@ -658,6 +665,10 @@ namespace LSharp.Parser
             return expression;
         }
 
+        /// <summary>
+        /// Rule handler for list expressions. Once the "[" character is found, the parser begins to parse a list, the rule
+        /// keeps on until it can find any commas or until a "]" is reached.
+        /// </summary>
         private Expression list()
         {
             var elements = new List<Expression>();

@@ -484,6 +484,13 @@ namespace LSharp.Interpreter
             return new LSFunction(expression, "anonymous", enviroment, false); 
         }
 
+        /// <summary>
+        /// Turns a list into a runtime representation. To do so, it 
+        /// parses each value contained on Expression.List and adds them to a List<object> that's returned 
+        /// once the process is done.
+        /// </summary>
+        /// <param name="expression">Any valid Expression.List</param>
+        /// <returns></returns>
         public object Visit(Expression.List expression)
         {
             var list = new List<object>();
@@ -494,6 +501,12 @@ namespace LSharp.Interpreter
             return list;
         }
 
+        /// <summary>
+        /// Turns an access expression into a runtime representation. Access expressions are somehow similiar to 
+        /// get expressions, they contain all the necessary data for accessing a specific list index.
+        /// Throws a runtime error if the provided list index is not a number or is out of range.
+        /// </summary>
+        /// <param name="expression">Any valid access expression.</param>
         public object Visit(Expression.Access expression)
         {
             try
