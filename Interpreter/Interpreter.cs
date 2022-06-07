@@ -248,6 +248,22 @@ namespace LSharp.Interpreter
                     return text;
                 }
             }
+            if (value is List<object>)
+            {
+                var sb = new StringBuilder();
+                var list = (List<object>)value;
+                sb.Append("[");
+                foreach (var el in list)
+                {
+                    sb.Append(el);
+                    if (!object.Equals(el, list[list.Count - 1]))
+                    {
+                        sb.Append(" ");
+                    }
+                }
+                sb.Append("]");
+                return sb.ToString();
+            }
 
             return value.ToString();
         }
@@ -469,6 +485,56 @@ namespace LSharp.Interpreter
         }
 
         /// <summary>
+        /// Turns a list into a runtime representation. To do so, it 
+        /// parses each value contained on Expression.List and adds them to a List<object> that's returned 
+        /// once the process is done.
+        /// </summary>
+        /// <param name="expression">Any valid Expression.List</param>
+        /// <returns></returns>
+        public object Visit(Expression.List expression)
+        {
+            var list = new List<object>();
+            foreach (var expr in expression.Elements)
+            {
+                list.Add(evaluate(expr));
+            }
+            return list;
+        }
+
+        /// <summary>
+        /// Turns an access expression into a runtime representation. Access expressions are somehow similiar to 
+        /// get expressions, they contain all the necessary data for accessing a specific list index.
+        /// Throws a runtime error if the provided list index is not a number or is out of range.
+        /// </summary>
+        /// <param name="expression">Any valid access expression.</param>
+        public object Visit(Expression.Access expression)
+        {
+            try
+            {
+                var list = evaluate(expression.Member);
+                var accessor = evaluate(expression.Accessor);
+                if ((list is List<object>))
+                {
+                    var literalList = (List<object>)list;
+                    var listIndex = (double)accessor;
+                    return literalList[(int)listIndex];
+                }
+                else
+                {
+                    throw new RuntimeError(expression.Index, "Only lists can be accessed by index.");
+                }
+            }
+            catch (ArgumentOutOfRangeException e)
+            {
+                throw new RuntimeError(expression.Index, "Index out of range.");
+            }
+            catch (InvalidCastException e)
+            {
+                throw new RuntimeError(expression.Index, "Only integers can be used as accessors.");
+            }
+        }
+
+        /// <summary>
         /// Checks if the provided object is a valid number.
         /// </summary>
         /// <param name="operatr">The unary operator that will take effect over the operand.</param>
@@ -642,6 +708,28 @@ namespace LSharp.Interpreter
         public object Visit(Expression.Set expression)
         {
             object obj = evaluate(expression.Object);
+            if (obj is List<object>)
+            {
+                try
+                {
+                    var accesor = expression.Name.Literal;
+                    var index = (double)accesor;
+                    var newValue = evaluate(expression.Value);
+                    var list = (List<object>)obj;
+                    list[(int)index] = newValue;
+                    return newValue;
+                } 
+                catch(InvalidCastException e)
+                {
+                    throw new RuntimeError(expression.Name, 
+                        "Only integers can be used as lists indexes.");
+                }
+                catch(ArgumentOutOfRangeException e)
+                {
+                    throw new RuntimeError(expression.Name,
+                        "Index out of range.");
+                }
+            }
             if (!(obj is LSInstance))
             {
                 throw new RuntimeError(expression.Name, 

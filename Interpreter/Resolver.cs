@@ -455,6 +455,32 @@ namespace LSharp.Interpreter
         }
 
         /// <summary>
+        /// Performs static analysis on a expression list. It basically resolves 
+        /// each expression contained on the Expression.List.
+        /// </summary>
+        /// <param name="expression">The Expression.List to be resolved.</param>
+        public object Visit(Expression.List expression)
+        {
+            foreach (var expr in expression.Elements)
+            {
+                resolve(expr);
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Performs static analysis on an access expression. In order to do so, it resolved the member that will
+        /// be accessed and the expression that represents the accessor.
+        /// </summary>
+        /// <param name="expression">The Expression.Access to be resolved.</param>
+        public object Visit(Expression.Access expression)
+        {
+            resolve(expression.Member);
+            resolve(expression.Accessor);
+            return null;
+        }
+
+        /// <summary>
         /// Proceeds to call the accept method of the provided statement.
         /// </summary>
         /// <param name="statement">Any statement of our stmt tree.</param>

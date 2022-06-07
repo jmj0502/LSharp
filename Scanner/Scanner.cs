@@ -69,6 +69,8 @@ namespace LSharp.Scanner
                 case ')': addToken(TokenType.RIGHT_PAREN); break;
                 case '{': addToken(TokenType.LEFT_BRACE); break;
                 case '}': addToken(TokenType.RIGHT_BRACE); break;
+                case '[': addToken(TokenType.LEFT_BRACKET); break;
+                case ']': addToken(TokenType.RIGHT_BRACKET); break;
                 case ',': addToken(TokenType.COMMA); break;
                 case '.': addToken(TokenType.DOT); break;
                 case '-': 

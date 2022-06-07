@@ -25,6 +25,8 @@ namespace LSharp
             T Visit(Super expression);
             T Visit(Ternary expression);
             T Visit(Function expression);
+            T Visit(List expression);
+            T Visit(Access expression);
         }
 
         public abstract T Accept<T>(IVisitor<T> visitor);
@@ -272,6 +274,40 @@ namespace LSharp
             {
                 Parameters = parameters;
                 Body = body;
+            }
+
+            public override T Accept<T>(IVisitor<T> visitor)
+            {
+                return visitor.Visit(this);
+            }
+        }
+
+        public class List : Expression
+        {
+            public readonly List<Expression> Elements;
+
+            public List(List<Expression> elements)
+            {
+                Elements = elements;
+            }
+
+            public override T Accept<T>(IVisitor<T> visitor)
+            {
+                return visitor.Visit(this);
+            }
+        }
+
+        public class Access : Expression
+        {
+            public Expression Member;
+            public Expression Accessor;
+            public Token Index; 
+
+            public Access(Expression member, Expression accessor, Token index)
+            {
+                Member = member;
+                Accessor = accessor;
+                Index = index;
             }
 
             public override T Accept<T>(IVisitor<T> visitor)
