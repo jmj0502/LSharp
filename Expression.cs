@@ -27,6 +27,7 @@ namespace LSharp
             T Visit(Function expression);
             T Visit(List expression);
             T Visit(Access expression);
+            T Visit(Dict expression);
         }
 
         public abstract T Accept<T>(IVisitor<T> visitor);
@@ -308,6 +309,23 @@ namespace LSharp
                 Member = member;
                 Accessor = accessor;
                 Index = index;
+            }
+
+            public override T Accept<T>(IVisitor<T> visitor)
+            {
+                return visitor.Visit(this);
+            }
+        }
+
+        public class Dict : Expression
+        {
+            public List<Token> Keys;
+            public List<Expression> Values;
+
+            public Dict(List<Token> keys, List<Expression> values)
+            {
+                Keys = keys;
+                Values = values;
             }
 
             public override T Accept<T>(IVisitor<T> visitor)
