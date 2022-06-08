@@ -274,7 +274,11 @@ namespace LSharp.Interpreter
                 sb.Append("{");
                 for (var i = 0; i < dictKeys.Count; i++)
                 {
-                    sb.Append($"{dictKeys[i]}:{dictValues[i]} ");
+                    sb.Append($"{dictKeys[i]}:{dictValues[i]}");
+                    if (!object.Equals(dictKeys[i], dictKeys.Last()))
+                    {
+                        sb.Append(" ");
+                    }
                 }
                 sb.Append("}");
                 return sb.ToString();
@@ -525,6 +529,10 @@ namespace LSharp.Interpreter
                 {
                     var key = enviroment.Get(expression.Keys[i]);
                     dict[key] = evaluate(expression.Values[i]);
+                }
+                else
+                {
+                    dict[expression.Keys[i].Literal] = evaluate(expression.Values[i]);
                 }
             }
             return dict;
