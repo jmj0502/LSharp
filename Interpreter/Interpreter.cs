@@ -255,10 +255,10 @@ namespace LSharp.Interpreter
                 sb.Append("[");
                 foreach (var el in list)
                 {
-                    sb.Append(el);
-                    if (!Equals(el, list[list.Count - 1]))
+                    sb.Append(stringify(el));
+                    if (!Equals(el, list.Last()))
                     {
-                        sb.Append(" ");
+                        sb.Append(", ");
                     }
                 }
                 sb.Append("]");
@@ -274,10 +274,10 @@ namespace LSharp.Interpreter
                 sb.Append("{");
                 for (var i = 0; i < dictKeys.Count; i++)
                 {
-                    sb.Append($"{dictKeys[i]}:{dictValues[i]}");
+                    sb.Append($"{stringify(dictKeys[i])}:{stringify(dictValues[i])}");
                     if (!Equals(dictKeys[i], dictKeys.Last()))
                     {
-                        sb.Append(" ");
+                        sb.Append(", ");
                     }
                 }
                 sb.Append("}");
