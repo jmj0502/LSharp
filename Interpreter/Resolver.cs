@@ -468,6 +468,15 @@ namespace LSharp.Interpreter
             return null;
         }
 
+        public object Visit(Expression.Dict expression)
+        {
+            foreach (var expr in expression.Values)
+            {
+                resolve(expr);
+            }
+            return null;
+        }
+
         /// <summary>
         /// Performs static analysis on an access expression. In order to do so, it resolved the member that will
         /// be accessed and the expression that represents the accessor.

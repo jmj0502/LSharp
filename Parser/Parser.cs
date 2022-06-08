@@ -59,9 +59,10 @@ namespace LSharp.Parser
         * access -> primary "[" primary "]";
         * arguments -> expression ("," expression )*;
         * primary -> NUMBER | STRING | "true" | "false" | "nil" | "(" expression ")" | "IDENTIFIER"
-        * | "super" "." IDENTIFIER | funExpression | list;
+        * | "super" "." IDENTIFIER | funExpression | list | dict;
         * funExpression -> "fun" "(" parameters? ")" block;
         * list -> "[" primary ("," primary | IDENTIFIER)* "]";
+        * dict -> "%" "{" ((NUMBER | STRING | BOOLEAN) ":" primary)* "}";
         * This sintax will allow us to represent our productions in code as follows:
         * Terminal -> Code to match and consume a token.
         * Non-Terminal -> Call to that rule's function.
@@ -685,6 +686,31 @@ namespace LSharp.Parser
             consume(TokenType.RIGHT_BRACKET, "Expect ']' to close a list.");
             return new Expression.List(elements);
         }
+        
+        private Expression map()
+        {
+            consume(TokenType.LEFT_BRACE, "Expected '{' after map declaration.");
+            var keys = new List<Token>();
+            var vals = new List<Expression>();
+            if (!check(TokenType.RIGHT_BRACE))
+            {
+                do
+                {
+                    if (check(TokenType.STRING) 
+                        || check(TokenType.NUMBER) 
+                        || check(TokenType.IDENTIFIER)
+                        )
+                    {
+                        keys.Add(advance());
+                        consume(TokenType.COLON, "Expect ':' after map key.");
+                        vals.Add(or());
+                    }
+                } while (match(TokenType.COMMA));
+            }
+
+            consume(TokenType.RIGHT_BRACE, "Expect '}' to close map.");
+            return new Expression.Dict(keys, vals);
+        }
 
         /// <summary>
         /// Rule handler for the primary production. It takes care of the terminal characters, an applies
@@ -737,6 +763,11 @@ namespace LSharp.Parser
             if (match(TokenType.LEFT_BRACKET))
             {
                 return list();
+            }
+
+            if (match(TokenType.PERCENT))
+            {
+                return map(); 
             }
 
             throw error(peek(), "Expected expression.");

@@ -264,6 +264,21 @@ namespace LSharp.Interpreter
                 sb.Append("]");
                 return sb.ToString();
             }
+            if (value is Dictionary<object, object>)
+            {
+                var sb = new StringBuilder();
+                var dict = (Dictionary<object, object>)value;
+                var dictKeys = dict.Keys.ToList();
+                var dictValues = dict.Values.ToList();
+                sb.Append("%");
+                sb.Append("{");
+                for (var i = 0; i < dictKeys.Count; i++)
+                {
+                    sb.Append($"{dictKeys[i]}:{dictValues[i]} ");
+                }
+                sb.Append("}");
+                return sb.ToString();
+            }
 
             return value.ToString();
         }
@@ -499,6 +514,20 @@ namespace LSharp.Interpreter
                 list.Add(evaluate(expr));
             }
             return list;
+        }
+
+        public object Visit(Expression.Dict expression)
+        {
+            var dict = new Dictionary<object, object>();
+            for (var i = 0;  i < expression.Keys.Count; i++)
+            {
+                if (expression.Keys[i].Type == TokenType.IDENTIFIER)
+                {
+                    var key = enviroment.Get(expression.Keys[i]);
+                    dict[key] = evaluate(expression.Values[i]);
+                }
+            }
+            return dict;
         }
 
         /// <summary>

@@ -18,6 +18,7 @@ namespace LSharp.Tokens
         PLUS,
         SEMICOLON,
         SLASH,
+        PERCENT,
         STAR,
 
         //One or two character tokens.
