@@ -256,7 +256,7 @@ namespace LSharp.Interpreter
                 foreach (var el in list)
                 {
                     sb.Append(el);
-                    if (!object.Equals(el, list[list.Count - 1]))
+                    if (!Equals(el, list[list.Count - 1]))
                     {
                         sb.Append(" ");
                     }
@@ -275,7 +275,7 @@ namespace LSharp.Interpreter
                 for (var i = 0; i < dictKeys.Count; i++)
                 {
                     sb.Append($"{dictKeys[i]}:{dictValues[i]}");
-                    if (!object.Equals(dictKeys[i], dictKeys.Last()))
+                    if (!Equals(dictKeys[i], dictKeys.Last()))
                     {
                         sb.Append(" ");
                     }
