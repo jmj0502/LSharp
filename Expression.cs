@@ -319,10 +319,10 @@ namespace LSharp
 
         public class Dict : Expression
         {
-            public List<Token> Keys;
+            public List<Expression> Keys;
             public List<Expression> Values;
 
-            public Dict(List<Token> keys, List<Expression> values)
+            public Dict(List<Expression> keys, List<Expression> values)
             {
                 Keys = keys;
                 Values = values;

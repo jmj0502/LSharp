@@ -525,15 +525,8 @@ namespace LSharp.Interpreter
             var dict = new Dictionary<object, object>();
             for (var i = 0;  i < expression.Keys.Count; i++)
             {
-                if (expression.Keys[i].Type == TokenType.IDENTIFIER)
-                {
-                    var key = enviroment.Get(expression.Keys[i]);
-                    dict[key] = evaluate(expression.Values[i]);
-                }
-                else
-                {
-                    dict[expression.Keys[i].Literal] = evaluate(expression.Values[i]);
-                }
+                var key = expression.Keys[i];
+                dict[evaluate(key)] = evaluate(expression.Values[i]);
             }
             return dict;
         }

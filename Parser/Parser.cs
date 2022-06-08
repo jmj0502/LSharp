@@ -690,21 +690,16 @@ namespace LSharp.Parser
         private Expression map()
         {
             consume(TokenType.LEFT_BRACE, "Expected '{' after map declaration.");
-            var keys = new List<Token>();
+            var keys = new List<Expression>();
             var vals = new List<Expression>();
             if (!check(TokenType.RIGHT_BRACE))
             {
                 do
                 {
-                    if (check(TokenType.STRING) 
-                        || check(TokenType.NUMBER) 
-                        || check(TokenType.IDENTIFIER)
-                        )
-                    {
-                        keys.Add(advance());
-                        consume(TokenType.COLON, "Expect ':' after map key.");
-                        vals.Add(or());
-                    }
+                    if (check(TokenType.RIGHT_BRACE)) break;
+                    keys.Add(or());
+                    consume(TokenType.COLON, "Expect ':' after map key.");
+                    vals.Add(or());
                 } while (match(TokenType.COMMA));
             }
 
