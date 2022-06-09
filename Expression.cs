@@ -200,6 +200,7 @@ namespace LSharp
         {
             public readonly Expression Object;
             public readonly Token Name;
+            public readonly Expression Accessor;
             public readonly Expression Value;
 
             public Set(Expression obj, Token name, Expression value)
@@ -207,6 +208,11 @@ namespace LSharp
                 Object = obj;
                 Name = name;
                 Value = value;
+            }
+
+            public Set(Expression obj, Token name, Expression accessor, Expression value) : this(obj, name, value)
+            {
+                Accessor = accessor;
             }
 
             public override T Accept<T>(IVisitor<T> visitor)

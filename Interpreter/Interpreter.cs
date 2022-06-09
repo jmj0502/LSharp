@@ -564,6 +564,10 @@ namespace LSharp.Interpreter
             {
                 throw new RuntimeError(expression.Index, "Only integers can be used as accessors.");
             }
+            catch (KeyNotFoundException e)
+            {
+                return null;
+            }
         }
 
         /// <summary>
@@ -744,8 +748,7 @@ namespace LSharp.Interpreter
             {
                 try
                 {
-                    var accesor = expression.Name.Literal;
-                    var index = (double)accesor;
+                    var index = (double)evaluate(expression.Accessor);
                     var newValue = evaluate(expression.Value);
                     var list = (List<object>)obj;
                     list[(int)index] = newValue;
@@ -764,7 +767,7 @@ namespace LSharp.Interpreter
             }
             if (obj is Dictionary<object, object>)
             {
-                var accesor = expression.Name.Literal;
+                var accesor = evaluate(expression.Accessor);
                 var newValue = evaluate(expression.Value);
                 var dict = (Dictionary<object, object>)obj;
                 dict[accesor] = newValue;

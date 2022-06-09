@@ -253,7 +253,7 @@ namespace LSharp.Parser
                 else if (expression is Expression.Access)
                 {
                     var access = (Expression.Access)expression;
-                    return new Expression.Set(access.Member, access.Index, value);
+                    return new Expression.Set(access.Member, access.Index, access.Accessor, value);
                 }
 
                 error(equals, "Invalid assignment target.");
@@ -628,7 +628,7 @@ namespace LSharp.Parser
         private Expression listAccess(Expression list)
         {
             var index = peek();
-            var accessor = primary();
+            var accessor = or();
             consume(TokenType.RIGHT_BRACKET, "Expect ']' after accessing a collection.");
             return new Expression.Access(list, accessor, index);
         }
