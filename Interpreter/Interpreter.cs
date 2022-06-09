@@ -541,18 +541,20 @@ namespace LSharp.Interpreter
         {
             try
             {
-                var list = evaluate(expression.Member);
+                var obj = evaluate(expression.Member);
                 var accessor = evaluate(expression.Accessor);
-                if ((list is List<object>))
+                if ((obj is List<object>))
                 {
-                    var literalList = (List<object>)list;
+                    var list = (List<object>)obj;
                     var listIndex = (double)accessor;
-                    return literalList[(int)listIndex];
+                    return list[(int)listIndex];
                 }
-                else
+                if ((obj is Dictionary<object, object>))
                 {
-                    throw new RuntimeError(expression.Index, "Only lists can be accessed by index.");
+                    var dict = (Dictionary<object, object>)obj;
+                    return dict[accessor];
                 }
+                throw new RuntimeError(expression.Index, "Only lists can be accessed by index.");
             }
             catch (ArgumentOutOfRangeException e)
             {
@@ -759,6 +761,14 @@ namespace LSharp.Interpreter
                     throw new RuntimeError(expression.Name,
                         "Index out of range.");
                 }
+            }
+            if (obj is Dictionary<object, object>)
+            {
+                var accesor = expression.Name.Literal;
+                var newValue = evaluate(expression.Value);
+                var dict = (Dictionary<object, object>)obj;
+                dict[accesor] = newValue;
+                return newValue;
             }
             if (!(obj is LSInstance))
             {

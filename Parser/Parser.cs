@@ -625,7 +625,6 @@ namespace LSharp.Parser
         /// Rule handling for access expressions. 
         /// </summary>
         /// <param name="list"></param>
-        /// <returns></returns>
         private Expression listAccess(Expression list)
         {
             var index = peek();
