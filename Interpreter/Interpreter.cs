@@ -520,6 +520,13 @@ namespace LSharp.Interpreter
             return list;
         }
 
+        /// <summary>
+        /// Turns a dictionary into a runtime representation. To do so, it 
+        /// parses each key and value contained on Expression.Dict and adds them to Dictionary<object, objact> that's returned
+        /// once the proccess is done.
+        /// </summary>
+        /// <param name="expression">Any valid Expression.Dict</param>
+        /// <returns></returns>
         public object Visit(Expression.Dict expression)
         {
             var dict = new Dictionary<object, object>();
