@@ -624,13 +624,13 @@ namespace LSharp.Parser
         /// <summary>
         /// Rule handling for access expressions. 
         /// </summary>
-        /// <param name="list"></param>
-        private Expression listAccess(Expression list)
+        /// <param name="collection">Any collection type (Lists, Dicts).</param>
+        private Expression access(Expression collection)
         {
             var index = peek();
             var accessor = or();
             consume(TokenType.RIGHT_BRACKET, "Expect ']' after accessing a collection.");
-            return new Expression.Access(list, accessor, index);
+            return new Expression.Access(collection, accessor, index);
         }
 
         /// <summary>
@@ -654,7 +654,7 @@ namespace LSharp.Parser
                 }
                 else if (match(TokenType.LEFT_BRACKET))
                 {
-                    expression = listAccess(expression);
+                    expression = access(expression);
                 }
                 else
                 {

@@ -322,30 +322,30 @@ namespace LSharp.Interpreter
 
             switch (expression.Operator.Type)
             {
-                case Tokens.TokenType.EQUAL_EQUAL: return isEqual(left, right);
-                case Tokens.TokenType.BANG_EQUAL: return !isEqual(left, right);
-                case Tokens.TokenType.GREATER:
+                case TokenType.EQUAL_EQUAL: return isEqual(left, right);
+                case TokenType.BANG_EQUAL: return !isEqual(left, right);
+                case TokenType.GREATER:
                     checkNumberOperands(expression.Operator, left, right);
                     return (double)left > (double)right;
-                case Tokens.TokenType.GREATER_EQUAL:
+                case TokenType.GREATER_EQUAL:
                     checkNumberOperands(expression.Operator, left, right);
                     return (double)left >= (double)right;
-                case Tokens.TokenType.LESS:
+                case TokenType.LESS:
                     checkNumberOperands(expression.Operator, left, right);
                     return (double)left < (double)right;
-                case Tokens.TokenType.LESS_EQUAL:
+                case TokenType.LESS_EQUAL:
                     checkNumberOperands(expression.Operator, left, right);
                     return (double)left <= (double)right;
-                case Tokens.TokenType.MINNUS:
+                case TokenType.MINNUS:
                     checkNumberOperands(expression.Operator, left, right);
                     return (double)left - (double)right;
-                case Tokens.TokenType.SLASH:
+                case TokenType.SLASH:
                     checkNumberOperands(expression.Operator, left, right);
                     return (double)left / (double)right;
-                case Tokens.TokenType.STAR:
+                case TokenType.STAR:
                     checkNumberOperands(expression.Operator, left, right);
                     return (double)left * (double)right;
-                case Tokens.TokenType.PLUS:
+                case TokenType.PLUS:
                     if (left is double && right is double)
                         return (double)left + (double)right;
 

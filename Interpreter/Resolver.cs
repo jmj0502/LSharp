@@ -468,8 +468,18 @@ namespace LSharp.Interpreter
             return null;
         }
 
+        /// <summary>
+        /// Performs static analysis on a Expression.Dict. To do so, it resolves the expressions used as 
+        /// dict keys an their respective values.
+        /// </summary>
+        /// <param name="expression">The dict expression to be resolved.</param>
         public object Visit(Expression.Dict expression)
         {
+            foreach (var expr in expression.Keys)
+            {
+                resolve(expr);
+            }
+
             foreach (var expr in expression.Values)
             {
                 resolve(expr);
