@@ -59,9 +59,10 @@ namespace LSharp.Parser
         * access -> primary "[" primary "]";
         * arguments -> expression ("," expression )*;
         * primary -> NUMBER | STRING | "true" | "false" | "nil" | "(" expression ")" | "IDENTIFIER"
-        * | "super" "." IDENTIFIER | funExpression | list;
+        * | "super" "." IDENTIFIER | funExpression | list | dict;
         * funExpression -> "fun" "(" parameters? ")" block;
         * list -> "[" primary ("," primary | IDENTIFIER)* "]";
+        * dict -> "%" "{" ((NUMBER | STRING | BOOLEAN) ":" primary)* "}";
         * This sintax will allow us to represent our productions in code as follows:
         * Terminal -> Code to match and consume a token.
         * Non-Terminal -> Call to that rule's function.
@@ -252,7 +253,7 @@ namespace LSharp.Parser
                 else if (expression is Expression.Access)
                 {
                     var access = (Expression.Access)expression;
-                    return new Expression.Set(access.Member, access.Index, value);
+                    return new Expression.Set(access.Member, access.Index, access.Accessor, value);
                 }
 
                 error(equals, "Invalid assignment target.");
@@ -623,14 +624,13 @@ namespace LSharp.Parser
         /// <summary>
         /// Rule handling for access expressions. 
         /// </summary>
-        /// <param name="list"></param>
-        /// <returns></returns>
-        private Expression listAccess(Expression list)
+        /// <param name="collection">Any collection type (Lists, Dicts).</param>
+        private Expression access(Expression collection)
         {
             var index = peek();
-            var accessor = primary();
+            var accessor = or();
             consume(TokenType.RIGHT_BRACKET, "Expect ']' after accessing a collection.");
-            return new Expression.Access(list, accessor, index);
+            return new Expression.Access(collection, accessor, index);
         }
 
         /// <summary>
@@ -654,7 +654,7 @@ namespace LSharp.Parser
                 }
                 else if (match(TokenType.LEFT_BRACKET))
                 {
-                    expression = listAccess(expression);
+                    expression = access(expression);
                 }
                 else
                 {
@@ -684,6 +684,30 @@ namespace LSharp.Parser
 
             consume(TokenType.RIGHT_BRACKET, "Expect ']' to close a list.");
             return new Expression.List(elements);
+        }
+        
+        /// <summary>
+        /// Rule handler for dict expressions. Once the % character is found, the parser begins to parse a dict, the rule
+        /// keeps on until it reaches the "}" character.
+        /// </summary>
+        private Expression dictionary()
+        {
+            consume(TokenType.LEFT_BRACE, "Expected '{' after dictionary declaration.");
+            var keys = new List<Expression>();
+            var vals = new List<Expression>();
+            if (!check(TokenType.RIGHT_BRACE))
+            {
+                do
+                {
+                    if (check(TokenType.RIGHT_BRACE)) break;
+                    keys.Add(or());
+                    consume(TokenType.COLON, "Expect ':' after dictionary key.");
+                    vals.Add(or());
+                } while (match(TokenType.COMMA));
+            }
+
+            consume(TokenType.RIGHT_BRACE, "Expect '}' to close dictionary.");
+            return new Expression.Dict(keys, vals);
         }
 
         /// <summary>
@@ -737,6 +761,11 @@ namespace LSharp.Parser
             if (match(TokenType.LEFT_BRACKET))
             {
                 return list();
+            }
+
+            if (match(TokenType.PERCENT))
+            {
+                return dictionary(); 
             }
 
             throw error(peek(), "Expected expression.");

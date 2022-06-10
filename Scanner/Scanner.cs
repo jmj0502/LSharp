@@ -79,6 +79,7 @@ namespace LSharp.Scanner
                 case '+': 
                     addToken(match('+') ? TokenType.PLUS_PLUS : TokenType.PLUS); 
                     break;
+                case '%': addToken(TokenType.PERCENT); break;
                 case ';': addToken(TokenType.SEMICOLON); break;
                 case '*': addToken(TokenType.STAR); break;
                 case '?': addToken(TokenType.QUESTION); break;

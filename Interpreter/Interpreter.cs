@@ -255,13 +255,32 @@ namespace LSharp.Interpreter
                 sb.Append("[");
                 foreach (var el in list)
                 {
-                    sb.Append(el);
-                    if (!object.Equals(el, list[list.Count - 1]))
+                    sb.Append(stringify(el));
+                    if (!Equals(el, list.Last()))
                     {
-                        sb.Append(" ");
+                        sb.Append(", ");
                     }
                 }
                 sb.Append("]");
+                return sb.ToString();
+            }
+            if (value is Dictionary<object, object>)
+            {
+                var sb = new StringBuilder();
+                var dict = (Dictionary<object, object>)value;
+                var dictKeys = dict.Keys.ToList();
+                var dictValues = dict.Values.ToList();
+                sb.Append("%");
+                sb.Append("{");
+                for (var i = 0; i < dictKeys.Count; i++)
+                {
+                    sb.Append($"{stringify(dictKeys[i])}:{stringify(dictValues[i])}");
+                    if (!Equals(dictKeys[i], dictKeys.Last()))
+                    {
+                        sb.Append(", ");
+                    }
+                }
+                sb.Append("}");
                 return sb.ToString();
             }
 
@@ -303,30 +322,30 @@ namespace LSharp.Interpreter
 
             switch (expression.Operator.Type)
             {
-                case Tokens.TokenType.EQUAL_EQUAL: return isEqual(left, right);
-                case Tokens.TokenType.BANG_EQUAL: return !isEqual(left, right);
-                case Tokens.TokenType.GREATER:
+                case TokenType.EQUAL_EQUAL: return isEqual(left, right);
+                case TokenType.BANG_EQUAL: return !isEqual(left, right);
+                case TokenType.GREATER:
                     checkNumberOperands(expression.Operator, left, right);
                     return (double)left > (double)right;
-                case Tokens.TokenType.GREATER_EQUAL:
+                case TokenType.GREATER_EQUAL:
                     checkNumberOperands(expression.Operator, left, right);
                     return (double)left >= (double)right;
-                case Tokens.TokenType.LESS:
+                case TokenType.LESS:
                     checkNumberOperands(expression.Operator, left, right);
                     return (double)left < (double)right;
-                case Tokens.TokenType.LESS_EQUAL:
+                case TokenType.LESS_EQUAL:
                     checkNumberOperands(expression.Operator, left, right);
                     return (double)left <= (double)right;
-                case Tokens.TokenType.MINNUS:
+                case TokenType.MINNUS:
                     checkNumberOperands(expression.Operator, left, right);
                     return (double)left - (double)right;
-                case Tokens.TokenType.SLASH:
+                case TokenType.SLASH:
                     checkNumberOperands(expression.Operator, left, right);
                     return (double)left / (double)right;
-                case Tokens.TokenType.STAR:
+                case TokenType.STAR:
                     checkNumberOperands(expression.Operator, left, right);
                     return (double)left * (double)right;
-                case Tokens.TokenType.PLUS:
+                case TokenType.PLUS:
                     if (left is double && right is double)
                         return (double)left + (double)right;
 
@@ -502,6 +521,24 @@ namespace LSharp.Interpreter
         }
 
         /// <summary>
+        /// Turns a dictionary into a runtime representation. To do so, it 
+        /// parses each key and value contained on Expression.Dict and adds them to Dictionary<object, objact> that's returned
+        /// once the proccess is done.
+        /// </summary>
+        /// <param name="expression">Any valid Expression.Dict</param>
+        /// <returns></returns>
+        public object Visit(Expression.Dict expression)
+        {
+            var dict = new Dictionary<object, object>();
+            for (var i = 0;  i < expression.Keys.Count; i++)
+            {
+                var key = expression.Keys[i];
+                dict[evaluate(key)] = evaluate(expression.Values[i]);
+            }
+            return dict;
+        }
+
+        /// <summary>
         /// Turns an access expression into a runtime representation. Access expressions are somehow similiar to 
         /// get expressions, they contain all the necessary data for accessing a specific list index.
         /// Throws a runtime error if the provided list index is not a number or is out of range.
@@ -511,18 +548,20 @@ namespace LSharp.Interpreter
         {
             try
             {
-                var list = evaluate(expression.Member);
+                var obj = evaluate(expression.Member);
                 var accessor = evaluate(expression.Accessor);
-                if ((list is List<object>))
+                if ((obj is List<object>))
                 {
-                    var literalList = (List<object>)list;
+                    var list = (List<object>)obj;
                     var listIndex = (double)accessor;
-                    return literalList[(int)listIndex];
+                    return list[(int)listIndex];
                 }
-                else
+                if ((obj is Dictionary<object, object>))
                 {
-                    throw new RuntimeError(expression.Index, "Only lists can be accessed by index.");
+                    var dict = (Dictionary<object, object>)obj;
+                    return dict[accessor];
                 }
+                throw new RuntimeError(expression.Index, "Only lists can be accessed by index.");
             }
             catch (ArgumentOutOfRangeException e)
             {
@@ -531,6 +570,10 @@ namespace LSharp.Interpreter
             catch (InvalidCastException e)
             {
                 throw new RuntimeError(expression.Index, "Only integers can be used as accessors.");
+            }
+            catch (KeyNotFoundException e)
+            {
+                return null;
             }
         }
 
@@ -712,8 +755,7 @@ namespace LSharp.Interpreter
             {
                 try
                 {
-                    var accesor = expression.Name.Literal;
-                    var index = (double)accesor;
+                    var index = (double)evaluate(expression.Accessor);
                     var newValue = evaluate(expression.Value);
                     var list = (List<object>)obj;
                     list[(int)index] = newValue;
@@ -729,6 +771,14 @@ namespace LSharp.Interpreter
                     throw new RuntimeError(expression.Name,
                         "Index out of range.");
                 }
+            }
+            if (obj is Dictionary<object, object>)
+            {
+                var accesor = evaluate(expression.Accessor);
+                var newValue = evaluate(expression.Value);
+                var dict = (Dictionary<object, object>)obj;
+                dict[accesor] = newValue;
+                return newValue;
             }
             if (!(obj is LSInstance))
             {
