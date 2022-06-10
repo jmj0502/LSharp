@@ -686,9 +686,13 @@ namespace LSharp.Parser
             return new Expression.List(elements);
         }
         
-        private Expression map()
+        /// <summary>
+        /// Rule handler for dict expressions. Once the % character is found, the parser begins to parse a dict, the rule
+        /// keeps on until it reaches the "}" character.
+        /// </summary>
+        private Expression dictionary()
         {
-            consume(TokenType.LEFT_BRACE, "Expected '{' after map declaration.");
+            consume(TokenType.LEFT_BRACE, "Expected '{' after dictionary declaration.");
             var keys = new List<Expression>();
             var vals = new List<Expression>();
             if (!check(TokenType.RIGHT_BRACE))
@@ -697,12 +701,12 @@ namespace LSharp.Parser
                 {
                     if (check(TokenType.RIGHT_BRACE)) break;
                     keys.Add(or());
-                    consume(TokenType.COLON, "Expect ':' after map key.");
+                    consume(TokenType.COLON, "Expect ':' after dictionary key.");
                     vals.Add(or());
                 } while (match(TokenType.COMMA));
             }
 
-            consume(TokenType.RIGHT_BRACE, "Expect '}' to close map.");
+            consume(TokenType.RIGHT_BRACE, "Expect '}' to close dictionary.");
             return new Expression.Dict(keys, vals);
         }
 
@@ -761,7 +765,7 @@ namespace LSharp.Parser
 
             if (match(TokenType.PERCENT))
             {
-                return map(); 
+                return dictionary(); 
             }
 
             throw error(peek(), "Expected expression.");
