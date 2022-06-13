@@ -15,6 +15,8 @@ namespace LSharp.GlobalModules
             moduleBody.Define("reverse", new Reverse());
             moduleBody.Define("substring", new Substring());
             moduleBody.Define("trim", new Trim());
+            moduleBody.Define("len", new Len());
+            moduleBody.Define("toUpper", new ToUpper());
             return moduleBody;
         }
     }
@@ -98,6 +100,44 @@ namespace LSharp.GlobalModules
         public override string ToString()
         {
             return "<native function string.trim>";
+        }
+    }
+
+    public class Len : ICallable
+    {
+        public int Arity()
+        {
+            return 1;
+        }
+
+        public object Call(Interpreter.Interpreter interpreter, List<object> arguments)
+        {
+            var str = (string)arguments[0];
+            return str.Length;
+        }
+
+        public override string ToString()
+        {
+            return "<native function string.len>";
+        }
+    }
+
+    public class ToUpper : ICallable
+    {
+        public int Arity()
+        {
+            return 1;
+        }
+
+        public object Call(Interpreter.Interpreter interpreter, List<object> arguments)
+        {
+            var str = (string)arguments[0];
+            return str.ToUpper();
+        }
+
+        public override string ToString()
+        {
+            return "<native function string.toUpper>";
         }
     }
 }
