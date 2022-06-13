@@ -17,6 +17,7 @@ namespace LSharp.GlobalModules
             moduleBody.Define("trim", new Trim());
             moduleBody.Define("len", new Len());
             moduleBody.Define("toUpper", new ToUpper());
+            moduleBody.Define("toLower", new ToLower());
             return moduleBody;
         }
     }
@@ -138,6 +139,25 @@ namespace LSharp.GlobalModules
         public override string ToString()
         {
             return "<native function string.toUpper>";
+        }
+    }
+
+    public class ToLower : ICallable
+    {
+        public int Arity()
+        {
+            return 1;
+        }
+
+        public object Call(Interpreter.Interpreter interpreter, List<object> arguments)
+        {
+            var str = (string)arguments[0];
+            return str.ToLower();
+        }
+
+        public override string ToString()
+        {
+            return "<native function string.ToLower>";
         }
     }
 }
