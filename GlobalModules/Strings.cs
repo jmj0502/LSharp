@@ -14,6 +14,7 @@ namespace LSharp.GlobalModules
             moduleBody.Define("split", new Split());
             moduleBody.Define("reverse", new Reverse());
             moduleBody.Define("substring", new Substring());
+            moduleBody.Define("trim", new Trim());
             return moduleBody;
         }
     }
@@ -77,7 +78,26 @@ namespace LSharp.GlobalModules
 
         public override string ToString()
         {
-            return "native function string.substring";
+            return "<native function string.substring>";
+        }
+    }
+
+    public class Trim : ICallable
+    {
+        public int Arity()
+        {
+            return 1;
+        }
+
+        public object Call(Interpreter.Interpreter interpreter, List<object> arguments)
+        {
+            var str = (string)arguments[0];
+            return str.Trim();
+        }
+
+        public override string ToString()
+        {
+            return "<native function string.trim>";
         }
     }
 }
