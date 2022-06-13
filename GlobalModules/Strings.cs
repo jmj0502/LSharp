@@ -13,6 +13,7 @@ namespace LSharp.GlobalModules
             var moduleBody = new Enviroment.Enviroment();
             moduleBody.Define("split", new Split());
             moduleBody.Define("reverse", new Reverse());
+            moduleBody.Define("substring", new Substring());
             return moduleBody;
         }
     }
@@ -56,6 +57,27 @@ namespace LSharp.GlobalModules
         public override string ToString()
         {
             return "<native function string.reverse>";
+        }
+    }
+
+    public class Substring : ICallable
+    {
+        public int Arity()
+        {
+            return 2;
+        }
+
+        public object Call(Interpreter.Interpreter interpreter, List<object> arguments)
+        {
+            var str = (string)arguments[0];
+            var indexValue = (double)arguments[1];
+            var index = (int)indexValue;
+            return str.Substring(index);
+        }
+
+        public override string ToString()
+        {
+            return "native function string.substring";
         }
     }
 }
