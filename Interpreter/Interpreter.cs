@@ -1,5 +1,6 @@
 ﻿using LSharp.Tokens;
 using LSharp.GlobalFunctions;
+using LSharp.GlobalModules;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -30,6 +31,7 @@ namespace LSharp.Interpreter
         {
             Globals = enviroment;
             enviroment.Define("clock", new Clock());
+            enviroment.Define("String", new LSModule(new Strings().GenerateBody(), "Strings"));
         } 
 
         /// <summary>
