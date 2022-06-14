@@ -171,9 +171,18 @@ namespace LSharp.GlobalModules
 
         public object Call(Interpreter.Interpreter interpreter, List<object> arguments)
         {
-            var str = (string)arguments[0];
-            var startingChar = (string)arguments[1];
-            return str.StartsWith(startingChar[0]);
+            var str1 = (string)arguments[0];
+            var str2 = (string)arguments[1];
+            if (str2.Length > str1.Length)
+            {
+                return false;
+            }
+            if (str1.Length > str2.Length)
+            {
+                var updatedStr1 = str1.Substring(0, str2.Length);
+                return string.Equals(updatedStr1, str2);
+            }
+            return string.Equals(str1, str2);
         }
 
         public override string ToString()
