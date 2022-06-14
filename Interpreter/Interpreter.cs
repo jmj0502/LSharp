@@ -382,7 +382,15 @@ namespace LSharp.Interpreter
                 throw new RuntimeError(expression.Paren,
                     $"Expected {function.Arity()} parameters but got {arguments.Count}");
             
-            return function.Call(this, arguments);
+            try
+            {
+                return function.Call(this, arguments);
+            }
+            catch(InvalidCastException e)
+            {
+                throw new RuntimeError(expression.Paren,
+                    $"Invalid parameter type.");
+            }
         }
 
         /// <summary>
