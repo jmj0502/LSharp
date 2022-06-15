@@ -75,9 +75,34 @@ namespace LSharp.GlobalModules
         public object Call(Interpreter.Interpreter interpreter, List<object> arguments)
         {
             var str = (string)arguments[0];
-            var indexValue = (double)arguments[1];
-            var index = (int)indexValue;
-            return str.Substring(index);
+            var leftValue = (double)arguments[1];
+            var leftIndex = (int)leftValue;
+            return str.Substring(leftIndex);
+
+
+            //if (arguments.Count == 2)
+            //{
+            //    if ((leftIndex > str.Length) || (leftIndex < 0)) leftIndex = str.Length;
+            //    return str.Substring(leftIndex);
+            //}
+
+            //if (arguments.Count > 2)
+            //{
+            //    var rightValue = (double)arguments[2];
+            //    var rightIndex = (int)rightValue;
+            //    if (rightIndex < leftIndex)
+            //    {
+            //        if (leftIndex > str.Length) leftIndex = str.Length;
+            //        if (rightIndex < 0) rightIndex = str.Length + rightIndex;
+            //        if (leftIndex < 0) leftIndex = str.Length;
+            //        return str.Substring(rightIndex, leftIndex);
+            //    }
+            //    if (rightIndex > str.Length) rightIndex = str.Length;
+            //    if (leftIndex < 0) leftIndex = str.Length + rightIndex;
+            //    if (rightIndex < 0) rightIndex = str.Length;
+            //    return str.Substring(leftIndex, rightIndex);
+            //}
+            //return str;
         }
 
         public override string ToString()
