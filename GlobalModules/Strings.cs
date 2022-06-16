@@ -19,6 +19,7 @@ namespace LSharp.GlobalModules
             moduleBody.Define("toUpper", new ToUpper());
             moduleBody.Define("toLower", new ToLower());
             moduleBody.Define("startsWith", new StartsWith());
+            moduleBody.Define("slice", new Slice());
             return moduleBody;
         }
     }
@@ -78,31 +79,6 @@ namespace LSharp.GlobalModules
             var leftValue = (double)arguments[1];
             var leftIndex = (int)leftValue;
             return str.Substring(leftIndex);
-
-
-            //if (arguments.Count == 2)
-            //{
-            //    if ((leftIndex > str.Length) || (leftIndex < 0)) leftIndex = str.Length;
-            //    return str.Substring(leftIndex);
-            //}
-
-            //if (arguments.Count > 2)
-            //{
-            //    var rightValue = (double)arguments[2];
-            //    var rightIndex = (int)rightValue;
-            //    if (rightIndex < leftIndex)
-            //    {
-            //        if (leftIndex > str.Length) leftIndex = str.Length;
-            //        if (rightIndex < 0) rightIndex = str.Length + rightIndex;
-            //        if (leftIndex < 0) leftIndex = str.Length;
-            //        return str.Substring(rightIndex, leftIndex);
-            //    }
-            //    if (rightIndex > str.Length) rightIndex = str.Length;
-            //    if (leftIndex < 0) leftIndex = str.Length + rightIndex;
-            //    if (rightIndex < 0) rightIndex = str.Length;
-            //    return str.Substring(leftIndex, rightIndex);
-            //}
-            //return str;
         }
 
         public override string ToString()
@@ -213,6 +189,40 @@ namespace LSharp.GlobalModules
         public override string ToString()
         {
             return "<native function string.startsWith>";
+        }
+    }
+
+    public class Slice : ICallable
+    {
+        public int Arity()
+        {
+            return 3;
+        }
+
+        public object Call(Interpreter.Interpreter interpreter, List<object> arguments)
+        {
+
+            var str = (string)arguments[0];
+            var leftValue = (double)arguments[1];
+            var leftIndex = (int)leftValue;
+            var rightValue = (double)arguments[2];
+            var rightIndex = (int)rightValue;
+            if (rightIndex < leftIndex)
+            {
+                if (leftIndex >= str.Length) leftIndex = str.Length;
+                if (rightIndex < 0) rightIndex = str.Length + rightIndex;
+                if (leftIndex < 0) leftIndex = str.Length - 1;
+                return str.Substring(rightIndex, leftIndex - rightIndex);
+            }
+            if (rightIndex >= str.Length) rightIndex = str.Length;
+            if (leftIndex < 0) leftIndex = str.Length + rightIndex;
+            if (rightIndex < 0) rightIndex = str.Length - 1;
+            return str.Substring(leftIndex, rightIndex - leftIndex);
+        }
+
+        public override string ToString()
+        {
+            return "<native function string.slice>";
         }
     }
 }
