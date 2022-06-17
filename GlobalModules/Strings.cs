@@ -22,6 +22,7 @@ namespace LSharp.GlobalModules
             moduleBody.Define("slice", new Slice());
             moduleBody.Define("endsWith", new EndsWith());
             moduleBody.Define("contains", new Contains());
+            moduleBody.Define("indexOf", new IndexOf());
             return moduleBody;
         }
     }
