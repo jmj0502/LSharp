@@ -20,6 +20,7 @@ namespace LSharp.GlobalModules
             moduleBody.Define("toLower", new ToLower());
             moduleBody.Define("startsWith", new StartsWith());
             moduleBody.Define("slice", new Slice());
+            moduleBody.Define("endsWith", new EndsWith());
             return moduleBody;
         }
     }
@@ -223,6 +224,25 @@ namespace LSharp.GlobalModules
         public override string ToString()
         {
             return "<native function string.slice>";
+        }
+    }
+
+    public class EndsWith : ICallable
+    {
+        public int Arity()
+        {
+            return 2;
+        }
+
+        public object Call(Interpreter.Interpreter interpreter, List<object> arguments)
+        {
+            var str = (string)arguments[0];
+            var str2 = (string)arguments[1];
+            if (str2.Length == 0) return true;
+            if (str2.Length > str.Length) return false;
+            if (str.Length == str2.Length) return string.Equals(str, str2);
+            var slicedString = str.Substring(str.Length - str2.Length);
+            return string.Equals(slicedString, str2);
         }
     }
 }
