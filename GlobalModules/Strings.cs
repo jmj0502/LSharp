@@ -279,4 +279,6 @@ namespace LSharp.GlobalModules
             return "<native function string.indexOf>";
         }
     }
+
+    //TODO: Match, Replace, Search.
 }
