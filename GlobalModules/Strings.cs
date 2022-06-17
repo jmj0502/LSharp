@@ -232,6 +232,11 @@ namespace LSharp.GlobalModules
             var str2 = (string)arguments[1];
             return str.EndsWith(str2);
         }
+
+        public override string ToString()
+        {
+            return "<native function string.endsWith>";
+        }
     }
 
     public class Contains : ICallable
@@ -246,6 +251,31 @@ namespace LSharp.GlobalModules
             var str = (string)arguments[0];
             var str2 = (string)arguments[1];
             return str.Contains(str2);
+        }
+
+        public override string ToString()
+        {
+            return "<native function string.contains>";
+        }
+    }
+
+    public class IndexOf : ICallable
+    {
+        public int Arity()
+        {
+            return 2;
+        }
+
+        public object Call(Interpreter.Interpreter interpreter, List<object> arguments)
+        {
+            var str = (string)arguments[0];
+            var str2 = (string)arguments[1];
+            return str.IndexOf(str2);
+        }
+
+        public override string ToString()
+        {
+            return "<native function string.indexOf>";
         }
     }
 }
