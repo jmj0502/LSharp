@@ -21,6 +21,7 @@ namespace LSharp.GlobalModules
             moduleBody.Define("startsWith", new StartsWith());
             moduleBody.Define("slice", new Slice());
             moduleBody.Define("endsWith", new EndsWith());
+            moduleBody.Define("contains", new Contains());
             return moduleBody;
         }
     }
@@ -175,16 +176,7 @@ namespace LSharp.GlobalModules
         {
             var str1 = (string)arguments[0];
             var str2 = (string)arguments[1];
-            if (str2.Length > str1.Length)
-            {
-                return false;
-            }
-            if (str1.Length > str2.Length)
-            {
-                var updatedStr1 = str1.Substring(0, str2.Length);
-                return string.Equals(updatedStr1, str2);
-            }
-            return string.Equals(str1, str2);
+            return str1.StartsWith(str2);
         }
 
         public override string ToString()
@@ -238,11 +230,22 @@ namespace LSharp.GlobalModules
         {
             var str = (string)arguments[0];
             var str2 = (string)arguments[1];
-            if (str2.Length == 0) return true;
-            if (str2.Length > str.Length) return false;
-            if (str.Length == str2.Length) return string.Equals(str, str2);
-            var slicedString = str.Substring(str.Length - str2.Length);
-            return string.Equals(slicedString, str2);
+            return str.EndsWith(str2);
+        }
+    }
+
+    public class Contains : ICallable
+    {
+        public int Arity()
+        {
+            return 2;
+        }
+
+        public object Call(Interpreter.Interpreter interpreter, List<object> arguments)
+        {
+            var str = (string)arguments[0];
+            var str2 = (string)arguments[1];
+            return str.Contains(str2);
         }
     }
 }
