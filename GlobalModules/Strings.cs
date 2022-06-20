@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace LSharp.GlobalModules
 {
-    class Strings
+    class Strings : IModule
     {
         public Enviroment.Enviroment GenerateBody()
         {
@@ -23,6 +23,7 @@ namespace LSharp.GlobalModules
             moduleBody.Define("endsWith", new EndsWith());
             moduleBody.Define("contains", new Contains());
             moduleBody.Define("indexOf", new IndexOf());
+            moduleBody.Define("at", new At());
             return moduleBody;
         }
     }
@@ -119,7 +120,7 @@ namespace LSharp.GlobalModules
         public object Call(Interpreter.Interpreter interpreter, List<object> arguments)
         {
             var str = (string)arguments[0];
-            return str.Length;
+            return (double)str.Length;
         }
 
         public override string ToString()
@@ -277,6 +278,27 @@ namespace LSharp.GlobalModules
         public override string ToString()
         {
             return "<native function string.indexOf>";
+        }
+    }
+
+    public class At : ICallable
+    {
+        public int Arity()
+        {
+            return 2;
+        }
+
+        public object Call(Interpreter.Interpreter interpreter, List<object> arguments)
+        {
+            var str = (string)arguments[0];
+            var indexValue = (double)arguments[1];
+            var index = (int)indexValue;
+            return str[index].ToString();
+        }
+
+        public override string ToString()
+        {
+            return "<native function string.at>";
         }
     }
 
