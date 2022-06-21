@@ -12,17 +12,17 @@ namespace LSharp.GlobalModules
         {
             var moduleBody = new Enviroment.Enviroment();
             moduleBody.Define("split", new Split());
-            moduleBody.Define("reverse", new Reverse());
+            moduleBody.Define("reverse", new Reverse("string")); // Should also apply o list.
             moduleBody.Define("substring", new Substring());
             moduleBody.Define("trim", new Trim());
-            moduleBody.Define("len", new Len());
+            moduleBody.Define("len", new Len("string")); //Should also apply to lists.
             moduleBody.Define("toUpper", new ToUpper());
             moduleBody.Define("toLower", new ToLower());
             moduleBody.Define("startsWith", new StartsWith());
-            moduleBody.Define("slice", new Slice());
+            moduleBody.Define("slice", new Slice("string")); //Should also apply to lists.
             moduleBody.Define("endsWith", new EndsWith());
-            moduleBody.Define("contains", new Contains());
-            moduleBody.Define("indexOf", new IndexOf());
+            moduleBody.Define("contains", new Contains("string")); //Should also apply to lists.
+            moduleBody.Define("indexOf", new IndexOf("string")); //Should also apply to lists.
             moduleBody.Define("at", new At());
             return moduleBody;
         }
@@ -51,6 +51,13 @@ namespace LSharp.GlobalModules
 
     public class Reverse : ICallable
     {
+        private readonly string moduleName;
+
+        public Reverse(string moduleName)
+        {
+            this.moduleName = moduleName;
+        }
+
         public int Arity()
         {
             return 1;
@@ -58,15 +65,21 @@ namespace LSharp.GlobalModules
 
         public object Call(Interpreter.Interpreter interpreter, List<object> arguments)
         {
-            var str = (string)arguments[0];
-            var strChars = str.ToCharArray();
-            Array.Reverse(strChars);
-            return new string(strChars);
+            if (arguments[0] is string)
+            {
+                var str = (string)arguments[0];
+                var strChars = str.ToCharArray();
+                Array.Reverse(strChars);
+                return new string(strChars);
+            }
+            var list = (List<object>)arguments[0];
+            list.Reverse();
+            return list;
         }
 
         public override string ToString()
         {
-            return "<native function string.reverse>";
+            return $"<native function {moduleName}.reverse>";
         }
     }
 
@@ -112,6 +125,13 @@ namespace LSharp.GlobalModules
 
     public class Len : ICallable
     {
+        private readonly string moduleName;
+
+        public Len(string moduleName)
+        {
+            this.moduleName = moduleName;
+        }
+
         public int Arity()
         {
             return 1;
@@ -119,13 +139,18 @@ namespace LSharp.GlobalModules
 
         public object Call(Interpreter.Interpreter interpreter, List<object> arguments)
         {
-            var str = (string)arguments[0];
-            return (double)str.Length;
+            if (arguments[0] is string)
+            {
+                var str = (string)arguments[0];
+                return (double)str.Length;
+            }
+            var list = (List<object>)arguments[0];
+            return (double)list.Count;
         }
 
         public override string ToString()
         {
-            return "<native function string.len>";
+            return $"<native function {moduleName}.len>";
         }
     }
 
@@ -189,6 +214,13 @@ namespace LSharp.GlobalModules
 
     public class Slice : ICallable
     {
+        private readonly string moduleName;
+
+        public Slice(string moduleName)
+        {
+            this.moduleName = moduleName;
+        }
+
         public int Arity()
         {
             return 3;
@@ -196,28 +228,34 @@ namespace LSharp.GlobalModules
 
         public object Call(Interpreter.Interpreter interpreter, List<object> arguments)
         {
-
-            var str = (string)arguments[0];
             var leftValue = (double)arguments[1];
             var leftIndex = (int)leftValue;
             var rightValue = (double)arguments[2];
             var rightIndex = (int)rightValue;
-            if (rightIndex < leftIndex)
+                
+            if (arguments[0] is string)
             {
-                if (leftIndex >= str.Length) leftIndex = str.Length;
-                if (rightIndex < 0) rightIndex = str.Length + rightIndex;
-                if (leftIndex < 0) leftIndex = str.Length - 1;
-                return str.Substring(rightIndex, leftIndex - rightIndex);
+                var str = (string)arguments[0];
+                if (rightIndex < leftIndex)
+                {
+                    if (leftIndex >= str.Length) leftIndex = str.Length;
+                    if (rightIndex < 0) rightIndex = str.Length + rightIndex;
+                    if (leftIndex < 0) leftIndex = str.Length - 1;
+                    return str.Substring(rightIndex, leftIndex - rightIndex);
+                }
+                if (rightIndex >= str.Length) rightIndex = str.Length;
+                if (leftIndex < 0) leftIndex = str.Length + rightIndex;
+                if (rightIndex < 0) rightIndex = str.Length - 1;
+                return str.Substring(leftIndex, rightIndex - leftIndex);
             }
-            if (rightIndex >= str.Length) rightIndex = str.Length;
-            if (leftIndex < 0) leftIndex = str.Length + rightIndex;
-            if (rightIndex < 0) rightIndex = str.Length - 1;
-            return str.Substring(leftIndex, rightIndex - leftIndex);
+
+            var list = (List<object>)arguments[0];
+            return list.GetRange(leftIndex, rightIndex);
         }
 
         public override string ToString()
         {
-            return "<native function string.slice>";
+            return $"<native function {moduleName}.slice>";
         }
     }
 
@@ -243,6 +281,13 @@ namespace LSharp.GlobalModules
 
     public class Contains : ICallable
     {
+        private readonly string moduleName;
+
+        public Contains(string moduleName)
+        {
+            this.moduleName = moduleName;
+        }
+
         public int Arity()
         {
             return 2;
@@ -250,19 +295,33 @@ namespace LSharp.GlobalModules
 
         public object Call(Interpreter.Interpreter interpreter, List<object> arguments)
         {
-            var str = (string)arguments[0];
-            var str2 = (string)arguments[1];
-            return str.Contains(str2);
+            if (arguments[0] is string)
+            {
+                var str = (string)arguments[0];
+                var str2 = (string)arguments[1];
+                return str.Contains(str2);
+            }
+
+            var list = (List<object>)arguments[0];
+            return list.Contains(arguments[1]);
         }
 
         public override string ToString()
         {
-            return "<native function string.contains>";
+            return $"<native function {moduleName}.contains>";
         }
     }
 
     public class IndexOf : ICallable
     {
+
+        private readonly string moduleName;
+
+        public IndexOf(string moduleName)
+        {
+            this.moduleName = moduleName;
+        }
+
         public int Arity()
         {
             return 2;
@@ -270,14 +329,21 @@ namespace LSharp.GlobalModules
 
         public object Call(Interpreter.Interpreter interpreter, List<object> arguments)
         {
-            var str = (string)arguments[0];
-            var str2 = (string)arguments[1];
-            return str.IndexOf(str2);
+            if (arguments[0] is string)
+            {
+                var str = (string)arguments[0];
+                var str2 = (string)arguments[1];
+                return str.IndexOf(str2);
+            }
+
+            var list = (List<object>)arguments[0];
+            var element = arguments[1];
+            return list.IndexOf(element);
         }
 
         public override string ToString()
         {
-            return "<native function string.indexOf>";
+            return $"<native function {moduleName}.indexOf>";
         }
     }
 
