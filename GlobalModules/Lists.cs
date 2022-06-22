@@ -21,6 +21,8 @@ namespace LSharp.GlobalModules
             moduleBody.Define("prepend", new Prepend());
             moduleBody.Define("insert", new Insert());
             moduleBody.Define("concat", new Concat());
+            moduleBody.Define("remove", new Remove());
+            moduleBody.Define("removeAt", new RemoveAt());
             return moduleBody;
         }
     }
@@ -127,6 +129,48 @@ namespace LSharp.GlobalModules
         public override string ToString()
         {
             return "<native function list.concat>";
+        }
+    }
+
+    public class Remove : ICallable
+    {
+        public int Arity()
+        {
+            return 1;
+        }
+
+        public object Call(Interpreter.Interpreter interpreter, List<object> arguments)
+        {
+            var list = (List<object>)arguments[0];
+            list.RemoveAt(0);
+            return (double)list.Count;
+        }
+
+        public override string ToString()
+        {
+            return "<native function list.remove>";
+        }
+    }
+
+    public class RemoveAt : ICallable
+    {
+        public int Arity()
+        {
+            return 2;
+        }
+
+        public object Call(Interpreter.Interpreter interpreter, List<object> arguments)
+        {
+            var list = (List<object>)arguments[0];
+            var indexValue = (double)arguments[1];
+            var index = (int)indexValue;
+            list.RemoveAt(index);
+            return (double)list.Count;
+        }
+
+        public override string ToString()
+        {
+            return "<native function list.removeAt>";
         }
     }
 }
