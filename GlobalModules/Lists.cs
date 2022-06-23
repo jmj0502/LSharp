@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LSharp.Interpreter;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -24,6 +25,7 @@ namespace LSharp.GlobalModules
             moduleBody.Define("removeFirst", new RemoveFirst());
             moduleBody.Define("removeLast", new RemoveLast());
             moduleBody.Define("removeAt", new RemoveAt());
+            moduleBody.Define("each", new Each());
             return moduleBody;
         }
     }
@@ -192,6 +194,30 @@ namespace LSharp.GlobalModules
         public override string ToString()
         {
             return "<native function list.removeAt>";
+        }
+    }
+
+    public class Each : ICallable
+    {
+        public int Arity()
+        {
+            return 2;
+        }
+
+        public object Call(Interpreter.Interpreter interpreter, List<object> arguments)
+        {
+            var list = (List<object>)arguments[0];
+            var fun = (LSFunction)arguments[1];
+            for (int i = 0; i < list.Count; i++)
+            {
+                 list[i] = fun.Call(interpreter, new List<object> { list[i] });
+            }
+            return null;
+        }
+
+        public override string ToString()
+        {
+            return "<native function list.each>";
         }
     }
 }
