@@ -26,6 +26,7 @@ namespace LSharp.GlobalModules
             moduleBody.Define("removeLast", new RemoveLast());
             moduleBody.Define("removeAt", new RemoveAt());
             moduleBody.Define("each", new Each());
+            moduleBody.Define("map", new Map());
             return moduleBody;
         }
     }
@@ -218,6 +219,31 @@ namespace LSharp.GlobalModules
         public override string ToString()
         {
             return "<native function list.each>";
+        }
+    }
+
+    public class Map : ICallable
+    {
+        public int Arity()
+        {
+            return 2;
+        }
+
+        public object Call(Interpreter.Interpreter interpreter, List<object> arguments)
+        {
+            var list = (List<object>)arguments[0];
+            var fun = (LSFunction)arguments[1];
+            var newList = new List<object>();
+            foreach (var member in list)
+            {
+                 newList.Add(fun.Call(interpreter, new List<object> { member }));
+            }
+            return newList;
+        }
+
+        public override string ToString()
+        {
+            return "<native function list.map>";
         }
     }
 }
