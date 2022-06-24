@@ -27,6 +27,8 @@ namespace LSharp.GlobalModules
             moduleBody.Define("removeAt", new RemoveAt());
             moduleBody.Define("each", new Each());
             moduleBody.Define("map", new Map());
+            moduleBody.Define("filter", new Filter());
+            moduleBody.Define("reduce", new Reduce());
             return moduleBody;
         }
     }
@@ -244,6 +246,61 @@ namespace LSharp.GlobalModules
         public override string ToString()
         {
             return "<native function list.map>";
+        }
+    }
+
+    public class Filter : ICallable
+    {
+        public int Arity()
+        {
+            return 2;
+        }
+
+        public object Call(Interpreter.Interpreter interpreter, List<object> arguments)
+        {
+            var list = (List<object>)arguments[0];
+            var fun = (LSFunction)arguments[1];
+            var filteredList = new List<object>();
+            foreach (var el in list)
+            {
+                var result = fun.Call(interpreter, new List<object>() { el });
+                var isValid = (bool)result;
+                if (isValid)
+                {
+                    filteredList.Add(el);
+                }
+            }
+            return filteredList;
+        }
+
+        public override string ToString()
+        {
+            return "<native function list.filter>";
+        }
+    }
+
+    public class Reduce : ICallable
+    {
+        public int Arity()
+        {
+            return 3;
+        }
+
+        public object Call(Interpreter.Interpreter interpreter, List<object> arguments)
+        {
+            var list = (List<object>)arguments[0];
+            var fun = (LSFunction)arguments[1];
+            var accumulator = arguments[2];
+            foreach (var el in list)
+            {
+                accumulator = fun.Call(interpreter, new List<object> { accumulator, el });
+            }
+            return accumulator;
+        }
+
+        public override string ToString()
+        {
+            return "<native function list.reduce>";
         }
     }
 }
