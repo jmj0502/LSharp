@@ -25,6 +25,8 @@ namespace LSharp.GlobalModules
             moduleBody.Define("removeFirst", new RemoveFirst());
             moduleBody.Define("removeLast", new RemoveLast());
             moduleBody.Define("removeAt", new RemoveAt());
+            moduleBody.Define("getFirst", new GetFirst());
+            moduleBody.Define("getLast", new GetLast());
             moduleBody.Define("each", new Each());
             moduleBody.Define("map", new Map());
             moduleBody.Define("filter", new Filter());
@@ -221,6 +223,46 @@ namespace LSharp.GlobalModules
         public override string ToString()
         {
             return "<native function list.each>";
+        }
+    }
+
+    public class GetFirst : ICallable
+    {
+        public int Arity()
+        {
+            return 1;
+        }
+
+        public object Call(Interpreter.Interpreter interpreter, List<object> arguments)
+        {
+            var list = (List<object>)arguments[0];
+            if (list.Count == 0) return null;
+            return list[0];
+        }
+
+        public override string ToString()
+        {
+            return "<native function list.getFirst>";
+        }
+    }
+
+    public class GetLast : ICallable
+    {
+        public int Arity()
+        {
+            return 1;
+        }
+
+        public object Call(Interpreter.Interpreter interpreter, List<object> arguments)
+        {
+            var list = (List<object>)arguments[0];
+            if (list.Count == 0) return null;
+            return list.Last();
+        }
+
+        public override string ToString()
+        {
+            return "<native function list.getLast>";
         }
     }
 
