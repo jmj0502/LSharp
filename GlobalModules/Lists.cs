@@ -345,4 +345,41 @@ namespace LSharp.GlobalModules
             return "<native function list.reduce>";
         }
     }
+
+    public class Sort : ICallable
+    {
+        public int Arity()
+        {
+            return 2;
+        }
+
+        public object Call(Interpreter.Interpreter interpreter, List<object> arguments)
+        {
+            var list = (List<object>)arguments[0];
+            var comparator = (LSFunction)arguments[1];
+
+            return null;
+        }
+
+    }
+
+    class MergeSort<T> where T : class, IComparable<T>, new()
+    {
+        private List<T> merge(List<T> lhs, List<T> rhs, Interpreter.Interpreter interpreter, LSFunction comparator = null)
+        {
+            var mergedList = new List<T>();
+            var i = 0;
+            var j = 0;
+            while(i < lhs.Count && j < rhs.Count)
+            {
+               // var comparisonResult = comparator != null 
+               //     ? comparator.Call(interpreter, new List<T> { lhs[i], rhs[i] }) : null;
+                if (lhs[i].CompareTo(rhs[j]) > 0)
+                {
+
+                }
+            }
+            return null;
+        }
+    }
 }
