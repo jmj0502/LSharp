@@ -399,7 +399,7 @@ namespace LSharp.GlobalModules
                 mergedList.Add(lhs[x]);
             }
 
-            for (var y = i; y < rhs.Count; y++)
+            for (var y = j; y < rhs.Count; y++)
             {
                 mergedList.Add(rhs[y]);
             }
