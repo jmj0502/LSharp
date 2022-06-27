@@ -363,9 +363,10 @@ namespace LSharp.GlobalModules
 
     }
 
-    class MergeSort<T> where T : class, IComparable<T>, new()
+    class Sorts<T> 
+        where T : class, IComparable<T>, new()
     {
-        private List<T> merge(List<T> lhs, List<T> rhs, Interpreter.Interpreter interpreter, LSFunction comparator = null)
+        private List<T> merge(List<T> lhs, List<T> rhs, Interpreter.Interpreter interpreter = null, LSFunction comparator = null)
         {
             var mergedList = new List<T>();
             var i = 0;
@@ -376,10 +377,45 @@ namespace LSharp.GlobalModules
                //     ? comparator.Call(interpreter, new List<T> { lhs[i], rhs[i] }) : null;
                 if (lhs[i].CompareTo(rhs[j]) > 0)
                 {
-
+                    mergedList.Add(rhs[j]);
+                    j++;
+                }
+                else if (lhs[i].CompareTo(rhs[j]) > 0)
+                {
+                    mergedList.Add(lhs[i]);
+                    i++;
+                }
+                else
+                {
+                    mergedList.Add(lhs[i]);
+                    mergedList.Add(rhs[j]);
+                    i++;
+                    j++;
                 }
             }
-            return null;
+
+            for (var x = i; x < lhs.Count; x++)
+            {
+                mergedList.Add(lhs[x]);
+            }
+
+            for (var y = i; y < rhs.Count; y++)
+            {
+                mergedList.Add(rhs[y]);
+            }
+
+            return mergedList;
+        }
+
+        public List<T> MergeSort(List<T> list)
+        {
+            if (list.Count == 0 || list.Count == 1) return list;
+
+            var middle = Math.Ceiling((double)list.Count / 2);
+            var middleIndex = (int)middle;
+            var leftHandSide = list.GetRange(0, middleIndex);
+            var rightHandSide = list.GetRange(middleIndex, list.Count);
+            return merge(leftHandSide, rightHandSide);
         }
     }
 }
