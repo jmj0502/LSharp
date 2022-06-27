@@ -361,6 +361,11 @@ namespace LSharp.GlobalModules
             return null;
         }
 
+        public override string ToString()
+        {
+            return "<native function list.sort>";
+        }
+
     }
 
     class Sorts<T> 
