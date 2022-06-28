@@ -31,6 +31,7 @@ namespace LSharp.GlobalModules
             moduleBody.Define("map", new Map());
             moduleBody.Define("filter", new Filter());
             moduleBody.Define("reduce", new Reduce());
+            moduleBody.Define("sort", new Sort());
             return moduleBody;
         }
     }
@@ -348,6 +349,7 @@ namespace LSharp.GlobalModules
 
     public class Sort : ICallable
     {
+
         public int Arity()
         {
             return 2;
@@ -355,9 +357,33 @@ namespace LSharp.GlobalModules
 
         public object Call(Interpreter.Interpreter interpreter, List<object> arguments)
         {
-            var list = (List<object>)arguments[0];
-            var comparator = (LSFunction)arguments[1];
-
+            var type = (arguments[0]).GetType();
+            Console.WriteLine(type);
+            var comparator = arguments[1] != null ? (LSFunction)arguments[1] : null;
+            if (arguments[0] is List<string>)
+            {
+                var list = (List<string>)arguments[0];
+                if (comparator == null)
+                {
+                    return new Sorts<string>().MergeSort(list);
+                }
+                else
+                {
+                    return new Sorts<string>().MergeSort(list, interpreter, comparator);
+                }
+            }
+            if (arguments[0] is List<double>)
+            {
+                var list = (List<double>)arguments[0];
+                if (comparator == null)
+                {
+                    return new Sorts<double>().MergeSort(list);
+                }
+                else
+                {
+                    return new Sorts<double>().MergeSort(list, interpreter, comparator);
+                }
+            }
             return null;
         }
 
@@ -369,7 +395,7 @@ namespace LSharp.GlobalModules
     }
 
     class Sorts<T> 
-        where T : class, IComparable<T>, new()
+        where T : IComparable<T>
     {
         private List<T> merge(List<T> lhs, List<T> rhs, Interpreter.Interpreter interpreter = null, LSFunction comparator = null)
         {
@@ -413,7 +439,7 @@ namespace LSharp.GlobalModules
             return mergedList;
         }
 
-        public List<T> MergeSort(List<T> list)
+        public List<T> MergeSort(List<T> list, Interpreter.Interpreter interpreter = null, LSFunction comparator = null)
         {
             if (list.Count == 0 || list.Count == 1) return list;
 
@@ -421,7 +447,11 @@ namespace LSharp.GlobalModules
             var middleIndex = (int)middle;
             var leftHandSide = list.GetRange(0, middleIndex);
             var rightHandSide = list.GetRange(middleIndex, list.Count);
-            return merge(leftHandSide, rightHandSide);
+            if (comparator == null)
+            {
+                return merge(leftHandSide, rightHandSide);
+            }
+            return merge(leftHandSide, rightHandSide, interpreter, comparator);
         }
     }
 }
