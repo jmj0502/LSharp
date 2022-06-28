@@ -1,6 +1,7 @@
 ﻿using LSharp.Interpreter;
 using System;
 using System.Collections.Generic;
+using System.Collections;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -357,34 +358,17 @@ namespace LSharp.GlobalModules
 
         public object Call(Interpreter.Interpreter interpreter, List<object> arguments)
         {
-            var type = (arguments[0]).GetType();
-            Console.WriteLine(type);
+            var list = (List<object>)arguments[0];
             var comparator = arguments[1] != null ? (LSFunction)arguments[1] : null;
-            if (arguments[0] is List<string>)
+            var sort = new Sorts();
+            if (comparator == null)
             {
-                var list = (List<string>)arguments[0];
-                if (comparator == null)
-                {
-                    return new Sorts<string>().MergeSort(list);
-                }
-                else
-                {
-                    return new Sorts<string>().MergeSort(list, interpreter, comparator);
-                }
+                return sort.MergeSort(list);
             }
-            if (arguments[0] is List<double>)
+            else
             {
-                var list = (List<double>)arguments[0];
-                if (comparator == null)
-                {
-                    return new Sorts<double>().MergeSort(list);
-                }
-                else
-                {
-                    return new Sorts<double>().MergeSort(list, interpreter, comparator);
-                }
+                return sort.MergeSort(list, interpreter, comparator);
             }
-            return null;
         }
 
         public override string ToString()
@@ -394,30 +378,30 @@ namespace LSharp.GlobalModules
 
     }
 
-    class Sorts<T> 
-        where T : IComparable<T>
+    class Sorts
     {
-        private List<T> merge(List<T> lhs, List<T> rhs, Interpreter.Interpreter interpreter = null, LSFunction comparator = null)
+        private List<object> merge(List<object> lhs, List<object> rhs, Interpreter.Interpreter interpreter = null, LSFunction comparator = null)
         {
-            var mergedList = new List<T>();
+            var mergedList = new List<object>();
             var i = 0;
             var j = 0;
             while(i < lhs.Count && j < rhs.Count)
             {
                 var comparisonReturnValue = comparator != null 
                     ? comparator.Call(interpreter, new List<object> { lhs[i], rhs[i] }) : null;
-                var comparisonResult = (int)comparisonReturnValue;
-                if (lhs[i].CompareTo(rhs[j]) > 0 || comparisonResult == 1)
+                int comparisonResult = -2;
+                if (comparisonReturnValue != null) comparisonResult = (int)comparisonReturnValue;
+                if (Comparer.Default.Compare(lhs[i], rhs[j]) > 0 || comparisonResult == 1)
                 {
                     mergedList.Add(rhs[j]);
                     j++;
                 }
-                else if (lhs[i].CompareTo(rhs[j]) < 0 || comparisonResult == -1)
+                else if (Comparer.Default.Compare(lhs[i], rhs[j]) < 0 || comparisonResult == -1)
                 {
                     mergedList.Add(lhs[i]);
                     i++;
                 }
-                else
+                else if (Comparer.Default.Compare(lhs[i], rhs[j]) == 0 || comparisonResult == 0)
                 {
                     mergedList.Add(lhs[i]);
                     mergedList.Add(rhs[j]);
@@ -439,18 +423,25 @@ namespace LSharp.GlobalModules
             return mergedList;
         }
 
-        public List<T> MergeSort(List<T> list, Interpreter.Interpreter interpreter = null, LSFunction comparator = null)
+        public List<object> MergeSort(List<object> list, Interpreter.Interpreter interpreter = null, LSFunction comparator = null)
         {
             if (list.Count == 0 || list.Count == 1) return list;
 
             var middle = Math.Ceiling((double)list.Count / 2);
             var middleIndex = (int)middle;
-            var leftHandSide = list.GetRange(0, middleIndex);
-            var rightHandSide = list.GetRange(middleIndex, list.Count);
+            var leftHandSideList = list.GetRange(0, middleIndex);
+            var rightHandSideList = list.GetRange(middleIndex, list.Count - middleIndex);
+            List<object> leftHandSide;
+            List<object> rightHandSide;
             if (comparator == null)
             {
+                leftHandSide = MergeSort(leftHandSideList);
+                rightHandSide = MergeSort(rightHandSideList);
                 return merge(leftHandSide, rightHandSide);
             }
+
+            leftHandSide = MergeSort(leftHandSideList, interpreter, comparator);
+            rightHandSide = MergeSort(rightHandSideList, interpreter, comparator);
             return merge(leftHandSide, rightHandSide, interpreter, comparator);
         }
     }
