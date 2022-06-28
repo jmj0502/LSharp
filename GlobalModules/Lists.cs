@@ -390,18 +390,18 @@ namespace LSharp.GlobalModules
                 var comparisonReturnValue = comparator != null 
                     ? comparator.Call(interpreter, new List<object> { lhs[i], rhs[i] }) : null;
                 int comparisonResult = -2;
-                if (comparisonReturnValue != null) comparisonResult = (int)comparisonReturnValue;
-                if (Comparer.Default.Compare(lhs[i], rhs[j]) > 0 || comparisonResult == 1)
+                if (comparisonReturnValue != null) comparisonResult = (int)((double)comparisonReturnValue);
+                if (comparisonResult == 1 || Comparer.Default.Compare(lhs[i], rhs[j]) > 0)
                 {
                     mergedList.Add(rhs[j]);
                     j++;
                 }
-                else if (Comparer.Default.Compare(lhs[i], rhs[j]) < 0 || comparisonResult == -1)
+                else if (comparisonResult == -1 || Comparer.Default.Compare(lhs[i], rhs[j]) < 0)
                 {
                     mergedList.Add(lhs[i]);
                     i++;
                 }
-                else if (Comparer.Default.Compare(lhs[i], rhs[j]) == 0 || comparisonResult == 0)
+                else if (comparisonResult == 0 || Comparer.Default.Compare(lhs[i], rhs[j]) == 0)
                 {
                     mergedList.Add(lhs[i]);
                     mergedList.Add(rhs[j]);

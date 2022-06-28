@@ -328,14 +328,36 @@ namespace LSharp.Interpreter
                 case TokenType.EQUAL_EQUAL: return isEqual(left, right);
                 case TokenType.BANG_EQUAL: return !isEqual(left, right);
                 case TokenType.GREATER:
-                    checkNumberOperands(expression.Operator, left, right);
-                    return (double)left > (double)right;
+
+                    if (left is double && right is double)
+                        return (double)left > (double)right;
+
+                    if (left is string && right is string)
+                    {
+                        var result = ((string)left).CompareTo((string)right);
+                        return result > 0 ? true : false;
+                    }
+
+                    throw new RuntimeError(expression.Operator, 
+                        "Operands must be two numbers or strings.");
+
                 case TokenType.GREATER_EQUAL:
                     checkNumberOperands(expression.Operator, left, right);
                     return (double)left >= (double)right;
                 case TokenType.LESS:
-                    checkNumberOperands(expression.Operator, left, right);
-                    return (double)left < (double)right;
+
+                    if (left is double && right is double)
+                        return (double)left < (double)right;
+
+                    if (left is string && right is string)
+                    {
+                        var result = ((string)left).CompareTo((string)right);
+                        return result < 0 ? true : false;
+                    }
+
+                    throw new RuntimeError(expression.Operator, 
+                        "Operands must be two numbers or strings.");
+
                 case TokenType.LESS_EQUAL:
                     checkNumberOperands(expression.Operator, left, right);
                     return (double)left <= (double)right;
