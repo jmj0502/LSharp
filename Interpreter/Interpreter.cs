@@ -242,6 +242,7 @@ namespace LSharp.Interpreter
         private string stringify(object value)
         {
             if (value == null) return "nil";
+            if (value is string) return $"\"{value}\"";
             if (value is double)
             {
                 var text = value.ToString();
@@ -256,10 +257,10 @@ namespace LSharp.Interpreter
                 var sb = new StringBuilder();
                 var list = (List<object>)value;
                 sb.Append("[");
-                foreach (var el in list)
+                for (int i = 0; i < list.Count; i++)
                 {
-                    sb.Append(stringify(el));
-                    if (!Equals(el, list.Last()))
+                    sb.Append(stringify(list[i]));
+                    if (!Equals(i, list.Count - 1))
                     {
                         sb.Append(", ");
                     }
@@ -278,7 +279,7 @@ namespace LSharp.Interpreter
                 for (var i = 0; i < dictKeys.Count; i++)
                 {
                     sb.Append($"{stringify(dictKeys[i])}:{stringify(dictValues[i])}");
-                    if (!Equals(dictKeys[i], dictKeys.Last()))
+                    if (!Equals(i, dictKeys.Count - 1))
                     {
                         sb.Append(", ");
                     }
