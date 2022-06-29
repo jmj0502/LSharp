@@ -361,6 +361,8 @@ namespace LSharp.GlobalModules
             var list = (List<object>)arguments[0];
             var comparator = arguments[1] != null ? (LSFunction)arguments[1] : null;
             var sort = new Sorts();
+            var amountOfTypes = list.Select(el => el.GetType()).Distinct().Count();
+            if (amountOfTypes > 1) return null;
             if (comparator == null)
             {
                 return sort.MergeSort(list);
