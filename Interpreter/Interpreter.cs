@@ -413,7 +413,12 @@ namespace LSharp.Interpreter
             catch(InvalidCastException e)
             {
                 throw new RuntimeError(expression.Paren,
-                    $"Invalid parameter type.");
+                    "Invalid parameter type.");
+            }
+            catch(SortError e)
+            {
+                throw new RuntimeError(expression.Paren,
+                    e.Message);
             }
         }
 

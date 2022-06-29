@@ -362,7 +362,7 @@ namespace LSharp.GlobalModules
             var comparator = arguments[1] != null ? (LSFunction)arguments[1] : null;
             var sort = new Sorts();
             var amountOfTypes = list.Select(el => el.GetType()).Distinct().Count();
-            if (amountOfTypes > 1) return null;
+            if (amountOfTypes > 1) throw new SortError("Can't compare elements of different types.");
             if (comparator == null)
             {
                 return sort.MergeSort(list);
@@ -468,6 +468,13 @@ namespace LSharp.GlobalModules
             leftHandSide = MergeSort(leftHandSideList, interpreter, comparator);
             rightHandSide = MergeSort(rightHandSideList, interpreter, comparator);
             return merge(leftHandSide, rightHandSide, interpreter, comparator);
+        }
+    }
+
+    class SortError : ApplicationException
+    {
+        public SortError(string message) : base(message)
+        {
         }
     }
 }
