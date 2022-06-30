@@ -109,8 +109,8 @@ namespace LSharp.GlobalModules
         public object Call(Interpreter.Interpreter interpreter, List<object> arguments)
         {
             var list = (List<object>)arguments[0];
-            var indexValue = (double)arguments[1];
-            var index = (int)indexValue;
+            var index = (int)((double)arguments[1]);
+            if (index >= list.Count || index < 0) throw new ListError("List index out of range.");
             var newItem = arguments[2];
             list.Insert(index, newItem);
             return (double)list.Count;
@@ -152,6 +152,7 @@ namespace LSharp.GlobalModules
         public object Call(Interpreter.Interpreter interpreter, List<object> arguments)
         {
             var list = (List<object>)arguments[0];
+            if (list.Count == 0) return null;
             list.RemoveAt(0);
             return (double)list.Count;
         }
@@ -172,6 +173,7 @@ namespace LSharp.GlobalModules
         public object Call(Interpreter.Interpreter interpreter, List<object> arguments)
         {
             var list = (List<object>)arguments[0];
+            if (list.Count == 0) return null;
             list.RemoveAt(list.Count - 1);
             return (double)list.Count;
         }
@@ -192,8 +194,8 @@ namespace LSharp.GlobalModules
         public object Call(Interpreter.Interpreter interpreter, List<object> arguments)
         {
             var list = (List<object>)arguments[0];
-            var indexValue = (double)arguments[1];
-            var index = (int)indexValue;
+            var index = (int)((double)arguments[1]);
+            if (index >= list.Count || index < 0) throw new ListError("List index out of range");
             list.RemoveAt(index);
             return (double)list.Count;
         }
@@ -362,7 +364,7 @@ namespace LSharp.GlobalModules
             var comparator = arguments[1] != null ? (LSFunction)arguments[1] : null;
             var sort = new Sorts();
             var amountOfTypes = list.Select(el => el.GetType()).Distinct().Count();
-            if (amountOfTypes > 1) throw new SortError("Can't compare elements of different types.");
+            if (amountOfTypes > 1) throw new ListError("Can't compare elements of different types.");
             if (comparator == null)
             {
                 return sort.MergeSort(list);
@@ -391,10 +393,14 @@ namespace LSharp.GlobalModules
             {
                 if (!(lhs[0] is IComparable) || !(rhs[0] is IComparable)) 
                 {
-                    var comparisonReturnValue = comparator != null 
-                        ? comparator.Call(interpreter, new List<object> { lhs[i], rhs[i] }) : null;
-                    int comparisonResult = -2;
-                    if (comparisonReturnValue != null) comparisonResult = (int)((double)comparisonReturnValue);
+                    //At this point comparator can't be null.
+                    if (comparator == null) throw new ListError(
+                        "A comparator must be provided in order to sort dictionaries, lists or objects.");
+
+                    var comparisonReturnValue = comparator.Call(interpreter, 
+                        new List<object> { lhs[i], rhs[i] });
+                    int comparisonResult = (int)((double)comparisonReturnValue);
+
                     if (comparisonResult == 1)
                     {
                         mergedList.Add(rhs[j]);
@@ -471,9 +477,9 @@ namespace LSharp.GlobalModules
         }
     }
 
-    class SortError : ApplicationException
+    class ListError : ApplicationException
     {
-        public SortError(string message) : base(message)
+        public ListError(string message) : base(message)
         {
         }
     }

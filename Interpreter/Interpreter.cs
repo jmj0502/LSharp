@@ -415,7 +415,7 @@ namespace LSharp.Interpreter
                 throw new RuntimeError(expression.Paren,
                     "Invalid parameter type.");
             }
-            catch(SortError e)
+            catch(ListError e)
             {
                 throw new RuntimeError(expression.Paren,
                     e.Message);
