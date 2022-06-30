@@ -37,8 +37,8 @@ namespace LSharp.GlobalModules
 
         public object Call(Interpreter.Interpreter interpreter, List<object> arguments)
         {
-            var str = ((string)arguments[0]);
-            var separator = ((string)arguments[1]);
+            var str = (string)arguments[0];
+            var separator = (string)arguments[1];
             var splittedStr = str.Split(separator);
             return splittedStr.ToList<object>();
         }
@@ -357,14 +357,21 @@ namespace LSharp.GlobalModules
         public object Call(Interpreter.Interpreter interpreter, List<object> arguments)
         {
             var str = (string)arguments[0];
-            var indexValue = (double)arguments[1];
-            var index = (int)indexValue;
+            var index = (int)((double)arguments[1]);
+            if (index < 0 || index >= str.Length) throw new StringError("String index out of range.");
             return str[index].ToString();
         }
 
         public override string ToString()
         {
             return "<native function string.at>";
+        }
+    }
+
+    class StringError : ApplicationException
+    {
+        public StringError(string message) : base(message)
+        {
         }
     }
 
