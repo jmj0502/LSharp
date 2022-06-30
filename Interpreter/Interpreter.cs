@@ -413,15 +413,20 @@ namespace LSharp.Interpreter
             catch(InvalidCastException e)
             {
                 throw new RuntimeError(expression.Paren,
-                    "Invalid parameter type.");
+                    "Invalid type provided.");
             }
             catch(ListError e)
             {
                 throw new RuntimeError(expression.Paren,
                     e.Message);
             }
+            catch(StringError e)
+            {
+                throw new RuntimeError(expression.Paren,
+                    e.Message);
+            }
         }
-
+        
         /// <summary>
         /// Turns a get expression (dot call EJ: test.test) into a runtime representation. It checks to determine if the object
         /// that's been called is an actual instance, if so, it proceeds to resolve the field from its respective list of fields;
