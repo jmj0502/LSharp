@@ -228,10 +228,8 @@ namespace LSharp.GlobalModules
 
         public object Call(Interpreter.Interpreter interpreter, List<object> arguments)
         {
-            var leftValue = (double)arguments[1];
-            var leftIndex = (int)leftValue;
-            var rightValue = (double)arguments[2];
-            var rightIndex = (int)rightValue;
+            var leftIndex = (int)((double)arguments[1]);
+            var rightIndex = (int)((double)arguments[2]);
                 
             if (arguments[0] is string)
             {
