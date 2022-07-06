@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -24,6 +25,7 @@ namespace LSharp.GlobalModules
             moduleBody.Define("contains", new Contains("string")); //Should also apply to lists.
             moduleBody.Define("indexOf", new IndexOf("string")); //Should also apply to lists.
             moduleBody.Define("at", new At());
+            moduleBody.Define("match", new Match());
             return moduleBody;
         }
     }
@@ -366,12 +368,47 @@ namespace LSharp.GlobalModules
         }
     }
 
+    //TODO: Match, Replace, Search.
+    public class Match : ICallable
+    {
+        public int Arity()
+        {
+            return 3;
+        }
+
+        public object Call(Interpreter.Interpreter interpreter, List<object> arguments)
+        {
+            var str = (string)arguments[0];
+            var pattern = (string)arguments[1];
+            var options = (Dictionary<object, object>)arguments[2];
+            Regex regex;
+            if (options.ContainsKey("insensitive"))
+            {
+                regex = new Regex($"{pattern}", RegexOptions.IgnoreCase);
+            }
+            else
+            {
+                regex = new Regex($"{pattern}");
+            }
+            var matches = regex.Match(str);
+            var results = new List<object>();
+            foreach (var match in matches.Groups)
+            {
+                results.Add(match.ToString());
+            }
+            return results;
+        }
+
+        public override string ToString()
+        {
+            return "<native function string.match>";
+        }
+    }
+
     class StringError : ApplicationException
     {
         public StringError(string message) : base(message)
         {
         }
     }
-
-    //TODO: Match, Replace, Search.
 }
