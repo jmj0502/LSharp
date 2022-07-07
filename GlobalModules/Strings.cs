@@ -26,6 +26,7 @@ namespace LSharp.GlobalModules
             moduleBody.Define("indexOf", new IndexOf("string")); //Should also apply to lists.
             moduleBody.Define("at", new At());
             moduleBody.Define("match", new Match());
+            moduleBody.Define("replace", new Replace());
             return moduleBody;
         }
     }
@@ -368,7 +369,6 @@ namespace LSharp.GlobalModules
         }
     }
 
-    //TODO: Match, Replace, Search.
     public class Match : ICallable
     {
         public int Arity()
@@ -402,6 +402,37 @@ namespace LSharp.GlobalModules
         public override string ToString()
         {
             return "<native function string.match>";
+        }
+    }
+
+    public class Replace : ICallable
+    {
+        public int Arity()
+        {
+            return 4;
+        }
+
+        public object Call(Interpreter.Interpreter interpreter, List<object> arguments)
+        {
+            var str = (string)arguments[0];
+            var pattern = (string)arguments[1];
+            var replacement = (string)arguments[2];
+            var options = (Dictionary<object, object>)arguments[3];
+            Regex regex;
+            if (options.ContainsKey("insensitive"))
+            {
+                regex = new Regex($"{pattern}", RegexOptions.IgnoreCase);
+            }
+            else
+            {
+                regex = new Regex($"{pattern}");
+            }
+            return regex.Replace(str, replacement);
+        }
+
+        public override string ToString()
+        {
+            return "<native function string.replace>";
         }
     }
 
