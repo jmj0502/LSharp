@@ -13,6 +13,7 @@ namespace LSharp.GlobalModules
             var moduleBody = new Enviroment.Enviroment();
             moduleBody.Define("keys", new Keys());
             moduleBody.Define("values", new Values());
+            moduleBody.Define("containsKey", new ContainsKey());
             return moduleBody;
         }
     }
@@ -54,4 +55,25 @@ namespace LSharp.GlobalModules
             return "<native function dictionary.values>";
         }
     }
+
+    public class ContainsKey : ICallable
+    {
+        public int Arity()
+        {
+            return 2;
+        }
+
+        public object Call(Interpreter.Interpreter interpreter, List<object> arguments)
+        {
+            var dict = (Dictionary<object, object>)arguments[0];
+            var key = arguments[1];
+            return dict.ContainsKey(key);
+        }
+
+        public override string ToString()
+        {
+            return "<native function dictionary.containsKey>";
+        }
+    }
+
 }
