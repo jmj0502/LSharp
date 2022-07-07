@@ -16,6 +16,7 @@ namespace LSharp.GlobalModules
             moduleBody.Define("containsKey", new ContainsKey());
             moduleBody.Define("delete", new Delete());
             moduleBody.Define("clear", new Clear());
+            moduleBody.Define("toList", new ToList());
             return moduleBody;
         }
     }
@@ -115,6 +116,31 @@ namespace LSharp.GlobalModules
         public override string ToString()
         {
             return "<native function dictionary.clear>";
+        }
+    }
+
+    public class ToList : ICallable
+    {
+        public int Arity()
+        {
+            return 1;
+        }
+
+        public object Call(Interpreter.Interpreter interpreter, List<object> arguments)
+        {
+            var dict = (Dictionary<object, object>)arguments[0];
+            var keyValuePairs = dict.ToList();
+            var entryList = new List<object>();
+            foreach (var (key, value) in keyValuePairs)
+            {
+                entryList.Add(new List<object> { key, value });
+            }
+            return entryList;
+        }
+
+        public override string ToString()
+        {
+            return "<native function dictionary.toList>";
         }
     }
 
