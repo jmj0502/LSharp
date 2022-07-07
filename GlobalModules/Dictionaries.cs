@@ -12,6 +12,7 @@ namespace LSharp.GlobalModules
         {
             var moduleBody = new Enviroment.Enviroment();
             moduleBody.Define("keys", new Keys());
+            moduleBody.Define("values", new Values());
             return moduleBody;
         }
     }
@@ -32,6 +33,25 @@ namespace LSharp.GlobalModules
         public override string ToString()
         {
             return "<native function dictionary.keys>";
+        }
+    }
+
+    public class Values : ICallable
+    {
+        public int Arity()
+        {
+            return 1;
+        }
+
+        public object Call(Interpreter.Interpreter interpreter, List<object> arguments)
+        {
+            var dict = (Dictionary<object, object>)arguments[0];
+            return dict.Values.ToList();
+        }
+
+        public override string ToString()
+        {
+            return "<native function dictionary.values>";
         }
     }
 }
