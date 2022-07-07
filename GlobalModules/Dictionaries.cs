@@ -14,6 +14,7 @@ namespace LSharp.GlobalModules
             moduleBody.Define("keys", new Keys());
             moduleBody.Define("values", new Values());
             moduleBody.Define("containsKey", new ContainsKey());
+            moduleBody.Define("delete", new Delete());
             return moduleBody;
         }
     }
@@ -73,6 +74,26 @@ namespace LSharp.GlobalModules
         public override string ToString()
         {
             return "<native function dictionary.containsKey>";
+        }
+    }
+
+    public class Delete : ICallable
+    {
+        public int Arity()
+        {
+            return 2;
+        }
+
+        public object Call(Interpreter.Interpreter interpreter, List<object> arguments)
+        {
+            var dict = (Dictionary<object, object>)arguments[0];
+            var key = arguments[1];
+            return dict.Remove(key);
+        }
+
+        public override string ToString()
+        {
+            return "<native function dictionary.delete>";
         }
     }
 
