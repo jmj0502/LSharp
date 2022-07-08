@@ -18,6 +18,8 @@ namespace LSharp.GlobalModules
             moduleBody.Define("createFile", new CreateFile());
             moduleBody.Define("writeFile", new WriteFile());
             moduleBody.Define("fileExists", new FileExists());
+            moduleBody.Define("directoryExists", new DirExist());
+            moduleBody.Define("createDirectory", new CreateDir());
             return moduleBody;
         }
     }
@@ -208,4 +210,58 @@ namespace LSharp.GlobalModules
             return "<native function io.fileExists>";
         }
     }
+
+    public class DirExist : ICallable
+    {
+        public int Arity()
+        {
+            return 1;
+        }
+
+        public object Call(Interpreter.Interpreter interpreter, List<object> arguments)
+        {
+            var path = (string)arguments[0];
+            try
+            {
+                return System.IO.Directory.Exists(path);
+            }
+            catch(Exception e)
+            {
+                return false;
+            }
+        }
+
+        public override string ToString()
+        {
+            return "<native function io.directoryExist>";
+        }
+    }
+
+    public class CreateDir : ICallable
+    {
+        public int Arity()
+        {
+            return 1;
+        }
+
+        public object Call(Interpreter.Interpreter interpreter, List<object> arguments)
+        {
+            var path = (string)arguments[0];
+            try
+            {
+                System.IO.Directory.CreateDirectory(path);
+                return true;
+            } 
+            catch(Exception e)
+            {
+                return false;
+            }
+        }
+
+        public override string ToString()
+        {
+            return "<native function io.createDirectory>";
+        }
+    }
+
 }
