@@ -17,6 +17,7 @@ namespace LSharp.GlobalModules
             moduleBody.Define("deleteFile", new DeleteFile());
             moduleBody.Define("createFile", new CreateFile());
             moduleBody.Define("writeFile", new WriteFile());
+            moduleBody.Define("fileExists", new FileExists());
             return moduleBody;
         }
     }
@@ -179,6 +180,32 @@ namespace LSharp.GlobalModules
         public override string ToString()
         {
             return "<native function io.writeFile>";
+        }
+    }
+
+    public class FileExists : ICallable
+    {
+        public int Arity()
+        {
+            return 1;
+        }
+
+        public object Call(Interpreter.Interpreter interpreter, List<object> arguments)
+        {
+            var path = (string)arguments[0];
+            try
+            {
+                return System.IO.File.Exists(path);
+            }
+            catch(Exception e)
+            {
+                return false;
+            }
+        }
+
+        public override string ToString()
+        {
+            return "<native function io.fileExists>";
         }
     }
 }
