@@ -15,6 +15,8 @@ namespace LSharp.GlobalModules
             moduleBody.Define("copyFile", new CopyFile());
             moduleBody.Define("moveFile", new MoveFile());
             moduleBody.Define("deleteFile", new DeleteFile());
+            moduleBody.Define("createFile", new CreateFile());
+            moduleBody.Define("writeFile", new WriteFile());
             return moduleBody;
         }
     }
@@ -121,6 +123,62 @@ namespace LSharp.GlobalModules
         public override string ToString()
         {
             return "<native function io.deleteFile>";
+        }
+    }
+
+    public class CreateFile : ICallable
+    {
+        public int Arity()
+        {
+            return 1;
+        }
+
+        public object Call(Interpreter.Interpreter interpreter, List<object> arguments)
+        {
+            var path = (string)arguments[0];
+            var content = (string)arguments[1];
+            try
+            {
+                System.IO.File.WriteAllText(path, content);
+                return true;
+            } 
+            catch(Exception e)
+            {
+                return false;
+            }
+        }
+
+        public override string ToString()
+        {
+            return "<native function io.createFile>";
+        }
+    }
+
+    public class WriteFile : ICallable
+    {
+        public int Arity()
+        {
+            return 1;
+        }
+
+        public object Call(Interpreter.Interpreter interpreter, List<object> arguments)
+        {
+            var path = (string)arguments[0];
+            var content = (string)arguments[1];
+            try
+            {
+                System.IO.File.AppendAllText(path, content);
+                return true;
+            }
+            catch(Exception e)
+            {
+                return false;
+            }
+        }
+
+        public override string ToString()
+        {
+            return "<native function io.writeFile>";
         }
     }
 }
