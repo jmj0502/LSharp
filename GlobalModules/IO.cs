@@ -13,6 +13,8 @@ namespace LSharp.GlobalModules
             var moduleBody = new Enviroment.Enviroment();
             moduleBody.Define("readFileAsText", new ReadFileAsText());
             moduleBody.Define("copyFile", new CopyFile());
+            moduleBody.Define("moveFile", new MoveFile());
+            moduleBody.Define("deleteFile", new DeleteFile());
             return moduleBody;
         }
     }
@@ -64,6 +66,61 @@ namespace LSharp.GlobalModules
         public override string ToString()
         {
             return "<native function io.copyFile>";
+        }
+    }
+
+    public class MoveFile : ICallable
+    {
+        public int Arity()
+        {
+            return 1;
+        }
+
+        public object Call(Interpreter.Interpreter interpreter, List<object> arguments)
+        {
+            var originPath = (string)arguments[0];
+            var destinationPath = (string)arguments[1];
+            try
+            {
+                System.IO.File.Move(originPath, destinationPath);
+                return true;
+            }
+            catch(Exception e)
+            {
+                return false;
+            }
+        }
+
+        public override string ToString()
+        {
+            return "<native function io.moveFile>";
+        }
+    }
+
+    public class DeleteFile : ICallable
+    {
+        public int Arity()
+        {
+            return 1;
+        }
+
+        public object Call(Interpreter.Interpreter interpreter, List<object> arguments)
+        {
+            var path = (string)arguments[0];
+            try
+            {
+                System.IO.File.Delete(path);
+                return true;
+            }
+            catch(Exception e)
+            {
+                return false;
+            }
+        }
+
+        public override string ToString()
+        {
+            return "<native function io.deleteFile>";
         }
     }
 }
