@@ -34,6 +34,7 @@ namespace LSharp.Interpreter
             enviroment.Define("String", new LSModule(new Strings().GenerateBody(), "Strings"));
             enviroment.Define("List", new LSModule(new Lists().GenerateBody(), "Lists"));
             enviroment.Define("Dictionary", new LSModule(new Dictionaries().GenerateBody(), "Dictionaries"));
+            enviroment.Define("IO", new LSModule(new IO().GenerateBody(), "IO"));
         } 
 
         /// <summary>
