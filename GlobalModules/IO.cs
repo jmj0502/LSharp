@@ -21,6 +21,7 @@ namespace LSharp.GlobalModules
             moduleBody.Define("directoryExists", new DirExist());
             moduleBody.Define("createDirectory", new CreateDir());
             moduleBody.Define("moveDirectory", new MoveDir());
+            moduleBody.Define("getDirectoryFiles", new GetDirFiles());
             return moduleBody;
         }
     }
@@ -290,6 +291,32 @@ namespace LSharp.GlobalModules
         public override string ToString()
         {
             return "<native function io.moveDirectory>";
+        }
+    }
+
+    public class GetDirFiles : ICallable
+    {
+        public int Arity()
+        {
+            return 1;
+        }
+
+        public object Call(Interpreter.Interpreter interpreter, List<object> arguments)
+        {
+            var path = (string)arguments[0];
+            try
+            {
+                return System.IO.Directory.GetFiles(path);
+            }
+            catch(Exception e)
+            {
+                return null;
+            }
+        }
+
+        public override string ToString()
+        {
+            return "<native function io.getDirectoryFiles>";
         }
     }
 
