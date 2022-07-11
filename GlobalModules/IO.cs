@@ -23,6 +23,7 @@ namespace LSharp.GlobalModules
             moduleBody.Define("moveDirectory", new MoveDir());
             moduleBody.Define("deleteDirectory", new DeleteDir());
             moduleBody.Define("getDirectoryFiles", new GetDirFiles());
+            moduleBody.Define("getParentPath", new GetParentPath());
             return moduleBody;
         }
     }
