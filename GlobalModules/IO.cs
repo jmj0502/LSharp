@@ -348,4 +348,29 @@ namespace LSharp.GlobalModules
         }
     }
 
+    public class GetParentPath : ICallable
+    {
+        public int Arity()
+        {
+            throw new NotImplementedException();
+        }
+
+        public object Call(Interpreter.Interpreter interpreter, List<object> arguments)
+        {
+            var path = (string)arguments[0];
+            var directoryInfo = System.IO.Directory.GetParent(path);
+            return new Dictionary<object, object>()
+            {
+                ["name"] = directoryInfo.FullName,
+                ["exists"] = directoryInfo.Exists,
+                ["creationDate"] = directoryInfo.CreationTimeUtc,
+            };
+        }
+
+        public override string ToString()
+        {
+            return "<native function io.getParentPath>";
+        }
+    }
+
 }
