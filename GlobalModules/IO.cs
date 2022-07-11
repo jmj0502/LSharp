@@ -360,18 +360,56 @@ namespace LSharp.GlobalModules
         {
             var path = (string)arguments[0];
             var directoryInfo = System.IO.Directory.GetParent(path);
-            return new Dictionary<object, object>()
-            {
-                ["name"] = directoryInfo.FullName,
-                ["exists"] = directoryInfo.Exists,
-                ["creationDate"] = directoryInfo.CreationTimeUtc,
-            };
+            return FileAndDirInfoParser.ParseDirInfo(directoryInfo);
         }
 
         public override string ToString()
         {
             return "<native function io.getParentPath>";
         }
+    }
+
+    class FileAndDirInfoParser
+    {
+        public static Dictionary<object, object> ParseFileInfo(System.IO.FileInfo fileInfo)
+        {
+            return new Dictionary<object, object>
+            {
+                ["extension"] = fileInfo.Extension,
+                ["name"] = fileInfo.Name,
+                ["path"] = fileInfo.DirectoryName,
+                ["creationDate"] = fileInfo.CreationTimeUtc,
+                ["exists"] = fileInfo.Exists,
+                ["lastUpdate"] = fileInfo.LastWriteTimeUtc
+            };
+        } 
+
+        public static Dictionary<object, object> ParseDirInfo(System.IO.DirectoryInfo directoryInfo)
+        {
+            var files = directoryInfo.GetFiles();
+            var parsedFilesInfo = new List<object>();
+            foreach (var file in files)
+            {
+                parsedFilesInfo.Add(ParseFileInfo(file));
+            }
+
+            var subDirectories = directoryInfo.GetDirectories();
+            var parsedDirsInfo = new List<object>();
+            foreach (var dir in subDirectories)
+            {
+                parsedDirsInfo.Add(ParseDirInfo(dir));
+            }
+
+            return new Dictionary<object, object>()
+            {
+                ["directory"] = directoryInfo.FullName,
+                ["exists"] = directoryInfo.Exists,
+                ["creationDate"] = directoryInfo.CreationTimeUtc,
+                ["files"] = parsedFilesInfo,
+                ["subdirectories"] = parsedDirsInfo
+            };
+        }
+            
     }
 
 }
