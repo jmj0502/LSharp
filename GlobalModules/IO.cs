@@ -353,7 +353,7 @@ namespace LSharp.GlobalModules
     {
         public int Arity()
         {
-            throw new NotImplementedException();
+            return 1;
         }
 
         public object Call(Interpreter.Interpreter interpreter, List<object> arguments)
