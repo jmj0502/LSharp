@@ -34,6 +34,11 @@ namespace LSharp.Tokens
         QUESTION,
         PLUS_PLUS,
         MINNUS_MINNUS,
+        BITWISE_AND,
+        BITWISE_OR,
+        BITWISE_XOR,
+        L_SHIFT,
+        R_SHIFT,
 
         //Literals
         IDENTIFIER,
