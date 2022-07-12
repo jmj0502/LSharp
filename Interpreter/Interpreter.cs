@@ -329,6 +329,15 @@ namespace LSharp.Interpreter
 
             switch (expression.Operator.Type)
             {
+                case TokenType.BITWISE_OR:
+                    result = Convert.ToInt32(left) | Convert.ToInt32(right);
+                    return (double)(int)result;
+                case TokenType.BITWISE_XOR:
+                    result = Convert.ToInt32(left) ^ Convert.ToInt32(right);
+                    return (double)(int)result;
+                case TokenType.BITWISE_AND:
+                    result = Convert.ToInt32(left) & Convert.ToInt32(right);
+                    return (double)(int)result;
                 case TokenType.EQUAL_EQUAL: return isEqual(left, right);
                 case TokenType.BANG_EQUAL: return !isEqual(left, right);
                 case TokenType.GREATER:
