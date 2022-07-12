@@ -1,5 +1,6 @@
 ﻿using LSharp.Tokens;
 using LSharp.GlobalFunctions;
+using LSharp.GlobalModules;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -30,6 +31,10 @@ namespace LSharp.Interpreter
         {
             Globals = enviroment;
             enviroment.Define("clock", new Clock());
+            enviroment.Define("String", new LSModule(new Strings().GenerateBody(), "Strings"));
+            enviroment.Define("List", new LSModule(new Lists().GenerateBody(), "Lists"));
+            enviroment.Define("Dictionary", new LSModule(new Dictionaries().GenerateBody(), "Dictionaries"));
+            enviroment.Define("IO", new LSModule(new IO().GenerateBody(), "IO"));
         } 
 
         /// <summary>
@@ -239,6 +244,7 @@ namespace LSharp.Interpreter
         private string stringify(object value)
         {
             if (value == null) return "nil";
+            if (value is string) return $"\"{value}\"";
             if (value is double)
             {
                 var text = value.ToString();
@@ -253,10 +259,10 @@ namespace LSharp.Interpreter
                 var sb = new StringBuilder();
                 var list = (List<object>)value;
                 sb.Append("[");
-                foreach (var el in list)
+                for (int i = 0; i < list.Count; i++)
                 {
-                    sb.Append(stringify(el));
-                    if (!Equals(el, list.Last()))
+                    sb.Append(stringify(list[i]));
+                    if (!Equals(i, list.Count - 1))
                     {
                         sb.Append(", ");
                     }
@@ -275,7 +281,7 @@ namespace LSharp.Interpreter
                 for (var i = 0; i < dictKeys.Count; i++)
                 {
                     sb.Append($"{stringify(dictKeys[i])}:{stringify(dictValues[i])}");
-                    if (!Equals(dictKeys[i], dictKeys.Last()))
+                    if (!Equals(i, dictKeys.Count - 1))
                     {
                         sb.Append(", ");
                     }
@@ -325,14 +331,36 @@ namespace LSharp.Interpreter
                 case TokenType.EQUAL_EQUAL: return isEqual(left, right);
                 case TokenType.BANG_EQUAL: return !isEqual(left, right);
                 case TokenType.GREATER:
-                    checkNumberOperands(expression.Operator, left, right);
-                    return (double)left > (double)right;
+
+                    if (left is double && right is double)
+                        return (double)left > (double)right;
+
+                    if (left is string && right is string)
+                    {
+                        var result = ((string)left).CompareTo((string)right);
+                        return result > 0 ? true : false;
+                    }
+
+                    throw new RuntimeError(expression.Operator, 
+                        "Operands must be two numbers or strings.");
+
                 case TokenType.GREATER_EQUAL:
                     checkNumberOperands(expression.Operator, left, right);
                     return (double)left >= (double)right;
                 case TokenType.LESS:
-                    checkNumberOperands(expression.Operator, left, right);
-                    return (double)left < (double)right;
+
+                    if (left is double && right is double)
+                        return (double)left < (double)right;
+
+                    if (left is string && right is string)
+                    {
+                        var result = ((string)left).CompareTo((string)right);
+                        return result < 0 ? true : false;
+                    }
+
+                    throw new RuntimeError(expression.Operator, 
+                        "Operands must be two numbers or strings.");
+
                 case TokenType.LESS_EQUAL:
                     checkNumberOperands(expression.Operator, left, right);
                     return (double)left <= (double)right;
@@ -380,9 +408,27 @@ namespace LSharp.Interpreter
                 throw new RuntimeError(expression.Paren,
                     $"Expected {function.Arity()} parameters but got {arguments.Count}");
             
-            return function.Call(this, arguments);
+            try
+            {
+                return function.Call(this, arguments);
+            }
+            catch(InvalidCastException e)
+            {
+                throw new RuntimeError(expression.Paren,
+                    "Invalid type provided.");
+            }
+            catch(ListError e)
+            {
+                throw new RuntimeError(expression.Paren,
+                    e.Message);
+            }
+            catch(StringError e)
+            {
+                throw new RuntimeError(expression.Paren,
+                    e.Message);
+            }
         }
-
+        
         /// <summary>
         /// Turns a get expression (dot call EJ: test.test) into a runtime representation. It checks to determine if the object
         /// that's been called is an actual instance, if so, it proceeds to resolve the field from its respective list of fields;
