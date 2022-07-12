@@ -49,7 +49,8 @@ namespace LSharp.Parser
         * logical_or -> logical_and ("or" logical_and)*; //Added on chapter 9.
         * logical_and -> equality ("and" equality)*; //Added on chapter 9.
         * equality -> comparison (("!=" | "==") comparison)*;
-        * comparison -> term ((">"|">="|"<"|"<=") term )*;
+        * comparison -> shift ((">"|">="|"<"|"<=") shift )*;
+        * shift -> term ((">>" | "<<") term)*;
         * term -> factor (("-"|"+") factor )*;
         * factor -> prefix (("/"|"*") prefix)*;
         * prefix -> ("++" | "--") unary | unary;
@@ -514,8 +515,23 @@ namespace LSharp.Parser
         /// </summary>
         private Expression comparison()
         {
-            var expression = term();
+            var expression = shift();
             while (match(TokenType.GREATER, TokenType.GREATER_EQUAL, TokenType.LESS, TokenType.LESS_EQUAL))
+            {
+                var operatr = previous();
+                var right = shift();
+                expression = new Expression.Binary(expression, right, operatr);
+            }
+            return expression;
+        }
+
+        /// <summary>
+        /// Rule handler for the shift operations (Non-terminal).
+        /// </summary>
+        private Expression shift()
+        {
+            var expression = term();
+            while (match(TokenType.R_SHIFT, TokenType.L_SHIFT))
             {
                 var operatr = previous();
                 var right = term();
