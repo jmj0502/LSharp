@@ -84,6 +84,9 @@ namespace LSharp.Scanner
                 case '*': addToken(TokenType.STAR); break;
                 case '?': addToken(TokenType.QUESTION); break;
                 case ':': addToken(TokenType.COLON); break;
+                case '&': addToken(TokenType.BITWISE_AND); break;
+                case '|': addToken(TokenType.BITWISE_OR); break;
+                case '^': addToken(TokenType.BITWISE_XOR); break;
                 case '!':
                     addToken(match('=') ? TokenType.BANG_EQUAL : TokenType.BANG);
                     break;
@@ -91,10 +94,32 @@ namespace LSharp.Scanner
                     addToken(match('=') ? TokenType.EQUAL_EQUAL : TokenType.EQUAL);
                     break;
                 case '>':
-                    addToken(match('=') ? TokenType.GREATER_EQUAL : TokenType.GREATER);
+                    if (match('>'))
+                    {
+                        addToken(TokenType.R_SHIFT);
+                    }
+                    else if (match('='))
+                    {
+                        addToken(TokenType.GREATER_EQUAL);
+                    }
+                    else
+                    {
+                        addToken(TokenType.GREATER);
+                    }
                     break;
                 case '<':
-                    addToken(match('=') ? TokenType.LESS_EQUAL : TokenType.LESS);
+                    if (match('<'))
+                    {
+                        addToken(TokenType.L_SHIFT);
+                    }
+                    else if (match('='))
+                    {
+                        addToken(TokenType.LESS_EQUAL);
+                    }
+                    else
+                    {
+                        addToken(TokenType.LESS);
+                    }
                     break;
                 case '/':
                     if (match('/'))

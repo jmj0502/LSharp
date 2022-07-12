@@ -325,9 +325,19 @@ namespace LSharp.Interpreter
         {
             object left = evaluate(expression.Left);
             object right = evaluate(expression.Right);
+            object result;
 
             switch (expression.Operator.Type)
             {
+                case TokenType.BITWISE_OR:
+                    result = Convert.ToInt32(left) | Convert.ToInt32(right);
+                    return (double)(int)result;
+                case TokenType.BITWISE_XOR:
+                    result = Convert.ToInt32(left) ^ Convert.ToInt32(right);
+                    return (double)(int)result;
+                case TokenType.BITWISE_AND:
+                    result = Convert.ToInt32(left) & Convert.ToInt32(right);
+                    return (double)(int)result;
                 case TokenType.EQUAL_EQUAL: return isEqual(left, right);
                 case TokenType.BANG_EQUAL: return !isEqual(left, right);
                 case TokenType.GREATER:
@@ -337,8 +347,8 @@ namespace LSharp.Interpreter
 
                     if (left is string && right is string)
                     {
-                        var result = ((string)left).CompareTo((string)right);
-                        return result > 0 ? true : false;
+                        result = ((string)left).CompareTo((string)right);
+                        return (int)result > 0 ? true : false;
                     }
 
                     throw new RuntimeError(expression.Operator, 
@@ -354,8 +364,8 @@ namespace LSharp.Interpreter
 
                     if (left is string && right is string)
                     {
-                        var result = ((string)left).CompareTo((string)right);
-                        return result < 0 ? true : false;
+                        result = ((string)left).CompareTo((string)right);
+                        return (int)result < 0 ? true : false;
                     }
 
                     throw new RuntimeError(expression.Operator, 
@@ -364,6 +374,14 @@ namespace LSharp.Interpreter
                 case TokenType.LESS_EQUAL:
                     checkNumberOperands(expression.Operator, left, right);
                     return (double)left <= (double)right;
+                case TokenType.L_SHIFT:
+                    checkNumberOperands(expression.Operator, left, right);
+                    result = Convert.ToInt32(left) << Convert.ToInt32(right);
+                    return (double)(int)result;
+                case TokenType.R_SHIFT:
+                    checkNumberOperands(expression.Operator, left, right);
+                    result = Convert.ToInt32(left) >> Convert.ToInt32(right);
+                    return (double)(int)result;
                 case TokenType.MINNUS:
                     checkNumberOperands(expression.Operator, left, right);
                     return (double)left - (double)right;

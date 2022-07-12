@@ -47,9 +47,13 @@ namespace LSharp.Parser
         * assignment -> (call ".")? IDENTIFIER (access)? "=" assignment | ternaryEx; //Added on chapter 8.
         * ternaryEx -> comparison "?" logical_or ":" ( logical_or | ternary_expression ) | logical_or;
         * logical_or -> logical_and ("or" logical_and)*; //Added on chapter 9.
-        * logical_and -> equality ("and" equality)*; //Added on chapter 9.
+        * logical_and -> bitwise_or ("and" bitwise_or)*; //Added on chapter 9.
+        * bitwise_or -> bitwise_xor ("|" bitwise_xor)*;
+        * bitwise_xor -> bitwise_and ("^" bitwise_and)*;
+        * bitwise_and -> equality ("&" equality)*;
         * equality -> comparison (("!=" | "==") comparison)*;
-        * comparison -> term ((">"|">="|"<"|"<=") term )*;
+        * comparison -> shift ((">"|">="|"<"|"<=") shift )*;
+        * shift -> term ((">>" | "<<") term)*;
         * term -> factor (("-"|"+") factor )*;
         * factor -> prefix (("/"|"*") prefix)*;
         * prefix -> ("++" | "--") unary | unary;
@@ -304,13 +308,55 @@ namespace LSharp.Parser
         /// </summary>
         private Expression and()
         {
-            var expression = equality();
+            var expression = bitwiseOr();
 
             while(match(TokenType.AND))
             {
                 var operatr = previous();
-                var right = equality();
+                var right = bitwiseOr();
                 return new Expression.Logical(expression, right, operatr);
+            }
+
+            return expression;
+        }
+
+        private Expression bitwiseOr()
+        {
+            var expression = bitwiseXOR();
+
+            while(match(TokenType.BITWISE_OR))
+            {
+                var operatr = previous();
+                var right = bitwiseXOR();
+                return new Expression.Binary(expression, right, operatr);
+            }
+
+            return expression;
+        }
+
+        private Expression bitwiseXOR()
+        {
+            var expression = bitwiseAnd();
+
+            while(match(TokenType.BITWISE_XOR))
+            {
+                var operatr = previous();
+                var right = bitwiseAnd();
+                return new Expression.Binary(expression, right, operatr);
+            }
+
+            return expression;
+        }
+
+        private Expression bitwiseAnd()
+        {
+            var expression = equality();
+
+            while(match(TokenType.BITWISE_AND))
+            {
+                var operatr = previous();
+                var right = equality();
+                return new Expression.Binary(expression, right, operatr);
             }
 
             return expression;
@@ -514,8 +560,23 @@ namespace LSharp.Parser
         /// </summary>
         private Expression comparison()
         {
-            var expression = term();
+            var expression = shift();
             while (match(TokenType.GREATER, TokenType.GREATER_EQUAL, TokenType.LESS, TokenType.LESS_EQUAL))
+            {
+                var operatr = previous();
+                var right = shift();
+                expression = new Expression.Binary(expression, right, operatr);
+            }
+            return expression;
+        }
+
+        /// <summary>
+        /// Rule handler for the shift operations (Non-terminal).
+        /// </summary>
+        private Expression shift()
+        {
+            var expression = term();
+            while (match(TokenType.R_SHIFT, TokenType.L_SHIFT))
             {
                 var operatr = previous();
                 var right = term();
