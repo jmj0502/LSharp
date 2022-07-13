@@ -304,7 +304,7 @@ namespace LSharp.Parser
 
 
         /// <summary>
-        /// Executes the parsing rule for the "or" operator. This code somehow mirrors the binary expression rule.
+        /// Executes the parsing rule for the "and" operator. This code somehow mirrors the binary expression rule.
         /// </summary>
         private Expression and()
         {
@@ -320,6 +320,9 @@ namespace LSharp.Parser
             return expression;
         }
 
+        /// <summary>
+        /// Executes the parsing rules for bitwise "| (OR)" operations.
+        /// </summary>
         private Expression bitwiseOr()
         {
             var expression = bitwiseXOR();
@@ -334,6 +337,9 @@ namespace LSharp.Parser
             return expression;
         }
 
+        /// <summary>
+        /// Executes the parsing rules for bitwise "^ (XOR)" operations.
+        /// </summary>
         private Expression bitwiseXOR()
         {
             var expression = bitwiseAnd();
@@ -348,6 +354,9 @@ namespace LSharp.Parser
             return expression;
         }
 
+        /// <summary>
+        /// Executes the parsing rules for bitwise "& (AND)" operations.
+        /// </summary>
         private Expression bitwiseAnd()
         {
             var expression = equality();

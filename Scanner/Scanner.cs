@@ -224,6 +224,9 @@ namespace LSharp.Scanner
 
         }
 
+        /// <summary>
+        /// Applies different validations in order to turn C-like hex numbers into numeric literal tokens.
+        /// </summary>
         private void hexNumber()
         {
             while (isDigit(peak())) advance();
@@ -231,7 +234,7 @@ namespace LSharp.Scanner
             //At this point we proceed to check 
             if (peak() == 'x' && isDigit(peakNext()))
             {
-                //We actually consume the . character.
+                //We actually consume the x character.
                 advance();
 
                 while (isDigit(peak())) advance();
