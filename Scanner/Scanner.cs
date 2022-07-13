@@ -154,7 +154,14 @@ namespace LSharp.Scanner
                 default:
                     if (isDigit(c))
                     {
-                        literalNumber();
+                        if (c == '0' && peak() == 'x')
+                        {
+                            hexNumber();
+                        }
+                        else
+                        {
+                            literalNumber();
+                        }
                     }
                     else if (isAlpha(c))
                     {
@@ -215,6 +222,24 @@ namespace LSharp.Scanner
             addToken(TokenType.NUMBER, 
                 double.Parse(source.Substring(start, current - start)));
 
+        }
+
+        private void hexNumber()
+        {
+            while (isDigit(peak())) advance();
+
+            //At this point we proceed to check 
+            if (peak() == 'x' && isDigit(peakNext()))
+            {
+                //We actually consume the . character.
+                advance();
+
+                while (isDigit(peak())) advance();
+            }
+
+            addToken(TokenType.NUMBER, 
+                (double)(int)new System.ComponentModel.Int32Converter().ConvertFromString(
+                    source.Substring(start, current - start)));
         }
 
         /// <summary>
