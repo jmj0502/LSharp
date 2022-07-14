@@ -24,6 +24,7 @@ namespace LSharp.GlobalModules
             moduleBody.Define("deleteDirectory", new DeleteDir());
             moduleBody.Define("getDirectoryFiles", new GetDirFiles());
             moduleBody.Define("getParentDirectory", new GetParentPath());
+            moduleBody.Define("readLine", new ReadLine());
             return moduleBody;
         }
     }
@@ -366,6 +367,28 @@ namespace LSharp.GlobalModules
         public override string ToString()
         {
             return "<native function io.getParentPath>";
+        }
+    }
+
+    public class ReadLine : ICallable
+    {
+        public int Arity()
+        {
+            return 1;
+        }
+
+        public object Call(Interpreter.Interpreter interpreter, List<object> arguments)
+        {
+            var prompt = (string)arguments[0];
+            Console.WriteLine(prompt);
+            var result = Console.ReadLine();
+            if (result == null) return "";
+            return result;
+        }
+
+        public override string ToString()
+        {
+            return "<native function io.readLine>";
         }
     }
 
