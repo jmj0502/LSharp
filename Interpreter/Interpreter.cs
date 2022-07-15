@@ -317,6 +317,19 @@ namespace LSharp.Interpreter
             return value;
         }
 
+        private object equalityTypeSelector(object value, Token sign)
+        {
+            if (sign.Type == TokenType.EQUAL)
+            {
+                return value;
+            }
+            else if (sign.Type == TokenType.PLUS_EQUAL)
+            {
+                return value;
+            }
+            return null;
+        }
+
         /// <summary>
         /// Converts a binary expression into a runtime value.
         /// </summary>
