@@ -37,11 +37,13 @@ namespace LSharp
         {
             public readonly Token Name;
             public readonly Expression Value;
+            public readonly Token AssignmentOp;
 
-            public Assign(Token name, Expression value)
+            public Assign(Token name, Expression value, Token assignmentOp)
             {
                 Name = name;
                 Value = value;
+                AssignmentOp = assignmentOp;
             }
 
             public override T Accept<T>(IVisitor<T> visitor)

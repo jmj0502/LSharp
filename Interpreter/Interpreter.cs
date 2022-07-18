@@ -308,16 +308,20 @@ namespace LSharp.Interpreter
             }
             if (distance != null)
             {
-                enviroment.AssignAt(distance.Value, expression.Name, value);
+                var oldValue = enviroment.GetAt(distance.Value, expression.Name.Lexeme);
+                var result = equalityTypeSelector(oldValue, value, expression.AssignmentOp);
+                enviroment.AssignAt(distance.Value, expression.Name, result);
             }
             else
             {
-                Globals.Assign(expression.Name, value);
+                var oldValue = Globals.Get(expression.Name);
+                var result = equalityTypeSelector(oldValue, value, expression.AssignmentOp);
+                Globals.Assign(expression.Name, result);
             }
             return value;
         }
 
-        private object equalityTypeSelector(object value, Token sign)
+        private object equalityTypeSelector(object oldValue, object value, Token sign)
         {
             if (sign.Type == TokenType.EQUAL)
             {
@@ -325,9 +329,57 @@ namespace LSharp.Interpreter
             }
             else if (sign.Type == TokenType.PLUS_EQUAL)
             {
-                return value;
+                if (oldValue is string && value is string)
+                {
+                    return (string)oldValue + (string)value;
+                }
+                if (oldValue is double && value is double)
+                {
+                    return (double)oldValue + (double)value;
+                }
             }
-            return null;
+            else if (sign.Type == TokenType.MINNUS_EQUAL &&
+                (oldValue is double && value is double))
+            {
+                return (double)oldValue - (double)value;
+            }
+            else if (sign.Type == TokenType.STAR_EQUAL &&
+                (oldValue is double && value is double))
+            {
+                return (double)oldValue * (double)value;
+            }
+            else if (sign.Type == TokenType.SLASH_EQUAL &&
+                (oldValue is double && value is double))
+            {
+                return (double)oldValue / (double)value;
+            }
+            else if (sign.Type == TokenType.AND_EQUAL &&
+                (oldValue is double && value is double))
+            {
+                return (double)((int)(double)oldValue & (int)(double)value);
+            }
+            else if (sign.Type == TokenType.OR_EQUAL &&
+                (oldValue is double && value is double))
+            {
+                return (double)((int)(double)oldValue | (int)(double)value);
+            }
+            else if (sign.Type == TokenType.XOR_EQUAL &&
+                (oldValue is double && value is double))
+            {
+                return (double)((int)(double)oldValue ^ (int)(double)value);
+            }
+            else if (sign.Type == TokenType.L_SHIFT_EQUAL &&
+                (oldValue is double && value is double))
+            {
+                return (double)((int)(double)oldValue << (int)(double)value);
+            }
+            else if (sign.Type == TokenType.R_SHIFT_EQUAL &&
+                (oldValue is double && value is double))
+            {
+                return (double)((int)(double)oldValue >> (int)(double)value);
+            }
+            throw new RuntimeError(sign, 
+                "Cannot apply an equality operation over the provided types");
         }
 
         /// <summary>
