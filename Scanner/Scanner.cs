@@ -125,7 +125,15 @@ namespace LSharp.Scanner
                 case '>':
                     if (match('>'))
                     {
-                        addToken(TokenType.R_SHIFT);
+                        if (peak() == '=')
+                        {
+                            advance();
+                            addToken(TokenType.R_SHIFT_EQUAL);
+                        }
+                        else
+                        {
+                            addToken(TokenType.R_SHIFT);
+                        }
                     }
                     else if (match('='))
                     {
@@ -139,7 +147,15 @@ namespace LSharp.Scanner
                 case '<':
                     if (match('<'))
                     {
-                        addToken(TokenType.L_SHIFT);
+                        if (peak() == '=')
+                        {
+                            advance();
+                            addToken(TokenType.L_SHIFT_EQUAL);
+                        }
+                        else
+                        {
+                            addToken(TokenType.L_SHIFT);
+                        }
                     }
                     else if (match('='))
                     {
