@@ -74,29 +74,66 @@ namespace LSharp.Scanner
                 case ',': addToken(TokenType.COMMA); break;
                 case '.': addToken(TokenType.DOT); break;
                 case '-': 
-                    addToken(match('-') ? TokenType.MINNUS_MINNUS : TokenType.MINNUS); 
+                    if (match('-'))
+                    {
+                        addToken(TokenType.MINNUS_MINNUS);
+                    }
+                    else if (match('='))
+                    {
+                        addToken(TokenType.MINNUS_EQUAL);
+                    }
+                    else
+                    {
+                        addToken(TokenType.MINNUS);
+                    }
                     break;
                 case '+': 
-                    addToken(match('+') ? TokenType.PLUS_PLUS : TokenType.PLUS); 
+                    if (match('+'))
+                    {
+                        addToken(TokenType.PLUS_PLUS);
+                    }
+                    else if (match('='))
+                    {
+                        addToken(TokenType.PLUS_EQUAL);
+                    } 
+                    else
+                    {
+                        addToken(TokenType.PLUS);
+                    }
                     break;
                 case '%': addToken(TokenType.PERCENT); break;
                 case ';': addToken(TokenType.SEMICOLON); break;
-                case '*': addToken(TokenType.STAR); break;
+                case '*': addToken(match('=') ? TokenType.STAR_EQUAL : TokenType.STAR); break;
                 case '?': addToken(TokenType.QUESTION); break;
                 case ':': addToken(TokenType.COLON); break;
-                case '&': addToken(TokenType.BITWISE_AND); break;
-                case '|': addToken(TokenType.BITWISE_OR); break;
-                case '^': addToken(TokenType.BITWISE_XOR); break;
+                case '&': addToken(match('=') ? TokenType.AND_EQUAL : TokenType.BITWISE_AND); break;
+                case '|': addToken(match('=') ? TokenType.OR_EQUAL : TokenType.BITWISE_OR); break;
+                case '^': addToken(match('=') ? TokenType.XOR_EQUAL : TokenType.BITWISE_XOR); break;
                 case '!':
                     addToken(match('=') ? TokenType.BANG_EQUAL : TokenType.BANG);
                     break;
                 case '=':
-                    addToken(match('=') ? TokenType.EQUAL_EQUAL : TokenType.EQUAL);
+                    if (match('='))
+                    {
+                        addToken(TokenType.EQUAL_EQUAL);
+                    }
+                    else
+                    {
+                        addToken(TokenType.EQUAL);
+                    }
                     break;
                 case '>':
                     if (match('>'))
                     {
-                        addToken(TokenType.R_SHIFT);
+                        if (peak() == '=')
+                        {
+                            advance();
+                            addToken(TokenType.R_SHIFT_EQUAL);
+                        }
+                        else
+                        {
+                            addToken(TokenType.R_SHIFT);
+                        }
                     }
                     else if (match('='))
                     {
@@ -110,7 +147,15 @@ namespace LSharp.Scanner
                 case '<':
                     if (match('<'))
                     {
-                        addToken(TokenType.L_SHIFT);
+                        if (peak() == '=')
+                        {
+                            advance();
+                            addToken(TokenType.L_SHIFT_EQUAL);
+                        }
+                        else
+                        {
+                            addToken(TokenType.L_SHIFT);
+                        }
                     }
                     else if (match('='))
                     {
@@ -132,6 +177,10 @@ namespace LSharp.Scanner
                     else if (match('*'))
                     {
                         multilineComment();
+                    }
+                    else if (match('='))
+                    {
+                        addToken(TokenType.SLASH_EQUAL);
                     }
                     else
                     {

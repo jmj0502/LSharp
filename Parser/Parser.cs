@@ -239,7 +239,17 @@ namespace LSharp.Parser
         private Expression assignment()
         {
             var expression = ternary();
-            if (match(TokenType.EQUAL))
+            if (match(
+                TokenType.EQUAL, 
+                TokenType.PLUS_EQUAL,
+                TokenType.MINNUS_EQUAL, 
+                TokenType.SLASH_EQUAL, 
+                TokenType.STAR_EQUAL,
+                TokenType.AND_EQUAL,
+                TokenType.OR_EQUAL,
+                TokenType.XOR_EQUAL,
+                TokenType.L_SHIFT_EQUAL,
+                TokenType.R_SHIFT_EQUAL))
             {
                 var equals = previous();
                 var value = assignment();
@@ -247,17 +257,17 @@ namespace LSharp.Parser
                 if (expression is Expression.Variable)
                 {
                     var name = ((Expression.Variable)expression).Name;
-                    return new Expression.Assign(name, value);
+                    return new Expression.Assign(name, value, equals);
                 }
                 else if (expression is Expression.Get)
                 {
                     var get = (Expression.Get)expression;
-                    return new Expression.Set(get.Object, get.Name, value);
+                    return new Expression.Set(get.Object, get.Name, value, equals);
                 }
                 else if (expression is Expression.Access)
                 {
                     var access = (Expression.Access)expression;
-                    return new Expression.Set(access.Member, access.Index, access.Accessor, value);
+                    return new Expression.Set(access.Member, access.Index, access.Accessor, value, equals);
                 }
 
                 error(equals, "Invalid assignment target.");

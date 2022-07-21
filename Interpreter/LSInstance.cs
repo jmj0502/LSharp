@@ -18,6 +18,16 @@ namespace LSharp.Interpreter
         }
 
         /// <summary>
+        /// Validates is a field with the provided name is contained on the fields of the instance. If so, returns
+        /// true, otherwise, returns false.
+        /// </summary>
+        /// <param name="name">The token that represents the name of the field.</param>
+        public bool HasField(Token name)
+        {
+            return fields.ContainsKey(name.Lexeme);
+        }
+
+        /// <summary>
         /// Performs a look up on the instance fields based on the identifier called on a get expression. 
         /// If the field is resolved as property, then its value is returned; otherwise it proceeds to check 
         /// if there's a method in the class with the given identifier, if so, proceeds to bind the method to the instance

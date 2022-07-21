@@ -308,13 +308,78 @@ namespace LSharp.Interpreter
             }
             if (distance != null)
             {
-                enviroment.AssignAt(distance.Value, expression.Name, value);
+                var oldValue = enviroment.GetAt(distance.Value, expression.Name.Lexeme);
+                var result = equalityTypeSelector(oldValue, value, expression.AssignmentOp);
+                enviroment.AssignAt(distance.Value, expression.Name, result);
             }
             else
             {
-                Globals.Assign(expression.Name, value);
+                var oldValue = Globals.Get(expression.Name);
+                var result = equalityTypeSelector(oldValue, value, expression.AssignmentOp);
+                Globals.Assign(expression.Name, result);
             }
             return value;
+        }
+
+        private object equalityTypeSelector(object oldValue, object value, Token sign)
+        {
+            if (sign.Type == TokenType.EQUAL)
+            {
+                return value;
+            }
+            else if (sign.Type == TokenType.PLUS_EQUAL)
+            {
+                if (oldValue is string && value is string)
+                {
+                    return (string)oldValue + (string)value;
+                }
+                if (oldValue is double && value is double)
+                {
+                    return (double)oldValue + (double)value;
+                }
+            }
+            else if (sign.Type == TokenType.MINNUS_EQUAL &&
+                (oldValue is double && value is double))
+            {
+                return (double)oldValue - (double)value;
+            }
+            else if (sign.Type == TokenType.STAR_EQUAL &&
+                (oldValue is double && value is double))
+            {
+                return (double)oldValue * (double)value;
+            }
+            else if (sign.Type == TokenType.SLASH_EQUAL &&
+                (oldValue is double && value is double))
+            {
+                return (double)oldValue / (double)value;
+            }
+            else if (sign.Type == TokenType.AND_EQUAL &&
+                (oldValue is double && value is double))
+            {
+                return (double)((int)(double)oldValue & (int)(double)value);
+            }
+            else if (sign.Type == TokenType.OR_EQUAL &&
+                (oldValue is double && value is double))
+            {
+                return (double)((int)(double)oldValue | (int)(double)value);
+            }
+            else if (sign.Type == TokenType.XOR_EQUAL &&
+                (oldValue is double && value is double))
+            {
+                return (double)((int)(double)oldValue ^ (int)(double)value);
+            }
+            else if (sign.Type == TokenType.L_SHIFT_EQUAL &&
+                (oldValue is double && value is double))
+            {
+                return (double)((int)(double)oldValue << (int)(double)value);
+            }
+            else if (sign.Type == TokenType.R_SHIFT_EQUAL &&
+                (oldValue is double && value is double))
+            {
+                return (double)((int)(double)oldValue >> (int)(double)value);
+            }
+            throw new RuntimeError(sign, 
+                "Cannot apply an equality operation over the provided types");
         }
 
         /// <summary>
@@ -815,6 +880,8 @@ namespace LSharp.Interpreter
         public object Visit(Expression.Set expression)
         {
             object obj = evaluate(expression.Object);
+            object oldValue;
+            object result;
             if (obj is List<object>)
             {
                 try
@@ -822,8 +889,10 @@ namespace LSharp.Interpreter
                     var index = (double)evaluate(expression.Accessor);
                     var newValue = evaluate(expression.Value);
                     var list = (List<object>)obj;
-                    list[(int)index] = newValue;
-                    return newValue;
+                    oldValue = list[(int)index];
+                    result = equalityTypeSelector(oldValue, newValue, expression.AssignmentOp);
+                    list[(int)index] = result;
+                    return result;
                 } 
                 catch(InvalidCastException e)
                 {
@@ -841,6 +910,13 @@ namespace LSharp.Interpreter
                 var accesor = evaluate(expression.Accessor);
                 var newValue = evaluate(expression.Value);
                 var dict = (Dictionary<object, object>)obj;
+                if (dict.ContainsKey(accesor))
+                {
+                    oldValue = dict[accesor]; 
+                    result = equalityTypeSelector(oldValue, newValue, expression.AssignmentOp);
+                    dict[accesor] = result;
+                    return result;
+                }
                 dict[accesor] = newValue;
                 return newValue;
             }
@@ -851,6 +927,12 @@ namespace LSharp.Interpreter
             }
 
             object value = evaluate(expression.Value);
+            if (((LSInstance)obj).HasField(expression.Name)) {
+                oldValue = ((LSInstance)obj).Get(expression.Name);
+                result = equalityTypeSelector(oldValue, value, expression.AssignmentOp);
+                ((LSInstance)obj).Set(expression.Name, result);
+                return result;
+            }
             ((LSInstance)obj).Set(expression.Name, value);
             return value;
         }
