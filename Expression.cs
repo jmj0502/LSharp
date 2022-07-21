@@ -204,15 +204,18 @@ namespace LSharp
             public readonly Token Name;
             public readonly Expression Accessor;
             public readonly Expression Value;
+            public readonly Token AssignmentOp;
 
-            public Set(Expression obj, Token name, Expression value)
+            public Set(Expression obj, Token name, Expression value, Token assignmentOp)
             {
                 Object = obj;
                 Name = name;
                 Value = value;
+                AssignmentOp = assignmentOp;
             }
 
-            public Set(Expression obj, Token name, Expression accessor, Expression value) : this(obj, name, value)
+            public Set(
+                Expression obj, Token name, Expression accessor, Expression value, Token assignmentOp) : this(obj, name, value, assignmentOp)
             {
                 Accessor = accessor;
             }

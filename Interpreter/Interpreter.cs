@@ -880,6 +880,8 @@ namespace LSharp.Interpreter
         public object Visit(Expression.Set expression)
         {
             object obj = evaluate(expression.Object);
+            object oldValue;
+            object result;
             if (obj is List<object>)
             {
                 try
@@ -887,8 +889,10 @@ namespace LSharp.Interpreter
                     var index = (double)evaluate(expression.Accessor);
                     var newValue = evaluate(expression.Value);
                     var list = (List<object>)obj;
-                    list[(int)index] = newValue;
-                    return newValue;
+                    oldValue = list[(int)index];
+                    result = equalityTypeSelector(oldValue, newValue, expression.AssignmentOp);
+                    list[(int)index] = result;
+                    return result;
                 } 
                 catch(InvalidCastException e)
                 {
@@ -906,6 +910,13 @@ namespace LSharp.Interpreter
                 var accesor = evaluate(expression.Accessor);
                 var newValue = evaluate(expression.Value);
                 var dict = (Dictionary<object, object>)obj;
+                if (dict.ContainsKey(accesor))
+                {
+                    oldValue = dict[accesor]; 
+                    result = equalityTypeSelector(oldValue, newValue, expression.AssignmentOp);
+                    dict[accesor] = result;
+                    return result;
+                }
                 dict[accesor] = newValue;
                 return newValue;
             }
@@ -916,6 +927,12 @@ namespace LSharp.Interpreter
             }
 
             object value = evaluate(expression.Value);
+            if (((LSInstance)obj).HasField(expression.Name)) {
+                oldValue = ((LSInstance)obj).Get(expression.Name);
+                result = equalityTypeSelector(oldValue, value, expression.AssignmentOp);
+                ((LSInstance)obj).Set(expression.Name, result);
+                return result;
+            }
             ((LSInstance)obj).Set(expression.Name, value);
             return value;
         }
