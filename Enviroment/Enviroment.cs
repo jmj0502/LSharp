@@ -11,7 +11,7 @@ namespace LSharp.Enviroment
     public class Enviroment
     {
         public readonly Enviroment Enclosing;
-        public readonly Dictionary<string, object> values = new();
+        public readonly Dictionary<string, (object Value, string Visibility)> values = new();
 
         public Enviroment()
         {
