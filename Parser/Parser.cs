@@ -394,7 +394,7 @@ namespace LSharp.Parser
         /// Executes the parsing process on a declaration statment. It matches the start of a statement, if it contains
         /// the var keyword at the beginning, it consumes it and executes the varDeclaration rules.
         /// </summary>
-        private Stmt declaration()
+        private Stmt declaration(bool module = false)
         {
             try
             {

@@ -11,10 +11,17 @@ namespace LSharp.Enviroment
     public class Enviroment
     {
         public readonly Enviroment Enclosing;
+        public readonly string Name;
         public readonly Dictionary<string, (object Value, string Visibility)> values = new();
 
         public Enviroment()
         {
+            Enclosing = null;
+        }
+
+        public Enviroment(string name)
+        {
+            Name = name;
             Enclosing = null;
         }
 
@@ -29,9 +36,9 @@ namespace LSharp.Enviroment
         /// </summary>
         /// <param name="name">Variable name. We'll be used as the key for the provided value.</param>
         /// <param name="value">Value tied to the variable. Nil, if no value is provided.</param>
-        public void Define(string name, object value)
+        public void Define(string name, object value, string visibility = "pub")
         {
-            values[name] = value;
+            values[name] = (value, visibility);
         }
 
         /// <summary>
@@ -41,7 +48,8 @@ namespace LSharp.Enviroment
         /// <param name="name">The name of the value that should be resolved once every step has been taken.</param>
         public object GetAt(int distance, string name)
         {
-            return Ancestor(distance).values[name];
+            var result = Ancestor(distance).values[name];
+            return result.Value;
         }
 
         /// <summary>
@@ -50,9 +58,9 @@ namespace LSharp.Enviroment
         /// <param name="distance">The number of steps to take to reach the target enviroment.</param>
         /// <param name="name">The identifier token that holds the name of a variable.</param>
         /// <param name="value">The value that will be asigned to the variable.</param>
-        public void AssignAt(int distance, Token name, object value)
+        public void AssignAt(int distance, Token name, object value, string visibility = "pub")
         {
-            Ancestor(distance).values[name.Lexeme] = value;
+            Ancestor(distance).values[name.Lexeme] = (value, visibility);
         }
 
         /// <summary>
@@ -79,9 +87,9 @@ namespace LSharp.Enviroment
         {
             if (values.ContainsKey(name.Lexeme))
             {
-                object value;
+                (object, string) value;
                 var result = values.TryGetValue(name.Lexeme, out value);
-                if (result) return value;
+                if (result) return value.Item1;
             }
 
             //If the variable we're loking for isn't found on this enviroment, the
@@ -98,11 +106,11 @@ namespace LSharp.Enviroment
         /// </summary>
         /// <param name="name">The token that represents the identifier which holds the variable name.</param>
         /// <param name="value">The value that will be tied up to the reasigned variable.</param>
-        public void Assign(Token name, object value)
+        public void Assign(Token name, object value, string visibility = "pub")
         {
             if (values.ContainsKey(name.Lexeme))
             {
-                values[name.Lexeme] = value;
+                values[name.Lexeme] = (value, visibility);
                 return;
             }
 

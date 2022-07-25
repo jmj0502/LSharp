@@ -75,6 +75,7 @@ namespace LSharp.Tokens
         BREAK,
         MODULE,
         USING,
+        PRIV,
 
         EOF
     }
