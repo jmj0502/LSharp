@@ -871,6 +871,17 @@ namespace LSharp.Interpreter
             return evaluate(expression.Right);
         }
 
+        public object Visit(Expression.Pipe expression)
+        {
+            if (expression.Right is Expression.Call)
+            {
+                ((Expression.Call)expression.Right).Arguments.Insert(0, expression.Left);
+                return evaluate(expression.Right);
+            }
+
+            throw new RuntimeError(expression.Operatr, "Can't pipe expressions into non-callable members.");
+        }
+
         /// <summary>
         /// Turns an set expression into a runtime representation. Performs a check similar to the one performed on get expressions,
         /// in order to determine if the object attached to the expression is an instance of a class. If so, it resolves the value

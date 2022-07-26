@@ -28,6 +28,7 @@ namespace LSharp
             T Visit(List expression);
             T Visit(Access expression);
             T Visit(Dict expression);
+            T Visit(Pipe expression);
         }
 
         public abstract T Accept<T>(IVisitor<T> visitor);
@@ -149,6 +150,25 @@ namespace LSharp
             public readonly Token Operatr;
 
             public Logical(Expression left, Expression right, Token operatr)
+            {
+                Left = left;
+                Right = right;
+                Operatr = operatr;
+            }
+
+            public override T Accept<T>(IVisitor<T> visitor)
+            {
+                return visitor.Visit(this);
+            }
+        }
+
+        public class Pipe : Expression
+        {
+            public readonly Expression Left;
+            public readonly Expression Right;
+            public readonly Token Operatr;
+
+            public Pipe(Expression left, Expression right, Token operatr)
             {
                 Left = left;
                 Right = right;

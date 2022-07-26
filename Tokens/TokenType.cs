@@ -48,6 +48,7 @@ namespace LSharp.Tokens
         BITWISE_XOR,
         L_SHIFT,
         R_SHIFT,
+        PIPE,
 
         //Literals
         IDENTIFIER,

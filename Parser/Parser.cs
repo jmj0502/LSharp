@@ -47,7 +47,8 @@ namespace LSharp.Parser
         * assignment -> (call ".")? IDENTIFIER (access)? "=" assignment | ternaryEx; //Added on chapter 8.
         * ternaryEx -> comparison "?" logical_or ":" ( logical_or | ternary_expression ) | logical_or;
         * logical_or -> logical_and ("or" logical_and)*; //Added on chapter 9.
-        * logical_and -> bitwise_or ("and" bitwise_or)*; //Added on chapter 9.
+        * logical_and -> pipe ("and" pipe)*; //Added on chapter 9.
+        * pipe -> bitwise_or ("|>" bitwise_or)*;
         * bitwise_or -> bitwise_xor ("|" bitwise_xor)*;
         * bitwise_xor -> bitwise_and ("^" bitwise_and)*;
         * bitwise_and -> equality ("&" equality)*;
@@ -318,13 +319,27 @@ namespace LSharp.Parser
         /// </summary>
         private Expression and()
         {
-            var expression = bitwiseOr();
+            var expression = pipe();
 
             while(match(TokenType.AND))
             {
                 var operatr = previous();
-                var right = bitwiseOr();
+                var right = pipe();
                 return new Expression.Logical(expression, right, operatr);
+            }
+
+            return expression;
+        }
+
+        private Expression pipe()
+        {
+            var expression = bitwiseOr();
+
+            while(match(TokenType.PIPE))
+            {
+                var operatr = previous();
+                var right = bitwiseOr();
+                expression = new Expression.Pipe(expression, right, operatr);
             }
 
             return expression;

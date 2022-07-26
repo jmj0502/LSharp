@@ -304,6 +304,13 @@ namespace LSharp.Interpreter
             return null;
         }
 
+        public object Visit(Expression.Pipe expression)
+        {
+            resolve(expression.Left);
+            resolve(expression.Right);
+            return null;
+        }
+
         /// <summary>
         /// Resolves each component of a binary expression.
         /// </summary>
@@ -314,6 +321,7 @@ namespace LSharp.Interpreter
             resolve(expression.Right);
             return null;
         }
+
 
         /// <summary>
         /// Resolves the callee and each one argument its arguments out of a call expression.
