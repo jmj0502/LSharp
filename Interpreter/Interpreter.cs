@@ -871,6 +871,12 @@ namespace LSharp.Interpreter
             return evaluate(expression.Right);
         }
 
+        /// <summary>
+        /// Turns a pipe expression into a composite function and then proceeds to perform the evaluation of such function.
+        /// EG: g() |> f() => f(g()). This kind of expression was inspired by Elixir's and FS's Pipe Operator.
+        /// Useful remarks: Will rise a runtime exception if an expression is piped into a non callable member. EG: 5 |> [];
+        /// </summary>
+        /// <param name="expression">Any valid pipe expression.</param>
         public object Visit(Expression.Pipe expression)
         {
             if (expression.Right is Expression.Call)

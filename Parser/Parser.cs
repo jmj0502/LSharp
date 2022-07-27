@@ -331,6 +331,9 @@ namespace LSharp.Parser
             return expression;
         }
 
+        /// <summary>
+        /// Executes the parsing rule for pipe "|>" operations.
+        /// </summary>
         private Expression pipe()
         {
             var expression = bitwiseOr();
