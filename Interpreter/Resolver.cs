@@ -305,6 +305,17 @@ namespace LSharp.Interpreter
         }
 
         /// <summary>
+        /// Resolves a Pipe expression. In order to do, it proceeds to resolver both sides of the pipe expression.
+        /// </summary>
+        /// <param name="expression">The expression to be resolved.</param>
+        public object Visit(Expression.Pipe expression)
+        {
+            resolve(expression.Left);
+            resolve(expression.Right);
+            return null;
+        }
+
+        /// <summary>
         /// Resolves each component of a binary expression.
         /// </summary>
         /// <param name="expression">The binary expression to be resolved.</param>
@@ -314,6 +325,7 @@ namespace LSharp.Interpreter
             resolve(expression.Right);
             return null;
         }
+
 
         /// <summary>
         /// Resolves the callee and each one argument its arguments out of a call expression.

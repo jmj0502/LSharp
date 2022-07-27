@@ -100,6 +100,11 @@ namespace LSharp
             throw new NotImplementedException();
         }
 
+        public string Visit(Expression.Pipe expression)
+        {
+            throw new NotImplementedException();
+        }
+
         private string parenthesize(string name, params Expression[] expressions)
         {
             var sb = new StringBuilder();
@@ -199,6 +204,11 @@ namespace LSharp
         }
 
         public string Visit(Expression.Dict expression)
+        {
+            throw new NotImplementedException();
+        }
+
+        public string Visit(Expression.Pipe expression)
         {
             throw new NotImplementedException();
         }

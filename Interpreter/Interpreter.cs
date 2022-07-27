@@ -872,6 +872,23 @@ namespace LSharp.Interpreter
         }
 
         /// <summary>
+        /// Turns a pipe expression into a composite function and then proceeds to perform the evaluation of such function.
+        /// EG: g() |> f() => f(g()). This kind of expression was inspired by Elixir's and FS's Pipe Operator.
+        /// Useful remarks: Will rise a runtime exception if an expression is piped into a non callable member. EG: 5 |> [];
+        /// </summary>
+        /// <param name="expression">Any valid pipe expression.</param>
+        public object Visit(Expression.Pipe expression)
+        {
+            if (expression.Right is Expression.Call)
+            {
+                ((Expression.Call)expression.Right).Arguments.Insert(0, expression.Left);
+                return evaluate(expression.Right);
+            }
+
+            throw new RuntimeError(expression.Operatr, "Can't pipe expressions into non-callable members.");
+        }
+
+        /// <summary>
         /// Turns an set expression into a runtime representation. Performs a check similar to the one performed on get expressions,
         /// in order to determine if the object attached to the expression is an instance of a class. If so, it resolves the value
         /// that will be assigned to such instance and adds/updates it on the fields map of said instance.
