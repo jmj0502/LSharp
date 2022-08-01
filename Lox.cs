@@ -117,7 +117,8 @@ namespace LSharp
         /// <param name="error">Runtime error produced by the interpreter.</param>
         public static void RuntimeError(LSharp.Interpreter.RuntimeError error)
         {
-            WriteLine($"{error.Message}\n[line {error.token.Line}]");
+            var fileName = error.FileName != null ? $"{error.FileName} - " : "";
+            WriteLine($"{error.Message}\n[{fileName}line {error.token.Line}]");
             HadRuntimeError = true;
         }
 

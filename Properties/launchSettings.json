@@ -2,7 +2,7 @@
   "profiles": {
     "LSharp": {
       "commandName": "Project",
-      "commandLineArgs": "class.ls"
+      "commandLineArgs": "foreing.ls"
     }
   }
 }

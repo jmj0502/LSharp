@@ -216,10 +216,11 @@ namespace LSharp.Interpreter
             }
             if (imports.ContainsKey(filePath)) return null;
             var resolvedFile = Lox.ResolveFile(filePath);
+            var fileName = filePath.Split($"{separator}").Last();
             if (resolvedFile == null)
             {
                 throw new RuntimeError(stmt.Keyword, 
-                    "Couldn't resolved the specified module.");
+                    "Couldn't resolved the specified module.", fileName);
             }
             imports[filePath] = true;
             resolveUsingStatement(resolvedFile);
