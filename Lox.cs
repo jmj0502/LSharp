@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using LSharp.Interpreter;
 using static System.Console;
 
@@ -10,6 +11,7 @@ namespace LSharp
         private static readonly Interpreter.Interpreter interpreter = new Interpreter.Interpreter();
         private static bool HadErrors = false;
         private static bool HadRuntimeError = false;
+        private static string EntryPointName;
 
         static void Main(string[] args)
         {
@@ -58,6 +60,7 @@ namespace LSharp
         private static void RunFile(string path) 
         {
             var source = System.IO.File.ReadAllText(path);
+            EntryPointName = path.Split("/").Last();
             Run(source);
             if (HadErrors) Environment.Exit(1);
             if (HadRuntimeError) Environment.Exit(1);
@@ -97,7 +100,7 @@ namespace LSharp
 
             if (HadErrors) return;
 
-            interpreter.Interpret(statements);
+            interpreter.Interpret(statements, EntryPointName);
         }
 
         /// <summary>

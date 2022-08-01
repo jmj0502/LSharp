@@ -25,6 +25,7 @@ namespace LSharp.Interpreter
         private Enviroment.Enviroment enviroment = new Enviroment.Enviroment();
         private Dictionary<string, bool> imports = new();
         private readonly Dictionary<Expression, int> locals = new();
+        private string fileName;
         public Enviroment.Enviroment Globals;
 
         public Interpreter()
@@ -42,8 +43,9 @@ namespace LSharp.Interpreter
         /// is invalid, a runtime error will be araised.
         /// </summary>
         /// <param name="statments">The list of statements intedend to be interpreted.</param>
-        public void Interpret(List<Stmt> statments)
+        public void Interpret(List<Stmt> statments, string fileName)
         {
+            this.fileName = fileName;
             try
             {
                 foreach (var statement in statments)
@@ -132,7 +134,7 @@ namespace LSharp.Interpreter
                 if (!(superclass is LSClass))
                 {
                     throw new RuntimeError(stmt.Superclass.Name, 
-                        "Superclass must be a class.");
+                        "Superclass must be a class.", this.fileName);
                 }
             }
             enviroment.Define(stmt.Name.Lexeme, null);
@@ -223,19 +225,22 @@ namespace LSharp.Interpreter
                     "Couldn't resolved the specified module.", fileName);
             }
             imports[filePath] = true;
-            resolveUsingStatement(resolvedFile);
+            resolveUsingStatement(resolvedFile, this.fileName);
             return null;
         }
 
         /// <summary>
         /// Executes a list of statements.
         /// </summary>
-        public void resolveUsingStatement(List<Stmt> stmts)
+        public void resolveUsingStatement(List<Stmt> stmts, string fileName)
         {
+            var temp = this.fileName;
+            this.fileName = fileName;
             foreach (var stmt in stmts)
             {
                 execute(stmt);
             }
+            this.fileName = temp;
         }
 
         /// <summary>
@@ -380,7 +385,7 @@ namespace LSharp.Interpreter
                 return (double)((int)(double)oldValue >> (int)(double)value);
             }
             throw new RuntimeError(sign, 
-                "Cannot apply an equality operation over the provided types");
+                "Cannot apply an equality operation over the provided types", this.fileName);
         }
 
         /// <summary>
@@ -418,7 +423,7 @@ namespace LSharp.Interpreter
                     }
 
                     throw new RuntimeError(expression.Operator, 
-                        "Operands must be two numbers or strings.");
+                        "Operands must be two numbers or strings.", this.fileName);
 
                 case TokenType.GREATER_EQUAL:
                     checkNumberOperands(expression.Operator, left, right);
@@ -435,7 +440,7 @@ namespace LSharp.Interpreter
                     }
 
                     throw new RuntimeError(expression.Operator, 
-                        "Operands must be two numbers or strings.");
+                        "Operands must be two numbers or strings.", this.fileName);
 
                 case TokenType.LESS_EQUAL:
                     checkNumberOperands(expression.Operator, left, right);
@@ -465,7 +470,7 @@ namespace LSharp.Interpreter
                         return (string)left + (string)right;
 
                     throw new RuntimeError(expression.Operator, 
-                        "Operands must be two numbers or strings.");
+                        "Operands must be two numbers or strings.", this.fileName);
             }
 
             return null;
@@ -485,12 +490,12 @@ namespace LSharp.Interpreter
 
             if (!(callee is ICallable))
                 throw new RuntimeError(expression.Paren,
-                    "Can only call functions and classes.");
+                    "Can only call functions and classes.", this.fileName);
 
             var function = (ICallable)callee;
             if (arguments.Count != function.Arity())
                 throw new RuntimeError(expression.Paren,
-                    $"Expected {function.Arity()} parameters but got {arguments.Count}");
+                    $"Expected {function.Arity()} parameters but got {arguments.Count}", this.fileName);
             
             try
             {
@@ -499,17 +504,17 @@ namespace LSharp.Interpreter
             catch(InvalidCastException e)
             {
                 throw new RuntimeError(expression.Paren,
-                    "Invalid type provided.");
+                    "Invalid type provided.", this.fileName);
             }
             catch(ListError e)
             {
                 throw new RuntimeError(expression.Paren,
-                    e.Message);
+                    e.Message, this.fileName);
             }
             catch(StringError e)
             {
                 throw new RuntimeError(expression.Paren,
-                    e.Message);
+                    e.Message, this.fileName);
             }
         }
         
@@ -532,7 +537,7 @@ namespace LSharp.Interpreter
             }
 
             throw new RuntimeError(expression.Name, 
-                "Only instances have properties.");
+                "Only instances have properties.", this.fileName);
         }
 
         /// <summary>
@@ -544,7 +549,7 @@ namespace LSharp.Interpreter
         private void checkNumberOperands(Token operatr, object left, object right)
         {
             if (left is double && right is double) return;
-            throw new RuntimeError(operatr, "Operands must be numbers.");
+            throw new RuntimeError(operatr, "Operands must be numbers.", this.fileName);
         }
 
         /// <summary>
@@ -604,13 +609,13 @@ namespace LSharp.Interpreter
                 case TokenType.MINNUS_MINNUS:
                     if (expression.Right == null)
                         throw new RuntimeError(expression.Operatr, 
-                            "Can't apply a prefix operator on a 'nil' value.");
+                            "Can't apply a prefix operator on a 'nil' value.", fileName);
 
                     if (!(expression.Right is Expression.Variable))
                     {
                         var expressionType = expression.Postfix ? "postfix" : "prefix";
                         throw new RuntimeError(expression.Operatr,
-                            $"Invalid left hand side operator in {expressionType} operation.");
+                            $"Invalid left hand side operator in {expressionType} operation.", fileName);
                     }
 
                     var varExpression = (Expression.Variable)expression.Right;
@@ -691,15 +696,15 @@ namespace LSharp.Interpreter
                     var dict = (Dictionary<object, object>)obj;
                     return dict[accessor];
                 }
-                throw new RuntimeError(expression.Index, "Only lists can be accessed by index.");
+                throw new RuntimeError(expression.Index, "Only lists can be accessed by index.", fileName);
             }
             catch (ArgumentOutOfRangeException e)
             {
-                throw new RuntimeError(expression.Index, "Index out of range.");
+                throw new RuntimeError(expression.Index, "Index out of range.", fileName);
             }
             catch (InvalidCastException e)
             {
-                throw new RuntimeError(expression.Index, "Only integers can be used as accessors.");
+                throw new RuntimeError(expression.Index, "Only integers can be used as accessors.", fileName);
             }
             catch (KeyNotFoundException e)
             {
@@ -715,7 +720,7 @@ namespace LSharp.Interpreter
         private void checkNumberOperand(Token operatr, object operand)
         {
             if (operand is double) return;
-            throw new RuntimeError(operatr, "Operand must be a number.");
+            throw new RuntimeError(operatr, "Operand must be a number.", fileName);
         }
 
         /// <summary>
@@ -886,7 +891,8 @@ namespace LSharp.Interpreter
                 return evaluate(expression.Right);
             }
 
-            throw new RuntimeError(expression.Operatr, "Can't pipe expressions into non-callable members.");
+            throw new RuntimeError(expression.Operatr, 
+                "Can't pipe expressions into non-callable members.", fileName);
         }
 
         /// <summary>
@@ -915,12 +921,12 @@ namespace LSharp.Interpreter
                 catch(InvalidCastException e)
                 {
                     throw new RuntimeError(expression.Name, 
-                        "Only integers can be used as lists indexes.");
+                        "Only integers can be used as lists indexes.", fileName);
                 }
                 catch(ArgumentOutOfRangeException e)
                 {
                     throw new RuntimeError(expression.Name,
-                        "Index out of range.");
+                        "Index out of range.", fileName);
                 }
             }
             if (obj is Dictionary<object, object>)
@@ -941,7 +947,7 @@ namespace LSharp.Interpreter
             if (!(obj is LSInstance))
             {
                 throw new RuntimeError(expression.Name, 
-                    "Only instances have fields.");
+                    "Only instances have fields.", fileName);
             }
 
             object value = evaluate(expression.Value);
@@ -970,7 +976,7 @@ namespace LSharp.Interpreter
             if (method == null)
             {
                 throw new RuntimeError(expression.Method, 
-                    $"Undefined property '{expression.Method.Lexeme}'.");
+                    $"Undefined property '{expression.Method.Lexeme}'.", fileName);
             }
             return method.Bind(instance);
         }
