@@ -225,7 +225,7 @@ namespace LSharp.Interpreter
                     "Couldn't resolved the specified module.", fileName);
             }
             imports[filePath] = true;
-            resolveUsingStatement(resolvedFile, this.fileName);
+            resolveUsingStatement(resolvedFile, fileName);
             return null;
         }
 

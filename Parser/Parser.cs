@@ -12,10 +12,17 @@ namespace LSharp.Parser
     {
         private readonly List<Token> tokens;
         private int current = 0;
+        private string fileName;
 
         public Parser(List<Token> tokens)
         {
             this.tokens = tokens;
+        }
+
+        public Parser(List<Token> tokens, string fileName)
+        {
+            this.tokens = tokens;
+            this.fileName = fileName;
         }
 
         /*
@@ -184,7 +191,7 @@ namespace LSharp.Parser
                 {
                     if (parameters.Count >= 255)
                     {
-                        error(peek(), "Can't have more than 255 parameters.");
+                        error(peek(), "Can't have more than 255 parameters.", fileName);
                     }
 
                     parameters.Add(
@@ -271,7 +278,7 @@ namespace LSharp.Parser
                     return new Expression.Set(access.Member, access.Index, access.Accessor, value, equals);
                 }
 
-                error(equals, "Invalid assignment target.");
+                error(equals, "Invalid assignment target.", fileName);
             }
 
             return expression;
@@ -708,7 +715,7 @@ namespace LSharp.Parser
                 {
                     if (arguments.Count >= 255)
                     {
-                        error(peek(), "Can't have more than 255 arguments.");
+                        error(peek(), "Can't have more than 255 arguments.", fileName);
                     }
                     arguments.Add(expression());
                 } 
@@ -866,7 +873,7 @@ namespace LSharp.Parser
                 return dictionary(); 
             }
 
-            throw error(peek(), "Expected expression.");
+            throw error(peek(), "Expected expression.", fileName);
         }
 
         /// <summary>
@@ -916,7 +923,7 @@ namespace LSharp.Parser
         {
             if (check(type)) return advance();
 
-            throw error(peek(), message);
+            throw error(peek(), message, fileName);
         }
 
         /// <summary>
@@ -1010,9 +1017,10 @@ namespace LSharp.Parser
         /// </summary>
         /// <param name="token">Token that caused a sintax error.</param>
         /// <param name="message">Error message.</param>
-        private ParseError error(Token token, string message)
+        /// <param name="fileName">The name of the file being parsed.</param>
+        private ParseError error(Token token, string message, string fileName)
         {
-            Lox.Error(token, message);
+            Lox.Error(token, message, fileName);
             return new ParseError();
         }
 

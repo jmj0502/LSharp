@@ -90,7 +90,7 @@ namespace LSharp
         {
             var scaner = new LSharp.Scanner.Scanner(source);
             var tokens = scaner.ScanTokens();
-            var parser = new LSharp.Parser.Parser(tokens);
+            var parser = new LSharp.Parser.Parser(tokens, EntryPointName);
             var statements = parser.Parse();
 
             if (HadErrors) return;
@@ -137,6 +137,12 @@ namespace LSharp
             HadErrors = true;
         }
 
+        private static void Report(int line, string where, string message, string fileName)
+        {
+            WriteLine($"[{fileName} - line {line}] Error {where}: {message}");
+            HadErrors = true;
+        }
+
         /// <summary>
         /// Reports a syntax error. Returns a formatted message that includes the token that originated the error, alonside
         /// the line number where the error was detected.
@@ -152,6 +158,24 @@ namespace LSharp
             else
             {
                 Report(token.Line, $"at '{token.Lexeme}'", message);
+            }
+        }
+
+        /// <summary>
+        /// Reports a syntax error. Returns a formatted message that includes the token that originated the error, alonside
+        /// the line number and the name of the file where the error was detected.
+        /// </summary>
+        /// <param name="token">Token that produced a syntax error.</param>
+        /// <param name="message">Message intended to describe the error.</param>
+        public static void Error(Tokens.Token token, string message, string fileName)
+        {
+            if (token.Type == Tokens.TokenType.EOF)
+            {
+                Report(token.Line, "at end", message, fileName);
+            }
+            else
+            {
+                Report(token.Line, $"at '{token.Lexeme}'", message, fileName);
             }
         }
     }
