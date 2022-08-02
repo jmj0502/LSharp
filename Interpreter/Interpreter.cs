@@ -211,6 +211,13 @@ namespace LSharp.Interpreter
         {
             var separator = Path.DirectorySeparatorChar;
             var filePath = Path.GetFullPath(stmt.Path.Replace("/", $"{separator}"));
+            var fileName = filePath.Split($"{separator}").Last();
+            var fileExtension = fileName.Split(".").Last();
+            if (fileExtension != "ls" && fileExtension != "lox")
+            {
+                throw new RuntimeError(stmt.Keyword, 
+                    "Please, provide a path to a valid module (a file ending with the .ls or .lox extensions).", fileName);
+            }
             if (!File.Exists(filePath))
             {
                 throw new RuntimeError(stmt.Keyword, 
@@ -218,7 +225,6 @@ namespace LSharp.Interpreter
             }
             if (imports.ContainsKey(filePath)) return null;
             var resolvedFile = Lox.ResolveFile(filePath);
-            var fileName = filePath.Split($"{separator}").Last();
             if (resolvedFile == null)
             {
                 throw new RuntimeError(stmt.Keyword, 

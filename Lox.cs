@@ -61,6 +61,12 @@ namespace LSharp
         {
             var source = System.IO.File.ReadAllText(path);
             EntryPointName = path.Split("/").Last();
+            var fileExtension = EntryPointName.Split(".").Last();
+            if (fileExtension != "ls" && fileExtension != "lox")
+            {
+                WriteLine("Unsupported file. Please, provide a path to a valid L# file (a file with the .ls or .lox extension).");
+                Environment.Exit(1);
+            }
             Run(source);
             if (HadErrors) Environment.Exit(1);
             if (HadRuntimeError) Environment.Exit(1);
@@ -137,6 +143,13 @@ namespace LSharp
             HadErrors = true;
         }
 
+        /// <summary>
+        /// Method intended to write to the console error messages.
+        /// </summary>
+        /// <param name="line">Line number where the error was found.</param>
+        /// <param name="where">Scope where the error took place.</param>
+        /// <param name="message">Message intented to nofity the user about its errors.</param>
+        /// <param name="fileName">The name of the file where the error took place.</param>
         private static void Report(int line, string where, string message, string fileName)
         {
             WriteLine($"[{fileName} - line {line}] Error {where}: {message}");
