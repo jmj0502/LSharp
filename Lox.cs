@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using LSharp.Interpreter;
 using static System.Console;
 
@@ -10,6 +11,7 @@ namespace LSharp
         private static readonly Interpreter.Interpreter interpreter = new Interpreter.Interpreter();
         private static bool HadErrors = false;
         private static bool HadRuntimeError = false;
+        private static string EntryPointName;
 
         static void Main(string[] args)
         {
@@ -58,6 +60,13 @@ namespace LSharp
         private static void RunFile(string path) 
         {
             var source = System.IO.File.ReadAllText(path);
+            EntryPointName = path.Split("/").Last();
+            var fileExtension = EntryPointName.Split(".").Last();
+            if (fileExtension != "ls" && fileExtension != "lox")
+            {
+                WriteLine("Unsupported file. Please, provide a path to a valid L# file (a file with the .ls or .lox extension).");
+                Environment.Exit(1);
+            }
             Run(source);
             if (HadErrors) Environment.Exit(1);
             if (HadRuntimeError) Environment.Exit(1);
@@ -87,7 +96,7 @@ namespace LSharp
         {
             var scaner = new LSharp.Scanner.Scanner(source);
             var tokens = scaner.ScanTokens();
-            var parser = new LSharp.Parser.Parser(tokens);
+            var parser = new LSharp.Parser.Parser(tokens, EntryPointName);
             var statements = parser.Parse();
 
             if (HadErrors) return;
@@ -97,7 +106,7 @@ namespace LSharp
 
             if (HadErrors) return;
 
-            interpreter.Interpret(statements);
+            interpreter.Interpret(statements, EntryPointName);
         }
 
         /// <summary>
@@ -117,7 +126,8 @@ namespace LSharp
         /// <param name="error">Runtime error produced by the interpreter.</param>
         public static void RuntimeError(LSharp.Interpreter.RuntimeError error)
         {
-            WriteLine($"{error.Message}\n[line {error.token.Line}]");
+            var fileName = error.FileName != null ? $"{error.FileName} - " : "";
+            WriteLine($"{error.Message}\n[{fileName}line {error.token.Line}]");
             HadRuntimeError = true;
         }
 
@@ -130,6 +140,19 @@ namespace LSharp
         private static void Report(int line, string where, string message)
         {
             WriteLine($"[line {line}] Error {where}: {message}");
+            HadErrors = true;
+        }
+
+        /// <summary>
+        /// Method intended to write to the console error messages.
+        /// </summary>
+        /// <param name="line">Line number where the error was found.</param>
+        /// <param name="where">Scope where the error took place.</param>
+        /// <param name="message">Message intented to nofity the user about its errors.</param>
+        /// <param name="fileName">The name of the file where the error took place.</param>
+        private static void Report(int line, string where, string message, string fileName)
+        {
+            WriteLine($"[{fileName} - line {line}] Error {where}: {message}");
             HadErrors = true;
         }
 
@@ -148,6 +171,24 @@ namespace LSharp
             else
             {
                 Report(token.Line, $"at '{token.Lexeme}'", message);
+            }
+        }
+
+        /// <summary>
+        /// Reports a syntax error. Returns a formatted message that includes the token that originated the error, alonside
+        /// the line number and the name of the file where the error was detected.
+        /// </summary>
+        /// <param name="token">Token that produced a syntax error.</param>
+        /// <param name="message">Message intended to describe the error.</param>
+        public static void Error(Tokens.Token token, string message, string fileName)
+        {
+            if (token.Type == Tokens.TokenType.EOF)
+            {
+                Report(token.Line, "at end", message, fileName);
+            }
+            else
+            {
+                Report(token.Line, $"at '{token.Lexeme}'", message, fileName);
             }
         }
     }
