@@ -9,7 +9,6 @@ namespace LSharp.Parser
 {
     class JSONParser
     {
-        private readonly Dictionary<object, object> JSON = new();
         private int current;
         private List<Token> tokens;
 
@@ -33,9 +32,14 @@ namespace LSharp.Parser
          *
          */
 
-        private Dictionary<object, object> container()
+        public object Parse()
         {
-            var obj = new Dictionary<object, object>();
+            return container();
+        } 
+
+        private object container()
+        {
+            object obj = null;
             if (match(TokenType.LEFT_BRACE))
             {
                 obj = jsonObject();
@@ -45,7 +49,54 @@ namespace LSharp.Parser
 
         private Dictionary<object, object> jsonObject()
         {
+            var obj = new Dictionary<object, object>();
+            while (match(TokenType.STRING))
+            {
+                var key = previous();
+                consume(TokenType.COLON, ": must be provided after a key definition");
+                obj[key] = primitive();
+                if (peek().Type == TokenType.RIGHT_BRACE) break;
+            }
+            return obj;
+        }
 
+        private object primitive()
+        {
+            if (check(TokenType.STRING))
+            {
+                var token = advance();
+                return token.Literal;
+            }
+            if (check(TokenType.NUMBER))
+            {
+                var token = advance();
+                return tokens[current].Literal;
+            }
+            if (check(TokenType.TRUE))
+            {
+                advance();
+                return true;
+            }
+            if (check(TokenType.FALSE))
+            {
+                advance();
+                return false;
+            }
+            if (check(TokenType.NIL))
+            {
+                advance();
+                return null;
+            }
+            if (check(TokenType.LEFT_BRACE))
+            {
+                advance();
+                return jsonObject();
+            }
+            if (check(TokenType.LEFT_BRACKET))
+            {
+                // TODO.
+            }
+            throw new JSONError();
         }
 
         private Token peek()
@@ -86,5 +137,13 @@ namespace LSharp.Parser
             }
             return false;
         }
+
+        private Token consume(TokenType type, string message)
+        {
+            if (check(type)) return advance();
+            throw new JSONError();
+        }
     }
+
+    public class JSONError : ApplicationException { }
 }

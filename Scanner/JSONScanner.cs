@@ -10,7 +10,7 @@ namespace LSharp.Scanner
     class JSONScanner
     {
         private readonly string source;
-        private readonly List<Token> tokens;
+        private readonly List<Token> tokens = new();
         private int start;
         private int current;
         private int line = 1;
@@ -74,7 +74,7 @@ namespace LSharp.Scanner
             addToken(token, null);
         }
 
-        private void addToken(TokenType token, object literal)
+        private void addToken(TokenType token, object literal = null)
         {
             var text = source.Substring(start, current - start);
             tokens.Add(new Token(token, text, literal, line));

@@ -36,6 +36,7 @@ namespace LSharp.Interpreter
             enviroment.Define("List", new LSModule(new Lists().GenerateBody(), "Lists"));
             enviroment.Define("Dictionary", new LSModule(new Dictionaries().GenerateBody(), "Dictionaries"));
             enviroment.Define("IO", new LSModule(new IO().GenerateBody(), "IO"));
+            enviroment.Define("JSON", new LSModule(new JSON().GenerateBody(), "JSON"));
         } 
 
         /// <summary>
