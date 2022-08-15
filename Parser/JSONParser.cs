@@ -50,13 +50,15 @@ namespace LSharp.Parser
         private Dictionary<object, object> jsonObject()
         {
             var obj = new Dictionary<object, object>();
-            while (match(TokenType.STRING))
+            do
             {
-                var key = previous();
+                consume(TokenType.STRING, "Only strings can be used as keys!");
+                var key = previous().Literal;
                 consume(TokenType.COLON, ": must be provided after a key definition");
                 obj[key] = primitive();
                 if (peek().Type == TokenType.RIGHT_BRACE) break;
             }
+            while (match(TokenType.COMMA));
             return obj;
         }
 
@@ -70,7 +72,7 @@ namespace LSharp.Parser
             if (check(TokenType.NUMBER))
             {
                 var token = advance();
-                return tokens[current].Literal;
+                return token.Literal;
             }
             if (check(TokenType.TRUE))
             {
