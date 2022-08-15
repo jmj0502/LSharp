@@ -44,6 +44,10 @@ namespace LSharp.Parser
             {
                 obj = jsonObject();
             }
+            if (match(TokenType.LEFT_BRACKET))
+            {
+                obj = jsonArray();
+            }
             return obj;
         }
 
@@ -60,6 +64,12 @@ namespace LSharp.Parser
             }
             while (match(TokenType.COMMA));
             return obj;
+        }
+
+        private List<object> jsonArray()
+        {
+            var arr = new List<object>();
+            return arr;
         }
 
         private object primitive()
