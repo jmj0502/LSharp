@@ -58,17 +58,27 @@ namespace LSharp.Parser
             {
                 consume(TokenType.STRING, "Only strings can be used as keys!");
                 var key = previous().Literal;
-                consume(TokenType.COLON, ": must be provided after a key definition");
+                consume(TokenType.COLON, "':' must be provided after a key definition");
                 obj[key] = primitive();
-                if (peek().Type == TokenType.RIGHT_BRACE) break;
             }
             while (match(TokenType.COMMA));
+
+            consume(TokenType.RIGHT_BRACE, "'}' must be provided as the closing character for objects.");
+
             return obj;
         }
 
         private List<object> jsonArray()
         {
             var arr = new List<object>();
+            do
+            {
+                arr.Add(primitive());
+            }
+            while (match(TokenType.COMMA));
+
+            consume(TokenType.RIGHT_BRACKET, "']' must be provided as the closing character for arrays.");
+
             return arr;
         }
 
@@ -106,7 +116,9 @@ namespace LSharp.Parser
             }
             if (check(TokenType.LEFT_BRACKET))
             {
-                // TODO.
+                advance();
+                return jsonArray();
+
             }
             throw new JSONError();
         }
