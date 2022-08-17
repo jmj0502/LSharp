@@ -34,7 +34,14 @@ namespace LSharp.Parser
 
         public object Parse()
         {
-            return container();
+            if (checkMany(TokenType.STRING, TokenType.NUMBER, TokenType.TRUE, TokenType.FALSE, TokenType.NIL))
+            {
+                return primitive();
+            } 
+            else
+            {
+                return container();
+            }
         } 
 
         private object container()
@@ -120,7 +127,7 @@ namespace LSharp.Parser
                 return jsonArray();
 
             }
-            throw new JSONError();
+            throw new JSONError("Invalid JSON character.");
         }
 
         private Token peek()
@@ -149,6 +156,19 @@ namespace LSharp.Parser
             return tokens[current].Type == type;
         }
 
+        private bool checkMany(params TokenType[] types)
+        {
+            foreach (var type in types)
+            {
+                if (tokens[current].Type == type)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         private bool match(params TokenType[] tokenTypes)
         {
             foreach (var type in tokenTypes)
@@ -165,9 +185,14 @@ namespace LSharp.Parser
         private Token consume(TokenType type, string message)
         {
             if (check(type)) return advance();
-            throw new JSONError();
+            throw new JSONError(message);
         }
     }
 
-    public class JSONError : ApplicationException { }
+    public class JSONError : ApplicationException 
+    {
+        public JSONError(string message) : base(message)
+        {
+        }
+    }
 }
