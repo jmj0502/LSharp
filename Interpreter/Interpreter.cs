@@ -1,6 +1,8 @@
 ﻿using LSharp.Tokens;
 using LSharp.GlobalFunctions;
 using LSharp.GlobalModules;
+using LSharp.Parser;
+using LSharp.Scanner;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -497,12 +499,12 @@ namespace LSharp.Interpreter
 
             if (!(callee is ICallable))
                 throw new RuntimeError(expression.Paren,
-                    "Can only call functions and classes.", this.fileName);
+                    "Can only call functions and classes.", fileName);
 
             var function = (ICallable)callee;
             if (arguments.Count != function.Arity())
                 throw new RuntimeError(expression.Paren,
-                    $"Expected {function.Arity()} parameters but got {arguments.Count}", this.fileName);
+                    $"Expected {function.Arity()} parameters but got {arguments.Count}", fileName);
             
             try
             {
@@ -511,17 +513,27 @@ namespace LSharp.Interpreter
             catch(InvalidCastException e)
             {
                 throw new RuntimeError(expression.Paren,
-                    "Invalid type provided.", this.fileName);
+                    "Invalid type provided.", fileName);
             }
             catch(ListError e)
             {
                 throw new RuntimeError(expression.Paren,
-                    e.Message, this.fileName);
+                    e.Message, fileName);
             }
             catch(StringError e)
             {
                 throw new RuntimeError(expression.Paren,
-                    e.Message, this.fileName);
+                    e.Message, fileName);
+            }
+            catch(JSONError  e)
+            {
+                throw new RuntimeError(expression.Paren,
+                    e.Message, fileName);
+            }
+            catch(JSONScanError e)
+            {
+                throw new RuntimeError(expression.Paren,
+                    e.Message, fileName);
             }
         }
         
