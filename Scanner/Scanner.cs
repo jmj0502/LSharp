@@ -212,7 +212,8 @@ namespace LSharp.Scanner
                     line++;
                     break;
                     //Here we are deling with string literals.
-                case '"': literalString(); break;
+                case '"': literalString('"'); break;
+                case '\'': literalString('\''); break; 
                 default:
                     if (isDigit(c))
                     {
@@ -329,9 +330,9 @@ namespace LSharp.Scanner
         /// Walks over a string literal. Is triggered if our scanner matches a " char. It performs different validations
         /// and operations in order to find the end of the string or raise an error, if needed.
         /// </summary>
-        private void literalString()
+        private void literalString(char stringDelimiter)
         {
-            while(peak() != '"' && !isAtEnd())
+            while(peak() != stringDelimiter && !isAtEnd())
             {
                 if (peak() == '\n') line++;
                 advance();
