@@ -24,6 +24,7 @@ namespace LSharp
             T Visit(Continue stmt);
             T Visit(Module stmt);
             T Visit(Using stmt);
+            T Visit(TryCatch stmt);
         }
 
         public abstract T accept<T>(IVisitor<T> visitor);
@@ -237,6 +238,25 @@ namespace LSharp
             {
                 Keyword = keyword;
                 Path = path;
+            }
+
+            public override T accept<T>(IVisitor<T> visitor)
+            {
+                return visitor.Visit(this);
+            }
+        }
+
+        public class TryCatch : Stmt
+        {
+            public readonly Stmt TryBranch;
+            public readonly Stmt CatchBranch;
+            public readonly Expression Condition;
+
+            public TryCatch(Stmt tryBranch, Stmt catchBranch, Expression condition)
+            {
+                TryBranch = tryBranch;
+                CatchBranch = catchBranch;
+                Condition = condition;
             }
 
             public override T accept<T>(IVisitor<T> visitor)
