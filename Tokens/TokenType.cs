@@ -76,6 +76,8 @@ namespace LSharp.Tokens
         BREAK,
         MODULE,
         USING,
+        TRY,
+        CATCH,
 
         EOF
     }

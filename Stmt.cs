@@ -250,13 +250,13 @@ namespace LSharp
         {
             public readonly Stmt TryBranch;
             public readonly Stmt CatchBranch;
-            public readonly Expression Condition;
+            public readonly Expression Error;
 
             public TryCatch(Stmt tryBranch, Stmt catchBranch, Expression condition)
             {
                 TryBranch = tryBranch;
                 CatchBranch = catchBranch;
-                Condition = condition;
+                Error = condition;
             }
 
             public override T accept<T>(IVisitor<T> visitor)

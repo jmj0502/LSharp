@@ -33,6 +33,8 @@ namespace LSharp.Scanner
             ["break"] = TokenType.BREAK,
             ["module"] = TokenType.MODULE,
             ["using"] = TokenType.USING,
+            ["try"] = TokenType.TRY,
+            ["catch"] = TokenType.CATCH,
         };
 
         public Scanner(string source)
