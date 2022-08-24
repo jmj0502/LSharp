@@ -182,6 +182,20 @@ namespace LSharp.Interpreter
         }
 
         /// <summary>
+        /// Performs static analysis on try/catch statements. Since the catch branch of the statement takes an error as a
+        /// parameter, the method defines and declares such error and then proceeds to resolve the try branch and the catch branch.
+        /// </summary>
+        /// <param name="stmt">The try/catch statemet to be resolved.</param>
+        public object Visit(Stmt.TryCatch stmt)
+        {
+            declare(stmt.Error);
+            define(stmt.Error);
+            resolve(stmt.TryBranch);
+            resolve(stmt.CatchBranch);
+            return null;
+        }
+
+        /// <summary>
         /// Performs static analysis on print statements. The resolution process somehow resembles the expresion statements
         /// resolution.
         /// </summary>

@@ -42,6 +42,7 @@ namespace LSharp.Parser
         * continueStmt -> "continue" ";";
         * forStmt -> "for" "(" (varDecl | exprStmt | ";" ) expression? ";" expression? ")" statement; //Added on chapter 9. 
         * whileStmt -> "while" "(" expression ")" statement; // Added on chapter 9.
+        * tryStmt -> "try" block  "catch" "(" expression ")" block;
         * ifStmt -> "if" "(" expression ")" statement ( "else" statement)?; //Added on chapter 9.
         * block -> "{" declaration* "}";
         * varDecl -> "var" IDENTIFIER ("=" expression)? ";"; //Added on chapter 8.
@@ -494,6 +495,7 @@ namespace LSharp.Parser
             if (match(TokenType.BREAK)) return breakStatement();
             if (match(TokenType.CONTINUE)) return continueStatement();
             if (match(TokenType.IF)) return ifStatement();
+            if (match(TokenType.TRY)) return tryStatement();
             if (match(TokenType.PRINT)) return printStatement();
             if (match(TokenType.RETURN)) return returnStatement();
             if (match(TokenType.WHILE)) return whileStatement();
@@ -561,6 +563,20 @@ namespace LSharp.Parser
             }
 
             return body;
+        }
+
+        /// <summary>
+        /// Executes the parsing rules for try/catch statements.
+        /// </summary>
+        private Stmt tryStatement()
+        {
+            var successStatement = statement();
+            consume(TokenType.CATCH, "Every 'try' statment must have a 'catch' clause.");
+            consume(TokenType.LEFT_PAREN, "Expect '(' after catch.");
+            var errorIdentifier = consume(TokenType.IDENTIFIER, "Expect 'error' definition in a catch clause.");
+            consume(TokenType.RIGHT_PAREN, "Expect ')' after error definition in 'catch' clause");
+            var errorHandlingStatement = statement();
+            return new Stmt.TryCatch(successStatement, errorHandlingStatement, errorIdentifier);
         }
 
         /// <summary>

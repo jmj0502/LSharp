@@ -866,6 +866,27 @@ namespace LSharp.Interpreter
         }
 
         /// <summary>
+        /// Turns a try/catch statement into a runtime representation. Since all the errors that can be potentially handled are
+        /// runtime errors, the only exception handled on the catch branch is RuntimeError.
+        /// </summary>
+        /// <param name="stmt">Any valid try/catch statement.</param>
+        /// <returns></returns>
+        public object Visit(Stmt.TryCatch stmt)
+        {
+            try
+            {
+                enviroment.Define(stmt.Error.Lexeme, null);
+                execute(stmt.TryBranch);
+            }
+            catch (RuntimeError error)
+            {
+                enviroment.Assign(stmt.Error, $"Error: {error.Message} - [{error.FileName}: line {error.token.Line}]");
+                execute(stmt.CatchBranch);
+            }
+            return null;
+        }
+
+        /// <summary>
         /// Turns a ternary expression into a runtime representation. This is one of the cases where the underline implementation
         /// mirrors the semantics of the language.
         /// </summary>
