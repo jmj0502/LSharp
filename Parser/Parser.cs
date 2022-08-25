@@ -579,6 +579,14 @@ namespace LSharp.Parser
             return new Stmt.TryCatch(successStatement, errorHandlingStatement, errorIdentifier);
         }
 
+        private Stmt throwStatement()
+        {
+            var keyword = previous();
+            var error = expression();
+            consume(TokenType.SEMICOLON, "Expect ';' after throwing error.");
+            return new Stmt.Throw(keyword, error);
+        }
+
         /// <summary>
         /// Executes the if statement rules.
         /// </summary>

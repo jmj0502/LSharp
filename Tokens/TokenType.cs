@@ -78,6 +78,7 @@ namespace LSharp.Tokens
         USING,
         TRY,
         CATCH,
+        THROW,
 
         EOF
     }

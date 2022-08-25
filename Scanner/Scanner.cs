@@ -35,6 +35,7 @@ namespace LSharp.Scanner
             ["using"] = TokenType.USING,
             ["try"] = TokenType.TRY,
             ["catch"] = TokenType.CATCH,
+            ["throw"] = TokenType.THROW,
         };
 
         public Scanner(string source)
