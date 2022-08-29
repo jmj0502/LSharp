@@ -498,6 +498,7 @@ namespace LSharp.Parser
             if (match(TokenType.TRY)) return tryStatement();
             if (match(TokenType.PRINT)) return printStatement();
             if (match(TokenType.RETURN)) return returnStatement();
+            if (match(TokenType.THROW)) return throwStatement();
             if (match(TokenType.WHILE)) return whileStatement();
             if (match(TokenType.LEFT_BRACE)) return new Stmt.Block(block());
             return expressionStatement();

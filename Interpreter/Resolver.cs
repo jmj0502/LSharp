@@ -195,6 +195,12 @@ namespace LSharp.Interpreter
             return null;
         }
 
+        public object Visit(Stmt.Throw stmt)
+        {
+            resolve(stmt.Error);
+            return null;
+        }
+
         /// <summary>
         /// Performs static analysis on print statements. The resolution process somehow resembles the expresion statements
         /// resolution.

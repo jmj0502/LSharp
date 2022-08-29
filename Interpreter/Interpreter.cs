@@ -39,6 +39,7 @@ namespace LSharp.Interpreter
             enviroment.Define("Dictionary", new LSModule(new Dictionaries().GenerateBody(), "Dictionaries"));
             enviroment.Define("IO", new LSModule(new IO().GenerateBody(), "IO"));
             enviroment.Define("JSON", new LSModule(new JSON().GenerateBody(), "JSON"));
+            enviroment.Define("Error", new LSModule(new Error().GenerateBody(), "Error"));
         } 
 
         /// <summary>
@@ -882,6 +883,23 @@ namespace LSharp.Interpreter
             {
                 enviroment.Assign(stmt.Error, $"Error: {error.Message} - [{error.FileName}: line {error.token.Line}]");
                 execute(stmt.CatchBranch);
+            }
+            return null;
+        }
+
+        public object Visit(Stmt.Throw stmt)
+        {
+            var exception = ((object)stmt.Error) as Exception;
+            if (exception != null)
+            {
+                try
+                {
+                    throw new RuntimeError(stmt.Keyword, exception.Message);
+                } 
+                catch (InvalidCastException e)
+                {
+                    throw new RuntimeError(stmt.Keyword, "Only errors can be thrown!");
+                }
             }
             return null;
         }
