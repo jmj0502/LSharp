@@ -10,6 +10,7 @@ namespace LSharp.Interpreter
     {
         public object Value;
         public string ErrorMessage;
+        private bool isHandled = false;
 
         public Result(object value)
         {
@@ -21,14 +22,25 @@ namespace LSharp.Interpreter
             ErrorMessage = errorMessage;
         }
 
-        public bool isOk()
+        public bool IsOk()
         {
             return Value != null;
         }
 
-        public bool isError()
+        public bool IsError()
         {
             return ErrorMessage != null;
+        }
+
+        public bool IsHandled()
+        {
+            return isHandled;
+        }
+
+        public void Handle()
+        {
+            if (isHandled) return;
+            isHandled = true;
         }
     }
 }

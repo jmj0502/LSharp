@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace LSharp.GlobalModules
 {
-    public class Error : IModule
+    public class ErrorVariant : IModule
     {
         public Enviroment.Enviroment GenerateBody()
         {

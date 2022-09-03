@@ -13,6 +13,9 @@ namespace LSharp.GlobalModules
         {
             var moduleBody = new Enviroment.Enviroment();
             moduleBody.Define("unwrapOrElse", new UnwrapOrElse());
+            moduleBody.Define("unwrap", new Unwrap());
+            moduleBody.Define("isOk", new IsOk());
+            moduleBody.Define("isErr", new IsErr());
             return moduleBody;
         }
     }
@@ -21,16 +24,89 @@ namespace LSharp.GlobalModules
     {
         public int Arity()
         {
-            throw new NotImplementedException();
+            return 2;
         }
 
         public object Call(Interpreter.Interpreter interpreter, List<object> arguments)
         {
             var resultObj = (Interpreter.Result)arguments[0];
+            if (resultObj.IsHandled()) return null;
             var fun = (LSFunction)arguments[1];
-            if (resultObj.isOk()) return resultObj.Value;
-            var args = new List<object> { resultObj };
+            resultObj.Handle();
+            if (resultObj.IsOk()) return resultObj.Value;
+            var args = new List<object> { resultObj.ErrorMessage };
             return fun.Call(interpreter, args);
+        }
+
+        public override string ToString()
+        {
+            return "<native function Result.unwrapOrElse>";
+        }
+    }
+
+    class Unwrap : ICallable
+    {
+        public int Arity()
+        {
+            return 1;
+        }
+
+        public object Call(Interpreter.Interpreter interpreter, List<object> arguments)
+        {
+            var resultObj = (Interpreter.Result)arguments[0];
+            if (resultObj.IsHandled()) return null;
+            if (resultObj.IsOk()) return resultObj.Value;
+            throw new ErrorResult(resultObj.ErrorMessage);
+        }
+
+        public override string ToString()
+        {
+            return "<native function Result.unwrap>";
+        }
+    }
+
+    class IsOk : ICallable
+    {
+        public int Arity()
+        {
+            return 1;
+        }
+
+        public object Call(Interpreter.Interpreter interpreter, List<object> arguments)
+        {
+            var resultObj = (Interpreter.Result)arguments[0];
+            return resultObj.IsOk();
+        }
+
+        public override string ToString()
+        {
+            return "<native function Result.isOK>";
+        }
+    }
+
+    class IsErr : ICallable
+    {
+        public int Arity()
+        {
+            return 1;
+        }
+
+        public object Call(Interpreter.Interpreter interpreter, List<object> arguments)
+        {
+            var resultObj = (Interpreter.Result)arguments[0];
+            return resultObj.IsError();
+        }
+
+        public override string ToString()
+        {
+            return "<native function Result.isErr>";
+        }
+    }
+
+    public class ErrorResult: ApplicationException
+    {
+        public ErrorResult(string message) : base(message)
+        {
         }
     }
 }

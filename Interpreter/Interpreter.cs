@@ -33,13 +33,16 @@ namespace LSharp.Interpreter
         public Interpreter()
         {
             Globals = enviroment;
+            enviroment.Define("Ok", new ResultOK());
+            enviroment.Define("Err", new ResultError());
+            enviroment.Define("Result", new LSModule(new GlobalModules.Result().GenerateBody(), "Result"));
             enviroment.Define("clock", new Clock());
             enviroment.Define("String", new LSModule(new Strings().GenerateBody(), "Strings"));
             enviroment.Define("List", new LSModule(new Lists().GenerateBody(), "Lists"));
             enviroment.Define("Dictionary", new LSModule(new Dictionaries().GenerateBody(), "Dictionaries"));
             enviroment.Define("IO", new LSModule(new IO().GenerateBody(), "IO"));
             enviroment.Define("JSON", new LSModule(new JSON().GenerateBody(), "JSON"));
-            enviroment.Define("Error", new LSModule(new Error().GenerateBody(), "Error"));
+            //enviroment.Define("Error", new LSModule(new Error().GenerateBody(), "Error"));
         } 
 
         /// <summary>
@@ -510,6 +513,11 @@ namespace LSharp.Interpreter
             try
             {
                 return function.Call(this, arguments);
+            }
+            catch (ErrorResult e)
+            {
+                throw new RuntimeError(expression.Paren,
+                    e.Message, fileName);
             }
             catch(InvalidCastException e)
             {
