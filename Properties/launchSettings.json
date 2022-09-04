@@ -2,7 +2,7 @@
   "profiles": {
     "LSharp": {
       "commandName": "Project",
-      "commandLineArgs": "errorHandling.ls"
+      "commandLineArgs": "IO.ls"
     }
   }
 }
