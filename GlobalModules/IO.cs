@@ -134,7 +134,7 @@ namespace LSharp.GlobalModules
             catch(Exception e)
             {
                 result = new ResultError();
-                return result.Call(interpreter, new List<object>());
+                return result.Call(interpreter, new List<object> { e.Message });
             }
         }
 
@@ -216,13 +216,17 @@ namespace LSharp.GlobalModules
         public object Call(Interpreter.Interpreter interpreter, List<object> arguments)
         {
             var path = (string)arguments[0];
+            ICallable result;
             try
             {
-                return System.IO.File.Exists(path);
+                var fileExists = System.IO.File.Exists(path);
+                result = new ResultOK();
+                return result.Call(interpreter, new List<object> { fileExists });
             }
             catch(Exception e)
             {
-                return false;
+                result = new ResultError();
+                return result.Call(interpreter, new List<object> { e.Message });
             }
         }
 
@@ -242,13 +246,17 @@ namespace LSharp.GlobalModules
         public object Call(Interpreter.Interpreter interpreter, List<object> arguments)
         {
             var path = (string)arguments[0];
+            ICallable result;
             try
             {
-                return System.IO.Directory.Exists(path);
+                var dirExist = System.IO.Directory.Exists(path);
+                result = new ResultOK();
+                return result.Call(interpreter, new List<object> { dirExist });
             }
             catch(Exception e)
             {
-                return false;
+                result = new ResultError();
+                return result.Call(interpreter, new List<object> { e.Message });
             }
         }
 
@@ -268,14 +276,18 @@ namespace LSharp.GlobalModules
         public object Call(Interpreter.Interpreter interpreter, List<object> arguments)
         {
             var path = (string)arguments[0];
+            ICallable result;
             try
             {
-                System.IO.Directory.CreateDirectory(path);
-                return true;
+                var dirInfo = System.IO.Directory.CreateDirectory(path);
+                var parsedDirInfo = FileAndDirInfoParser.ParseDirInfo(dirInfo);
+                result = new ResultOK();
+                return result.Call(interpreter, new List<object> { parsedDirInfo });
             } 
             catch(Exception e)
             {
-                return false;
+                result = new ResultError();
+                return result.Call(interpreter, new List<object> { e.Message });
             }
         }
 
