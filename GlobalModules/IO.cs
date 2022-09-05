@@ -311,11 +311,11 @@ namespace LSharp.GlobalModules
             try
             {
                 System.IO.Directory.Move(originPath, destinationPath);
-                return true;
+                return new ResultOK().Call(interpreter, new List<object>());
             }
             catch(Exception e)
             {
-                return false;
+                return new ResultError().Call(interpreter, new List<object> { e.Message });
             }
         }
 
@@ -338,11 +338,11 @@ namespace LSharp.GlobalModules
             try
             {
                 System.IO.Directory.Delete(path);
-                return true;
+                return new ResultOK().Call(interpreter, new List<object>());
             }
             catch(Exception e)
             {
-                return false;
+                return new ResultError().Call(interpreter, new List<object> { e.Message });
             }
         }
 
@@ -364,11 +364,12 @@ namespace LSharp.GlobalModules
             var path = (string)arguments[0];
             try
             {
-                return System.IO.Directory.GetFiles(path);
+                var dirFiles = System.IO.Directory.GetFiles(path);
+                return new ResultOK().Call(interpreter, new List<object> { dirFiles });
             }
             catch(Exception e)
             {
-                return null;
+                return new ResultError().Call(interpreter, new List<object> { e.Message });
             }
         }
 
@@ -388,8 +389,16 @@ namespace LSharp.GlobalModules
         public object Call(Interpreter.Interpreter interpreter, List<object> arguments)
         {
             var path = (string)arguments[0];
-            var directoryInfo = System.IO.Directory.GetParent(path);
-            return FileAndDirInfoParser.ParseDirInfo(directoryInfo);
+            try
+            {
+                var directoryInfo = System.IO.Directory.GetParent(path);
+                var parsedDirInfo = FileAndDirInfoParser.ParseDirInfo(directoryInfo);
+                return new ResultOK().Call(interpreter, new List<object> { parsedDirInfo });
+            }
+            catch (Exception e)
+            {
+                return new ResultError().Call(interpreter, new List<object> { e.Message });
+            }
         }
 
         public override string ToString()
@@ -437,6 +446,7 @@ namespace LSharp.GlobalModules
 
         public static Dictionary<object, object> ParseDirInfo(System.IO.DirectoryInfo directoryInfo)
         {
+            if (directoryInfo == null) return null;
             var files = directoryInfo.GetFiles();
             var parsedFilesInfo = new List<object>();
             foreach (var file in files)
