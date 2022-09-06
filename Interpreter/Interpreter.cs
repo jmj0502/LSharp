@@ -308,6 +308,15 @@ namespace LSharp.Interpreter
                 sb.Append("}");
                 return sb.ToString();
             }
+            if (value is Result)
+            {
+                var result = (Result)value;
+                if (result.IsOk())
+                {
+                    return $"Result.Ok";
+                }
+                return $"Result.Err";
+            }
 
             return value.ToString();
         }
@@ -724,7 +733,7 @@ namespace LSharp.Interpreter
                     var dict = (Dictionary<object, object>)obj;
                     return dict[accessor];
                 }
-                throw new RuntimeError(expression.Index, "Only lists can be accessed by index.", fileName);
+                throw new RuntimeError(expression.Index, "Only lists and dictionaries can be accessed by index.", fileName);
             }
             catch (ArgumentOutOfRangeException e)
             {
