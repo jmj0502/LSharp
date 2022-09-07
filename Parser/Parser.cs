@@ -718,7 +718,7 @@ namespace LSharp.Parser
         /// </summary>
         private Expression postfix()
         {
-            if (matchNext(TokenType.PLUS_PLUS, TokenType.MINNUS_MINNUS))
+            if (matchNext(TokenType.PLUS_PLUS, TokenType.MINNUS_MINNUS, TokenType.QUESTION))
             {
                 var value = primary();
                 var operatr = advance();

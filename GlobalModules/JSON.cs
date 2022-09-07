@@ -78,6 +78,7 @@ namespace LSharp.GlobalModules
                     text = text.Substring(0, text.Length - 2);
                     return text;
                 }
+                return text;
             }
             if (value is List<object>)
             {

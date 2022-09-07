@@ -642,6 +642,17 @@ namespace LSharp.Interpreter
                 case TokenType.MINNUS:
                     checkNumberOperand(expression.Operatr, right);
                     return -(double) right;
+                case TokenType.QUESTION:
+                    if (!(right is Result))
+                    {
+                        throw new RuntimeError(expression.Operatr,
+                            "The ? operator should only be applied to functions that return 'Result'.", fileName);
+                    }
+                    var result = (Result)right;
+                    if (result.IsError()) throw new Return(result);
+                    var resultValue = result.Value;
+                    result.Handle();
+                    return resultValue;
                 case TokenType.PLUS_PLUS:
                 case TokenType.MINNUS_MINNUS:
                     if (expression.Right == null)
