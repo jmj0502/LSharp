@@ -33,6 +33,7 @@ namespace LSharp.GlobalModules
             moduleBody.Define("filter", new Filter());
             moduleBody.Define("reduce", new Reduce());
             moduleBody.Define("sort", new Sort());
+            moduleBody.Define("at", new At("list"));
             return moduleBody;
         }
 
