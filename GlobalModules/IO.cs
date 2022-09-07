@@ -28,6 +28,11 @@ namespace LSharp.GlobalModules
             moduleBody.Define("readLine", new ReadLine());
             return moduleBody;
         }
+
+        public override string ToString()
+        {
+            return "<native module IO>";
+        }
     }
 
     public class ReadFileAsText : ICallable

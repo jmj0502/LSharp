@@ -18,6 +18,11 @@ namespace LSharp.GlobalModules
             moduleBody.Define("isErr", new IsErr());
             return moduleBody;
         }
+
+        public override string ToString()
+        {
+            return "<native module Result>";
+        }
     }
 
     class UnwrapOrElse : ICallable

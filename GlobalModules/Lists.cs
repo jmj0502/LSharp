@@ -35,6 +35,11 @@ namespace LSharp.GlobalModules
             moduleBody.Define("sort", new Sort());
             return moduleBody;
         }
+
+        public override string ToString()
+        {
+            return "<native module List>";
+        }
     }
 
     public class Join : ICallable

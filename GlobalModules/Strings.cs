@@ -29,6 +29,11 @@ namespace LSharp.GlobalModules
             moduleBody.Define("replace", new Replace());
             return moduleBody;
         }
+
+        public override string ToString()
+        {
+            return "<native module String>";
+        }
     }
 
     public class Split : ICallable

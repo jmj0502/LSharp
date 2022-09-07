@@ -18,6 +18,11 @@ namespace LSharp.GlobalModules
             moduleBody.Define("into", new Into());
             return moduleBody;
         }
+
+        public override string ToString()
+        {
+            return "<native module JSON>";
+        }
     }
 
     public class Parse : ICallable

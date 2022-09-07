@@ -19,6 +19,11 @@ namespace LSharp.GlobalModules
             moduleBody.Define("toList", new ToList());
             return moduleBody;
         }
+
+        public override string ToString()
+        {
+            return "<native module Dictionary>";
+        }
     }
 
     public class Keys : ICallable
