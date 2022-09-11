@@ -642,14 +642,16 @@ namespace LSharp.Interpreter
                 case TokenType.MINNUS:
                     checkNumberOperand(expression.Operatr, right);
                     return -(double) right;
-                case TokenType.QUESTION:
+                case TokenType.QUESTION_QUESTION:
                     if (!(right is Result))
                     {
                         throw new RuntimeError(expression.Operatr,
-                            "The ? operator should only be applied to functions that return 'Result'.", fileName);
+                            "The ?? operator should only be applied to functions that return 'Result'.", fileName);
                     }
                     var result = (Result)right;
-                    if (result.IsError()) throw new Return(result);
+                    if (result.IsError() && enviroment != Globals) throw new Return(result);
+                    else if (result.IsError() && enviroment == Globals) throw new RuntimeError(expression.Operatr,
+                        result.ErrorMessage, fileName);
                     var resultValue = result.Value;
                     result.Handle();
                     return resultValue;
@@ -890,44 +892,6 @@ namespace LSharp.Interpreter
             else if (stmt.ElseBranch != null)
             {
                 execute(stmt.ElseBranch);
-            }
-            return null;
-        }
-
-        /// <summary>
-        /// Turns a try/catch statement into a runtime representation. Since all the errors that can be potentially handled are
-        /// runtime errors, the only exception handled on the catch branch is RuntimeError.
-        /// </summary>
-        /// <param name="stmt">Any valid try/catch statement.</param>
-        /// <returns></returns>
-        public object Visit(Stmt.TryCatch stmt)
-        {
-            try
-            {
-                enviroment.Define(stmt.Error.Lexeme, null);
-                execute(stmt.TryBranch);
-            }
-            catch (RuntimeError error)
-            {
-                enviroment.Assign(stmt.Error, $"Error: {error.Message} - [{error.FileName}: line {error.token.Line}]");
-                execute(stmt.CatchBranch);
-            }
-            return null;
-        }
-
-        public object Visit(Stmt.Throw stmt)
-        {
-            var exception = ((object)stmt.Error) as Exception;
-            if (exception != null)
-            {
-                try
-                {
-                    throw new RuntimeError(stmt.Keyword, exception.Message);
-                } 
-                catch (InvalidCastException e)
-                {
-                    throw new RuntimeError(stmt.Keyword, "Only errors can be thrown!");
-                }
             }
             return null;
         }

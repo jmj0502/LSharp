@@ -67,7 +67,8 @@ namespace LSharp.Parser
         * factor -> prefix (("/"|"*") prefix)*;
         * prefix -> ("++" | "--") unary | unary;
         * unary -> ("!","-") unary | call;
-        * postfix -> call ("++" | "--") | call;
+        * postfix -> errorPropagation ("++" | "--") | errorPropagation;
+        * errorPropagation -> call ("??") | call;
         * call -> primary ( "(" arguments? ")" | "." IDENTIFIER )*;
         * access -> primary "[" primary "]";
         * arguments -> expression ("," expression )*;
@@ -495,10 +496,8 @@ namespace LSharp.Parser
             if (match(TokenType.BREAK)) return breakStatement();
             if (match(TokenType.CONTINUE)) return continueStatement();
             if (match(TokenType.IF)) return ifStatement();
-            if (match(TokenType.TRY)) return tryStatement();
             if (match(TokenType.PRINT)) return printStatement();
             if (match(TokenType.RETURN)) return returnStatement();
-            if (match(TokenType.THROW)) return throwStatement();
             if (match(TokenType.WHILE)) return whileStatement();
             if (match(TokenType.LEFT_BRACE)) return new Stmt.Block(block());
             return expressionStatement();
@@ -564,28 +563,6 @@ namespace LSharp.Parser
             }
 
             return body;
-        }
-
-        /// <summary>
-        /// Executes the parsing rules for try/catch statements.
-        /// </summary>
-        private Stmt tryStatement()
-        {
-            var successStatement = statement();
-            consume(TokenType.CATCH, "Every 'try' statment must have a 'catch' clause.");
-            consume(TokenType.LEFT_PAREN, "Expect '(' after catch.");
-            var errorIdentifier = consume(TokenType.IDENTIFIER, "Expect 'error' definition in a catch clause.");
-            consume(TokenType.RIGHT_PAREN, "Expect ')' after error definition in 'catch' clause");
-            var errorHandlingStatement = statement();
-            return new Stmt.TryCatch(successStatement, errorHandlingStatement, errorIdentifier);
-        }
-
-        private Stmt throwStatement()
-        {
-            var keyword = previous();
-            var error = expression();
-            consume(TokenType.SEMICOLON, "Expect ';' after throwing error.");
-            return new Stmt.Throw(keyword, error);
         }
 
         /// <summary>
@@ -718,13 +695,24 @@ namespace LSharp.Parser
         /// </summary>
         private Expression postfix()
         {
-            if (matchNext(TokenType.PLUS_PLUS, TokenType.MINNUS_MINNUS, TokenType.QUESTION))
+            if (matchNext(TokenType.PLUS_PLUS, TokenType.MINNUS_MINNUS))
             {
                 var value = primary();
                 var operatr = advance();
                 return new Expression.Unary(operatr, value, true);
             }
-            return call();
+            return errorPropagation();
+        }
+
+        private Expression errorPropagation()
+        {
+            var expression = call();
+            if (match(TokenType.QUESTION_QUESTION)) 
+            {
+                var operatr = previous();
+                return new Expression.Unary(operatr, expression, true);
+            }
+            return expression;
         }
 
         /// <summary>

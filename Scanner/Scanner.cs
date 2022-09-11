@@ -33,9 +33,6 @@ namespace LSharp.Scanner
             ["break"] = TokenType.BREAK,
             ["module"] = TokenType.MODULE,
             ["using"] = TokenType.USING,
-            ["try"] = TokenType.TRY,
-            ["catch"] = TokenType.CATCH,
-            ["throw"] = TokenType.THROW,
         };
 
         public Scanner(string source)
@@ -107,7 +104,7 @@ namespace LSharp.Scanner
                 case '%': addToken(TokenType.PERCENT); break;
                 case ';': addToken(TokenType.SEMICOLON); break;
                 case '*': addToken(match('=') ? TokenType.STAR_EQUAL : TokenType.STAR); break;
-                case '?': addToken(TokenType.QUESTION); break;
+                case '?': addToken(match('?') ? TokenType.QUESTION_QUESTION : TokenType.QUESTION); break;
                 case ':': addToken(TokenType.COLON); break;
                 case '&': addToken(match('=') ? TokenType.AND_EQUAL : TokenType.BITWISE_AND); break;
                 case '|': 
