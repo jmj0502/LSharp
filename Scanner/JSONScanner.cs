@@ -144,7 +144,7 @@ namespace LSharp.Scanner
 
             if (isAtEnd())
             {
-                throw new JSONScanError("Unterminated JSON string.");
+                throw new JSONScanError("Unterminated JSON string.", line);
             }
 
             advance();
@@ -160,7 +160,7 @@ namespace LSharp.Scanner
             var isKeyword = keywords.TryGetValue(keyword, out token);
             if (!isKeyword)
             {
-                throw new JSONScanError("Invalid JSON value.");
+                throw new JSONScanError("Invalid JSON value.", line);
             }
             addToken(token);
         }
@@ -168,8 +168,11 @@ namespace LSharp.Scanner
 
     class JSONScanError : ApplicationException
     {
-        public JSONScanError(string message) : base(message)
+        public int Line;
+
+        public JSONScanError(string message, int line) : base(message)
         {
+            Line = line;
         }
     }
 }

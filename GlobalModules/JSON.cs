@@ -39,14 +39,20 @@ namespace LSharp.GlobalModules
             {
                 var tokens = new JSONScanner(json).ScanTokens();
                 var parsedJson =  new JSONParser(tokens).Parse();
+                if (parsedJson is null)
+                {
+                    return new ResultOK().Call(interpreter, new List<object> { "null" });
+                }
                 return new ResultOK().Call(interpreter, new List<object> { parsedJson });
             }
             catch(JSONError e)
             {
+                Console.WriteLine(e);
                 return new ResultError().Call(interpreter, new List<object> { e.Message });
             }
             catch(JSONScanError e)
             {
+                Console.WriteLine(e);
                 return new ResultError().Call(interpreter, new List<object> { e.Message });
             }
         }
