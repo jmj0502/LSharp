@@ -47,13 +47,11 @@ namespace LSharp.GlobalModules
             }
             catch(JSONError e)
             {
-                Console.WriteLine(e);
-                return new ResultError().Call(interpreter, new List<object> { e.Message });
+                return new ResultError().Call(interpreter, new List<object> { $"{e.Message} At JSON, line: {e.Line}" });
             }
             catch(JSONScanError e)
             {
-                Console.WriteLine(e);
-                return new ResultError().Call(interpreter, new List<object> { e.Message });
+                return new ResultError().Call(interpreter, new List<object> { $"{e.Message} At JSON, line: {e.Line}" });
             }
         }
 
