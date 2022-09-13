@@ -5,6 +5,7 @@ using LSharp.Scanner;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using LSharp.GlobalFunctions;
 
 namespace LSharp.GlobalModules
 {
@@ -16,6 +17,11 @@ namespace LSharp.GlobalModules
             moduleBody.Define("parse", new Parse());
             moduleBody.Define("into", new Into());
             return moduleBody;
+        }
+
+        public override string ToString()
+        {
+            return "<native module JSON>";
         }
     }
 
@@ -29,8 +35,24 @@ namespace LSharp.GlobalModules
         public object Call(Interpreter.Interpreter interpreter, List<object> arguments)
         {
             var json = (string)arguments[0];
-            var tokens = new JSONScanner(json).ScanTokens();
-            return new JSONParser(tokens).Parse();
+            try
+            {
+                var tokens = new JSONScanner(json).ScanTokens();
+                var parsedJson =  new JSONParser(tokens).Parse();
+                if (parsedJson is null)
+                {
+                    return new ResultOK().Call(interpreter, new List<object> { "null" });
+                }
+                return new ResultOK().Call(interpreter, new List<object> { parsedJson });
+            }
+            catch(JSONError e)
+            {
+                return new ResultError().Call(interpreter, new List<object> { $"{e.Message} At JSON, line: {e.Line}" });
+            }
+            catch(JSONScanError e)
+            {
+                return new ResultError().Call(interpreter, new List<object> { $"{e.Message} At JSON, line: {e.Line}" });
+            }
         }
 
         public override string ToString()
@@ -60,6 +82,7 @@ namespace LSharp.GlobalModules
                     text = text.Substring(0, text.Length - 2);
                     return text;
                 }
+                return text;
             }
             if (value is List<object>)
             {
@@ -96,18 +119,33 @@ namespace LSharp.GlobalModules
                 return sb.ToString();
             }
 
-            return value.ToString();
+            throw new InvalidJSONError("Invalid JSON value provided.");
         }
 
         public object Call(Interpreter.Interpreter interpreter, List<object> arguments)
         {
             var json = arguments[0];
-            return stringify(json);
+            try
+            {
+                var jsonString = stringify(json);
+                return new ResultOK().Call(interpreter, new List<object> { jsonString });
+            }
+            catch(InvalidJSONError e)
+            {
+                return new ResultError().Call(interpreter, new List<object> { e.Message });
+            }
         }
 
         public override string ToString()
         {
             return "<native function json.into>";
+        }
+    }
+
+    class InvalidJSONError : ApplicationException
+    {
+        public InvalidJSONError(string message) : base(message)
+        {
         }
     }
 }

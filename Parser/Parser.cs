@@ -42,6 +42,7 @@ namespace LSharp.Parser
         * continueStmt -> "continue" ";";
         * forStmt -> "for" "(" (varDecl | exprStmt | ";" ) expression? ";" expression? ")" statement; //Added on chapter 9. 
         * whileStmt -> "while" "(" expression ")" statement; // Added on chapter 9.
+        * tryStmt -> "try" block  "catch" "(" expression ")" block;
         * ifStmt -> "if" "(" expression ")" statement ( "else" statement)?; //Added on chapter 9.
         * block -> "{" declaration* "}";
         * varDecl -> "var" IDENTIFIER ("=" expression)? ";"; //Added on chapter 8.
@@ -66,7 +67,8 @@ namespace LSharp.Parser
         * factor -> prefix (("/"|"*") prefix)*;
         * prefix -> ("++" | "--") unary | unary;
         * unary -> ("!","-") unary | call;
-        * postfix -> call ("++" | "--") | call;
+        * postfix -> errorPropagation ("++" | "--") | errorPropagation;
+        * errorPropagation -> call ("??") | call;
         * call -> primary ( "(" arguments? ")" | "." IDENTIFIER )*;
         * access -> primary "[" primary "]";
         * arguments -> expression ("," expression )*;
@@ -699,7 +701,18 @@ namespace LSharp.Parser
                 var operatr = advance();
                 return new Expression.Unary(operatr, value, true);
             }
-            return call();
+            return errorPropagation();
+        }
+
+        private Expression errorPropagation()
+        {
+            var expression = call();
+            if (match(TokenType.QUESTION_QUESTION)) 
+            {
+                var operatr = previous();
+                return new Expression.Unary(operatr, expression, true);
+            }
+            return expression;
         }
 
         /// <summary>

@@ -24,10 +24,15 @@ namespace LSharp.GlobalModules
             moduleBody.Define("endsWith", new EndsWith());
             moduleBody.Define("contains", new Contains("string")); //Should also apply to lists.
             moduleBody.Define("indexOf", new IndexOf("string")); //Should also apply to lists.
-            moduleBody.Define("at", new At());
+            moduleBody.Define("at", new At("string"));
             moduleBody.Define("match", new Match());
             moduleBody.Define("replace", new Replace());
             return moduleBody;
+        }
+
+        public override string ToString()
+        {
+            return "<native module String>";
         }
     }
 
@@ -350,6 +355,13 @@ namespace LSharp.GlobalModules
 
     public class At : ICallable
     {
+        private readonly string moduleName;
+
+        public At(string moduleName)
+        {
+            this.moduleName = moduleName;
+        }
+
         public int Arity()
         {
             return 2;
@@ -357,10 +369,23 @@ namespace LSharp.GlobalModules
 
         public object Call(Interpreter.Interpreter interpreter, List<object> arguments)
         {
-            var str = (string)arguments[0];
-            var index = (int)((double)arguments[1]);
-            if (index < 0 || index >= str.Length) throw new StringError("String index out of range.");
-            return str[index].ToString();
+            var obj = arguments[0];
+            if (obj is string)
+            {
+                var strIndex = (int)((double)arguments[1]);
+                var str = (string)arguments[0];
+                if (strIndex < 0 || strIndex >= str.Length) throw new StringError("String index out of range.");
+                return str[strIndex].ToString();
+            }
+            if (obj is List<object>)
+            {
+                var listIndex = (int)((double)arguments[1]);
+                var list = (List<object>)arguments[1];
+                if (listIndex < 0 || listIndex >= list.Count) throw new ListError("List index out of range");
+            }
+            var dict = (Dictionary<object, object>)obj;
+            var key = (string)arguments[1];
+            return dict[key];
         }
 
         public override string ToString()

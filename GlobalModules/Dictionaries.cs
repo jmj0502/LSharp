@@ -17,7 +17,13 @@ namespace LSharp.GlobalModules
             moduleBody.Define("delete", new Delete());
             moduleBody.Define("clear", new Clear());
             moduleBody.Define("toList", new ToList());
+            moduleBody.Define("at", new At("dictionary"));
             return moduleBody;
+        }
+
+        public override string ToString()
+        {
+            return "<native module Dictionary>";
         }
     }
 

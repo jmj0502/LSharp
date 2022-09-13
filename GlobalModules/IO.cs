@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using LSharp.GlobalFunctions;
 
 namespace LSharp.GlobalModules
 {
@@ -26,6 +27,11 @@ namespace LSharp.GlobalModules
             moduleBody.Define("getParentDirectory", new GetParentPath());
             moduleBody.Define("readLine", new ReadLine());
             return moduleBody;
+        }
+
+        public override string ToString()
+        {
+            return "<native module IO>";
         }
     }
 
@@ -55,21 +61,24 @@ namespace LSharp.GlobalModules
     {
         public int Arity()
         {
-            return 1;
+            return 2;
         }
 
         public object Call(Interpreter.Interpreter interpreter, List<object> arguments)
         {
             var originPath = (string)arguments[0];
             var destinationPath = (string)arguments[1];
+            ICallable result;
             try
             {
                 System.IO.File.Copy(originPath, destinationPath);
-                return true;
+                result = new ResultOK();
+                return result.Call(interpreter, new List<object>());
             }
             catch (Exception e)
             {
-                return false;
+                result = new ResultError();
+                return result.Call(interpreter, new List<object> { e.Message });
             }
         }
 
@@ -83,21 +92,24 @@ namespace LSharp.GlobalModules
     {
         public int Arity()
         {
-            return 1;
+            return 2;
         }
 
         public object Call(Interpreter.Interpreter interpreter, List<object> arguments)
         {
             var originPath = (string)arguments[0];
             var destinationPath = (string)arguments[1];
+            ICallable result;
             try
             {
                 System.IO.File.Move(originPath, destinationPath);
-                return true;
+                result = new ResultOK();
+                return result.Call(interpreter, new List<object>());
             }
             catch(Exception e)
             {
-                return false;
+                result = new ResultError();
+                return result.Call(interpreter, new List<object> { e.Message });
             }
         }
 
@@ -117,14 +129,17 @@ namespace LSharp.GlobalModules
         public object Call(Interpreter.Interpreter interpreter, List<object> arguments)
         {
             var path = (string)arguments[0];
+            ICallable result;
             try
             {
                 System.IO.File.Delete(path);
-                return true;
+                result = new ResultOK();
+                return result.Call(interpreter, new List<object>());
             }
             catch(Exception e)
             {
-                return false;
+                result = new ResultError();
+                return result.Call(interpreter, new List<object> { e.Message });
             }
         }
 
@@ -145,14 +160,17 @@ namespace LSharp.GlobalModules
         {
             var path = (string)arguments[0];
             var content = (string)arguments[1];
+            ICallable result;
             try
             {
                 System.IO.File.WriteAllText(path, content);
-                return true;
+                result = new ResultOK();
+                return result.Call(interpreter, new List<object>());
             } 
             catch(Exception e)
             {
-                return false;
+                result = new ResultError();
+                return result.Call(interpreter, new List<object> { e.Message });
             }
         }
 
@@ -173,14 +191,17 @@ namespace LSharp.GlobalModules
         {
             var path = (string)arguments[0];
             var content = (string)arguments[1];
+            ICallable result;
             try
             {
                 System.IO.File.AppendAllText(path, content);
-                return true;
+                result = new ResultOK();
+                return result.Call(interpreter, new List<object>());
             }
             catch(Exception e)
             {
-                return false;
+                result = new ResultError();
+                return result.Call(interpreter, new List<object> { e.Message });
             }
         }
 
@@ -200,13 +221,17 @@ namespace LSharp.GlobalModules
         public object Call(Interpreter.Interpreter interpreter, List<object> arguments)
         {
             var path = (string)arguments[0];
+            ICallable result;
             try
             {
-                return System.IO.File.Exists(path);
+                var fileExists = System.IO.File.Exists(path);
+                result = new ResultOK();
+                return result.Call(interpreter, new List<object> { fileExists });
             }
             catch(Exception e)
             {
-                return false;
+                result = new ResultError();
+                return result.Call(interpreter, new List<object> { e.Message });
             }
         }
 
@@ -226,13 +251,17 @@ namespace LSharp.GlobalModules
         public object Call(Interpreter.Interpreter interpreter, List<object> arguments)
         {
             var path = (string)arguments[0];
+            ICallable result;
             try
             {
-                return System.IO.Directory.Exists(path);
+                var dirExist = System.IO.Directory.Exists(path);
+                result = new ResultOK();
+                return result.Call(interpreter, new List<object> { dirExist });
             }
             catch(Exception e)
             {
-                return false;
+                result = new ResultError();
+                return result.Call(interpreter, new List<object> { e.Message });
             }
         }
 
@@ -252,14 +281,18 @@ namespace LSharp.GlobalModules
         public object Call(Interpreter.Interpreter interpreter, List<object> arguments)
         {
             var path = (string)arguments[0];
+            ICallable result;
             try
             {
-                System.IO.Directory.CreateDirectory(path);
-                return true;
+                var dirInfo = System.IO.Directory.CreateDirectory(path);
+                var parsedDirInfo = FileAndDirInfoParser.ParseDirInfo(dirInfo);
+                result = new ResultOK();
+                return result.Call(interpreter, new List<object> { parsedDirInfo });
             } 
             catch(Exception e)
             {
-                return false;
+                result = new ResultError();
+                return result.Call(interpreter, new List<object> { e.Message });
             }
         }
 
@@ -283,11 +316,11 @@ namespace LSharp.GlobalModules
             try
             {
                 System.IO.Directory.Move(originPath, destinationPath);
-                return true;
+                return new ResultOK().Call(interpreter, new List<object>());
             }
             catch(Exception e)
             {
-                return false;
+                return new ResultError().Call(interpreter, new List<object> { e.Message });
             }
         }
 
@@ -310,11 +343,11 @@ namespace LSharp.GlobalModules
             try
             {
                 System.IO.Directory.Delete(path);
-                return true;
+                return new ResultOK().Call(interpreter, new List<object>());
             }
             catch(Exception e)
             {
-                return false;
+                return new ResultError().Call(interpreter, new List<object> { e.Message });
             }
         }
 
@@ -336,11 +369,12 @@ namespace LSharp.GlobalModules
             var path = (string)arguments[0];
             try
             {
-                return System.IO.Directory.GetFiles(path);
+                var dirFiles = System.IO.Directory.GetFiles(path);
+                return new ResultOK().Call(interpreter, new List<object> { dirFiles });
             }
             catch(Exception e)
             {
-                return null;
+                return new ResultError().Call(interpreter, new List<object> { e.Message });
             }
         }
 
@@ -360,8 +394,16 @@ namespace LSharp.GlobalModules
         public object Call(Interpreter.Interpreter interpreter, List<object> arguments)
         {
             var path = (string)arguments[0];
-            var directoryInfo = System.IO.Directory.GetParent(path);
-            return FileAndDirInfoParser.ParseDirInfo(directoryInfo);
+            try
+            {
+                var directoryInfo = System.IO.Directory.GetParent(path);
+                var parsedDirInfo = FileAndDirInfoParser.ParseDirInfo(directoryInfo);
+                return new ResultOK().Call(interpreter, new List<object> { parsedDirInfo });
+            }
+            catch (Exception e)
+            {
+                return new ResultError().Call(interpreter, new List<object> { e.Message });
+            }
         }
 
         public override string ToString()
@@ -409,6 +451,7 @@ namespace LSharp.GlobalModules
 
         public static Dictionary<object, object> ParseDirInfo(System.IO.DirectoryInfo directoryInfo)
         {
+            if (directoryInfo == null) return null;
             var files = directoryInfo.GetFiles();
             var parsedFilesInfo = new List<object>();
             foreach (var file in files)

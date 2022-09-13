@@ -127,7 +127,7 @@ namespace LSharp.Parser
                 return jsonArray();
 
             }
-            throw new JSONError("Invalid JSON character.");
+            throw new JSONError("Invalid JSON character.", tokens[current].Line);
         }
 
         private Token peek()
@@ -185,14 +185,17 @@ namespace LSharp.Parser
         private Token consume(TokenType type, string message)
         {
             if (check(type)) return advance();
-            throw new JSONError(message);
+            throw new JSONError(message, tokens[current].Line);
         }
     }
 
     public class JSONError : ApplicationException 
     {
-        public JSONError(string message) : base(message)
+        public int Line;
+
+        public JSONError(string message, int line) : base(message)
         {
+            Line = line;
         }
     }
 }

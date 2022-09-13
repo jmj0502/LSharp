@@ -33,12 +33,16 @@ namespace LSharp.Interpreter
         public Interpreter()
         {
             Globals = enviroment;
+            enviroment.Define("Ok", new ResultOK());
+            enviroment.Define("Err", new ResultError());
+            enviroment.Define("Result", new LSModule(new GlobalModules.Result().GenerateBody(), "Result"));
             enviroment.Define("clock", new Clock());
             enviroment.Define("String", new LSModule(new Strings().GenerateBody(), "Strings"));
             enviroment.Define("List", new LSModule(new Lists().GenerateBody(), "Lists"));
             enviroment.Define("Dictionary", new LSModule(new Dictionaries().GenerateBody(), "Dictionaries"));
             enviroment.Define("IO", new LSModule(new IO().GenerateBody(), "IO"));
             enviroment.Define("JSON", new LSModule(new JSON().GenerateBody(), "JSON"));
+            //enviroment.Define("Error", new LSModule(new Error().GenerateBody(), "Error"));
         } 
 
         /// <summary>
@@ -304,6 +308,15 @@ namespace LSharp.Interpreter
                 sb.Append("}");
                 return sb.ToString();
             }
+            if (value is Result)
+            {
+                var result = (Result)value;
+                if (result.IsOk())
+                {
+                    return $"Result.Ok";
+                }
+                return $"Result.Err";
+            }
 
             return value.ToString();
         }
@@ -510,6 +523,11 @@ namespace LSharp.Interpreter
             {
                 return function.Call(this, arguments);
             }
+            catch (ErrorResult e)
+            {
+                throw new RuntimeError(expression.Paren,
+                    e.Message, fileName);
+            }
             catch(InvalidCastException e)
             {
                 throw new RuntimeError(expression.Paren,
@@ -624,6 +642,19 @@ namespace LSharp.Interpreter
                 case TokenType.MINNUS:
                     checkNumberOperand(expression.Operatr, right);
                     return -(double) right;
+                case TokenType.QUESTION_QUESTION:
+                    if (!(right is Result))
+                    {
+                        throw new RuntimeError(expression.Operatr,
+                            "The ?? operator should only be applied to functions that return 'Result'.", fileName);
+                    }
+                    var result = (Result)right;
+                    if (result.IsError() && enviroment != Globals) throw new Return(result);
+                    else if (result.IsError() && enviroment == Globals) throw new RuntimeError(expression.Operatr,
+                        result.ErrorMessage, fileName);
+                    var resultValue = result.Value;
+                    result.Handle();
+                    return resultValue;
                 case TokenType.PLUS_PLUS:
                 case TokenType.MINNUS_MINNUS:
                     if (expression.Right == null)
@@ -715,7 +746,7 @@ namespace LSharp.Interpreter
                     var dict = (Dictionary<object, object>)obj;
                     return dict[accessor];
                 }
-                throw new RuntimeError(expression.Index, "Only lists can be accessed by index.", fileName);
+                throw new RuntimeError(expression.Index, "Only lists and dictionaries can be accessed by index.", fileName);
             }
             catch (ArgumentOutOfRangeException e)
             {
