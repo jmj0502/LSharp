@@ -21,6 +21,13 @@ idea of the different components involved in this kind of project.
 
 L# aims to become a multi-paradigm scripting language that can be used to generate scripts that interact with the `File System`, gather
 data from a resource hosted on the cloud (through HTTP) or both. Right now I don't think the language can be used for extremely complex tasks 
-(That may change as the language improves), but I would like to see if its use cases actually go beyond the fields of application I initially ambisitioned.
+(That may change as the language improves), but I would like to see if its use cases actually go beyond the fields of application I initially ambitioned.
 
+## Features
 
+`L#` supports all the features supported by `Lox`, so let's start by reviewing those:
+
+### Lox supports variables and functions
+```lox
+
+```
