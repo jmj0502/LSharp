@@ -27,7 +27,147 @@ data from a resource hosted on the cloud (through HTTP) or both. Right now I don
 
 `L#` supports all the features supported by `Lox`, so let's start by reviewing those:
 
-### Lox supports variables and functions
+### Lox supports variables, functions and closures.
 ```lox
+var someString = "something";
+print someString; // something.
+var nilVar;
 
+fun add(a, b) {
+  return a + b;
+}
+
+print add(2, 1); // 3.
+
+fun findMiddlePoint(x1, x2) {
+  fun add(a, b) {
+    return a + b;
+  }
+
+  return add(x1, x2) / 2;
+}
+```
+
+### Lox has lexical blocks.
+```lox
+var a = "global a";
+{
+  var a  = "inner a";
+  print a; // inner a.
+}
+print a; // global a.
+```
+
+### Lox supports logical operators.
+```lox
+var a = true;
+var b = false;
+
+if (a and b) {
+  print "Truee.";
+} else {
+  print "Falsee.";
+}
+
+if (a or b) {
+  print "Partially true.";
+} else {
+  print "Again, false.";
+}
+
+if (a and !b) {
+  print "True.";
+} else {
+  print "False.";
+}
+```
+
+### Lox has different control flow mechanisms.
+```lox
+var boolean = true;
+
+if (boolean) {
+  print "true!";
+} else {
+  print "false";
+}
+
+var counter = 0;
+while (counter < 5) {
+  print counter;
+  counter = counter + 1;
+}
+
+for (var i = 0; i < 10; i = i + 1) {
+  print i;
+}
+```
+
+### Lox supports OOP.
+```lox
+// Basic class.
+class Breakfast {
+  cook() {
+    print "Eggs a-fryin'!";
+  }
+
+  serve(who) {
+    print "Enjoy your breakfast, " + who + ".";
+  }
+}
+
+var breakfast = Breakfast();
+breakfast.cook(); // Eggs a fryin'!
+breakfast.serve("Bob"); // Enjoy your breakfast, Bob.
+
+// Class with a constructor.
+class Dog {
+  init(name, age) {
+    this.name = name;
+    this.age = age;
+  }
+
+  pet() {
+    print this.name + " is happy!";
+  }
+
+  howOld() {
+    if (age < 14) {
+      print this.name + " is quite young.";
+    } else {
+      print this.name + " is getting old.";
+    }
+  }
+}
+
+var fiddo = Dog("fiddo", 5);
+fiddo.name(); // fiddo.
+fiddo.pet(); // fiddo is happy.
+fiddo.howOld(); // fiddo is quite young.
+
+// Inheritance.
+class Bread {
+  init(kind) {
+    this.kind = kind;
+  }
+
+  choosenBread() {
+    print "You choose " + kind + " as your desired kind of bread!";
+  }
+}
+
+class Bagget < Bread {
+  init(kind, crunchy) {
+    super(kind);
+    this.cruncry = crunchy;
+  }
+
+  isCrunchy() {
+    if (crunchy) {
+      print "This is a crunchy " + this.kind + "!";
+    } else {
+      print "This a not-so crunchy " + this.kind + ".";
+    }
+  }
+}
 ```
