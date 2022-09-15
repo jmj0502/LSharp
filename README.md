@@ -1,8 +1,8 @@
 # The L# Programming Language
 
-The `L#` programming language is a superset of the (Lox Programming Language)[https://github.com/munificent/craftinginterpreters]. The project started as
-as a Lox implementation written in `C#`. However, after finishing the first part of (Crafting Interpreters And Compilers)[http://www.craftinginterpreters.com/]
-(the tree-walk interpreter project) I decided to give (@Munificent)[https://github.com/munificent]'s challenge a shot and try to come up with features that I
+The `L#` programming language is a superset of the [Lox Programming Language](https://github.com/munificent/craftinginterpreters). The project started as
+as a Lox implementation written in `C#`. However, after finishing the first part of [Crafting Interpreters And Compilers](http://www.craftinginterpreters.com/)
+(the tree-walk interpreter project) I decided to give [@Munificent](https://github.com/munificent)'s challenge a shot and try to come up with features that I
 thought `Lox` is missing.
 
 Despite the fact that this project is still a work in progress, it feels like a huge achivement. I've always been interested in language programming, mainly because I 
@@ -171,3 +171,27 @@ class Bagget < Bread {
   }
 }
 ```
+
+## Now let's take a look at `L#` features.
+
+### L# support postfix and prefix increment/decrement.
+```javascript
+var number = 0;
+number++; // 1.
+++number; // 2.
+number--; // 1.
+--number; // 0.
+```
+
+### L# supports hex notation for numbers and bitwise operations.
+```javascript
+var hex = 0x10; // 16.
+print hex >> 1; // 8.
+print hex << 1; // 32.
+print 0x11 & hex; // 16. 
+print 0x11 | hex; // 17.
+print 0x11 ^ hex; // 1.
+```
+
+### L# has function expressions.
+
