@@ -174,6 +174,19 @@ class Bagget < Bread {
 
 ## Now let's take a look at `L#` features.
 
+### L# supports single-line and multi-line comments.
+```
+// single line comment.
+fun testFunction() {
+  /*
+   Multi-line
+   comment.
+  */
+  print "test";
+}
+```
+**NOTE**: multi-line comments can't be nested (C, Java, C#, JS, TS and Rust doesn't allow such behaviour, so I decided to do the same).
+
 ### L# support postfix and prefix increment/decrement.
 ```javascript
 var number = 0;
@@ -182,6 +195,49 @@ number++; // 1.
 number--; // 1.
 --number; // 0.
 ```
+
+### L# has ternary expressions.
+```
+var boolean = true;
+var test = boolean ? "true" : "false";
+var something = boolean ? "true" : 4 < 5 ? "false" : "something";
+```
+Ternary expressions are right-associative (as they are in most programming languages).
+
+### L# has list and dictionaries.
+```
+var list = [1,2,3,4];
+print list[0]; // 1 
+list[1] = 3;
+print list[1]; // 3
+
+var dictionary = %{"test": "string", 5: "five", true: false};
+print dictionary["test"]; // string
+dictionary["some"] = "thing";
+print dictionary["some"]; // thing
+```
+
+### L# supports F#/Elixir's pipe operator.
+```
+fun sum(a, b) {
+  return a + b;
+}
+
+fun multiply(a, b) {
+  return a * b;
+}
+
+fun divide(a, b) {
+  return a / b;
+}
+
+print sum(2,2) |> multiply(2) |> divide(2); // 4
+```
+
+The pipe operator is just syntactic sugar for function composition. The following expression `f(g(r(x)))` can be turned into
+`f(x) |> g() |> r()`. In simple terms, the pipe operator will turn the a value into the first positional parameter
+of the next function on the pipe chain. If a function takes more than one parameter, each one of them should be provided in the
+appropiate order.
 
 ### L# supports hex notation for numbers and bitwise operations.
 ```javascript
