@@ -272,7 +272,7 @@ print result; // 6.
 module Example {
   var moduleConstant = "constant";
 
-  function exampleFunction() {
+  fun exampleFunction() {
     print "module function";
   }
 
@@ -288,13 +288,13 @@ Modules are basically an environment, so variables, classes, and functions can b
 Modules allow you to avoid namespace collitions and to efficiently encapsulate the behaviour related to a 
 certain functionality.
 
-### L# support multi-file imports.
+### L# supports multi-file imports.
 ```
 // test.ls
 module Example {
   var moduleConstant = "constant";
 
-  function exampleFunction() {
+  fun exampleFunction() {
     print "module function";
   }
 
@@ -326,3 +326,69 @@ using "./test.lox";
 
 testFunction(); // test function.
 ```
+
+### L# has support for `break` and `continue` statements.
+```
+fun printNumbersFromOneToFive() {
+    for (var i = 1; i < 10; i++) {
+      print i;
+      if (i == 5) {
+        break;
+      }
+    }
+}
+
+printNumbersFromOneToFive()
+// 1.
+// 2.
+// 3.
+// 4.
+// 5.
+
+fun skipNumbers() {
+  for (var i = 0; i < 10; i++) {
+     if (i == 5 or i == 7) {
+       continue;
+     }
+     print i;
+  }
+}
+
+skipNumbers();
+// 1.
+// 2.
+// 3.
+// 4.
+// 6.
+// 8.
+// 9.
+```
+
+### L# supports error propagation using result values and the error propagation operator `??`.
+```
+fun div(a, b) {
+  if (b == 0) return Err("Can't divide by 0");
+  return Ok(a/b);
+}
+
+fun sum(a, b) {
+  return a + b;
+}
+
+fun divideAndSum(a, b) {
+  // If an error is returned the function will return such error, else it will extract the value from ok. 
+  return div(a, b)??
+  |> sum(b); 
+}
+
+// The ?? operator can also be used at top-level. If an error is 
+// returned, a runtime error will take place.
+divideAndSum(2,2)??; 
+```
+
+The error propagation approach is inspired by Rust's `Result` enum. There are other useful ways to deal with `Result`s 
+on the standard library, keep reading in order to find out about all of them.
+
+### L# also has a standard library composed by native modules.
+`L#`'s standard library is composed of different modules that expose functions that can be used to perform operations
+on the different data types available, and the file system.
