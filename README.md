@@ -235,7 +235,7 @@ print sum(2,2) |> multiply(2) |> divide(2); // 4
 ```
 
 The pipe operator is just syntactic sugar for function composition. The following expression `f(g(r(x)))` can be turned into
-`r(x) |> g() |> f()`. In simple terms, the pipe operator will turn the a value into the first positional parameter
+`r(x) |> g() |> f()`. In simple terms, the pipe operator will turn a value into the first positional parameter
 of the next function on the pipe chain. If a function takes more than one parameter, each one of them should be provided in the
 appropiate order.
 
