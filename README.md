@@ -194,4 +194,79 @@ print 0x11 ^ hex; // 1.
 ```
 
 ### L# has function expressions.
+```
+var testFun = fun (test) {
+  print test;
+};
 
+testFun("Hello, yo'"); // Hello, yo'.
+
+fun increment(number, callback) {
+  return callback(number);
+}
+
+var result = increment(5, fun (number) {
+  return number + 1;
+});
+print result; // 6. 
+```
+
+### L# has support for modules (inspired by Ruby, ML modules and C# namespaces).
+```
+module Example {
+  var moduleConstant = "constant";
+
+  function exampleFunction() {
+    print "module function";
+  }
+
+  class ModuleClass {
+    module() {
+      print "example";
+    }
+  }
+}
+```
+
+Modules are basically an environment, so variables, classes, and functions can be defined inside them.
+Modules allow you to avoid namespace collitions and to efficiently encapsulate the behaviour related to a 
+certain functionality.
+
+### L# support multi-file imports.
+```
+// test.ls
+module Example {
+  var moduleConstant = "constant";
+
+  function exampleFunction() {
+    print "module function";
+  }
+
+  class ModuleClass {
+    module() {
+      print "example";
+    }
+  }
+}
+
+// usingTest.ls
+using "./test.ls";
+
+print Example.moduleConstant; // constant.
+```
+
+The symbols of a `Lox` file can also be imported from `L#`. However, you should always try to keep your code
+organized in modules if you want to do so. `Lox` doesn't have a way to group code, so all the symbols imported from a `Lox` file
+will be defined on the global scope.
+
+```
+// test.lox
+fun testFunction() {
+  print "test function";
+}
+
+// usingTest.ls
+using "./test.lox";
+
+testFunction(); // test function.
+```
