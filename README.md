@@ -391,4 +391,40 @@ on the standard library, keep reading in order to find out about all of them.
 
 ### L# also has a standard library composed by native modules.
 `L#`'s standard library is composed of different modules that expose functions that can be used to perform operations
-on the different data types available, and the file system.
+on the different data types available, and the file system. This approach was inspired by languages like F# and Elixir.
+However, I'm planning to add native classes as well (for Strings, FS, etc), since that will allow users to take the approach
+the like/need the most (I would really like `L#` to be trully multiparadigm).
+
+Let's explore some of the native modules!
+#### String module
+Allow users to perform string manipulation.
+```
+	String.reverse("hello") // olleh.
+    String.substring("something else", 1); // omething else.
+    String.trim(" test ") // test.
+    String.len("hello") // 5.
+    String.toUpper("Something") // SOMETHING.	
+    String.toLower("SCREEAM") // screeam.
+	String.startsWith("test string", "te") // true.
+	String.slice("test", 0, 2) //  tes.
+	String.endsWith("test string", "string") // true.
+	String.contains("something in the way", "in") // true.
+	String.indexOf("hello", "o") // 4.
+	String.at("hello", 0) // h.
+
+    // The `match` function takes the string we'll match against,
+    // the regex pattern we'll match (expressed using another string, the language doesn't have a regex engine yet)
+    // and a dictionary that will contain additional options (`insensitive` is the only possible option right now).
+    // The function will return a list containing all the captured groups.
+	String.match("test 123", "[0-9]+", %{}); // ["123", "123"]
+    String.match("Xd123456789", "(XD)([0-9]{8,}))", %{"insensitive": true}); // ["Xd123456789", "Xd", "123456789"].
+
+    // `replace` and `match` take similar parameters.
+    // `replace` takes:
+    // 1. The string that will be modified.
+    // 2. The pattern that will be replaced.
+    // 3. The string that will replace the specified pattern.
+    // 4. A dictionary containing addittional options (`insensitive` is the only valid option right now).
+	String.replace("The fox jumped over the bridge", "(fox)", "dog", %{}); // The dog jumped over the bridge.
+    String.replace("The Rabbit dug a hole.", "(rabbit)", "mole", %{"insensitive": true}); // The mole dug a hole.
+```
