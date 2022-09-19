@@ -428,3 +428,42 @@ String.match("Xd123456789", "(XD)([0-9]{8,})", %{"insensitive": true}); // ["Xd1
 String.replace("The fox jumped over the bridge", "(fox)", "dog", %{}); // The dog jumped over the bridge.
 String.replace("The Rabbit dug a hole.", "(rabbit)", "mole", %{"insensitive": true}); // The mole dug a hole.
 ```
+
+### Result module
+Allow users to perform better error handling on `Result` types.
+```
+fun divide(a, b) {
+  if (b == 0) return Err("Can't divide by 0");
+  return Ok(a/b);
+}
+
+// Result.unwrapOrElse: Extracts the value contained on Ok() and returns it, allow the user the perform error handling otherwise.
+// The function takes two parameters.
+// 1. A Result (could be either Ok or Err).
+// 2. A function expression that will be used to perform error handling.
+var number = divide(1,0) 
+|> Result.unwrapOrElse(fun (e) {
+  print e;  // Will print the error message. In this case: "Can't divide by 0". 
+  return 0; // Will return 0; hence number will equal 0. NOTE: If no value is returned, number will be equal to nil.
+});
+
+// Result.unwrap: Extracts the value contained on OK() an returns it, throws a runtime error otherwise.
+// Takes one parameter:
+// 1. A Result(could be either Ok or Err).
+var number = divide(2,0) |> Result.unwrap(); // Runtime error. Can't divide by 0.
+
+// Result.isOk: Checks if the provided Result is an OK Result.
+// Takes one parameter:
+// 1. A Result(could be either Ok or Err).
+var number = divide(2,2) |> Result.isOk(); // true.
+
+// Result.isErr: Checks if the provided Result is an Err Result.
+// Takes one parameter:
+// 1. A Result(could be either Ok or Err).
+var number = divide(4,0) |> Result.isErr(); // true.
+```
+
+### List module
+Allow users to perform different operations on lists.
+```
+```
