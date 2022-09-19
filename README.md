@@ -417,7 +417,7 @@ String.at("hello", 0) // "h".
 // 2. The regex pattern we'll use to perform the match operation (expressed as a string).
 // 3. A dictionary that will contain additional options (`insensitive` is the only supported option right now).
 String.match("test 123", "[0-9]+", %{}); // ["123", "123"]
-String.match("Xd123456789", "(XD)([0-9]{8,}))", %{"insensitive": true}); // ["Xd123456789", "Xd", "123456789"].
+String.match("Xd123456789", "(XD)([0-9]{8,})", %{"insensitive": true}); // ["Xd123456789", "Xd", "123456789"].
 
 // `replace` and `match` take similar parameters.
 // `replace` takes:
