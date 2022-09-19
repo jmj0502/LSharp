@@ -481,14 +481,14 @@ List.getFirst([1,2,3]); // Returns the first element of a list. In this case 1.
 List.getLast([1,2,3]); // Returns the last element of the list. In this case 3.
 List.at([1,2,3], 1); // Returns the element located on the specied index. In this case 2.
 
-// Creates a sublist based on the provided list.
+// List.slice: Creates a sublist based on the provided list.
 // Takes the following parameters:
 // 1. The list that will be used to create the slice.
 // 2. The beginning index of the slice.
 // 3. The ending index of the slice.
 List.slice([1,2,3], 1, 2); // [2,3].
 
-// Inserts an element at the specified index.
+// List.insert: Inserts an element at the specified index.
 // Takes the following parameters:
 // 1. The list that will be modified.
 // 2. The index where the new element will be placed.
@@ -496,7 +496,7 @@ List.slice([1,2,3], 1, 2); // [2,3].
 // NOTE: Mutates the original list.
 List.insert([1,3,4], 1, 2); // [1,2,3,4].
 
-// Iterates over each element of a list and perform the specied action on each one of them.
+// List.each: Iterates over each element of a list and perform the specied action on each one of them.
 // Takes the following parameters:
 // 1. The list that will be mutated.
 // 2. A function expression that represents the operation that will be performed on each list element.
@@ -507,7 +507,7 @@ var exampleList = [1,2,3]
 });
 print exampleList; // [2,3,4].
 
-// Iterates over each element of a list and generates a new list containing the modified elements.
+// List.map: Iterates over each element of a list and generates a new list containing the modified elements.
 // Takes the following parameters:
 // 1. The list that will be used to generate the updated list.
 // 2. A fuction expression that will operate on each provided element.
@@ -519,7 +519,7 @@ var updatedList = baseList
 print baseList; // [1,2,3,4].
 print updatedList; // [2,3,4,5].
 
-// Iterates over each element of a list and returns a new list containing the elements that meet the specified
+// List.filter: Iterates over each element of a list and returns a new list containing the elements that meet the specified
 // condition.
 // Takes two parameters:
 // 1. The list that will be used to generate the updated list.
@@ -531,7 +531,7 @@ var numbersGreaterThanOne = numbers
 });
 print numbersGreaterThanOne; // [2,3,4].
 
-// Reduce the elements of a list into a single element based on the provided callback function.
+// List.reduce: Reduce the elements of a list into a single element based on the provided callback function.
 // Takes three parameters:
 // 1. The list that will be used to perform the reduce operation (won't be mutated).
 // 2. A function expression that takes two positional parameters (a reference to the accumulator and a reference to the current element).
@@ -541,7 +541,7 @@ var result = numbers
 |> List.reduce(fun (acc, curr) { return acc + curr; }, 0);
 print result; // 10.
 
-// Sorts the elements of the provided list (mutates the original list).
+// List.sort: Sorts the elements of the provided list (mutates the original list).
 // Takes two parameters:
 // 1. The list that will be sorted.
 // 2. An optional function expression that should be provided only if the list is composed by non-primitive members.
@@ -564,4 +564,10 @@ print people; // [%{"name": "Alexa"}, %{"name": "Jesse"}, %{"name": "Zorg"}].
 var unsortableList = [1,"tree",4];
 unsortableList 
 |> List.sort(nil); //--> Runtime error: Can't compare elements of different types.
+```
+
+#### JSON module.
+`L#` has a built-in module to serialize and deserialize JSON.
+```
+
 ```
