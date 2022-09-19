@@ -466,4 +466,84 @@ var number = divide(4,0) |> Result.isErr(); // true.
 ### List module
 Allow users to perform different operations on lists.
 ```
+List.len([1,2,4]); // 3.
+List.reverse([4,3,2]); // [2,3,4].
+List.contains([1,2,4], 4); // true.
+List.indexOf([1,2,3]); // 1.
+List.join([1,2,3], "*"); // "1*2*3".
+List.add([1,2,3], 4); // Adds an element to the end on the list. Hence, the list provided as parameter will now contain [1,2,3,4].
+List.prepend([1,2,3,4], 0); // Adds an element to the beginning of the list. Hence, the list provided as parameter will now contain [0,1,2,3,4].
+List.concat([1,2,3], [4,5,6]); // [1,2,3,4,5,6].
+List.removeFirst([1,2,3]); // Mutates the original list and removes its first element. The list provided as parameter will now contain [2,3].
+List.removeLast([1,2,3]); // Mutates the original list and removes its last element. The list provided as parameter will now contain [1,2].
+List.removeAt([1,4,2,3], 1); // Mutates the original list and removes the element at the specified index from the list.The list provided as parameter will now contain [1,2,3].
+List.getFirst([1,2,3]); // Returns the first element of a list. In this case 1.
+List.getLast([1,2,3]); // Returns the last element of the list. In this case 3.
+List.at([1,2,3], 1); // Returns the element located on the specied index. In this case 2.
+
+// Creates a sublist based on the provided list.
+// Takes the following parameters:
+// 1. The list that will be used to create the slice.
+// 2. The beginning index of the slice.
+// 3. The ending index of the slice.
+List.slice([1,2,3], 1, 2); // [2,3].
+
+// Inserts an element at the specified index.
+// Takes the following parameters:
+// 1. The list that will be modified.
+// 2. The index where the new element will be placed.
+// 3. The element that will be added to the list.
+// NOTE: Mutates the original list.
+List.insert([1,3,4], 1, 2); // [1,2,3,4].
+
+// Iterates over each element of a list and perform the specied action on each one of them.
+// Takes the following parameters:
+// 1. The list that will be mutated.
+// 2. A function expression that represents the operation that will be performed on each list element.
+var exampleList = [1,2,3]
+|> List.each(fun (el) {
+   print el; // 1, 2 and 3 respectively.
+   return el + 1;
+});
+print exampleList; // [2,3,4].
+
+// Iterates over each element of a list and generates a new list containing the modified elements.
+// Takes the following parameters:
+// 1. The list that will be used to generate the updated list.
+// 2. A fuction expression that will operate on each provided element.
+var baseList = [1,2,3,4];
+var updatedList = baseList 
+|> List.map(fun (el) {
+  return el + 1;
+});
+print baseList; // [1,2,3,4].
+print updatedList; // [2,3,4,5].
+
+// Iterates over each element of a list and returns a new list containing the elements that meet the specified
+// condition.
+// Takes two parameters:
+// 1. The list that will be used to generate the updated list.
+// 2. A function expression that will check for a certain condition.
+var numbers = [1,2,3,4];
+var numbersGreaterThanOne = numbers 
+|> List.filter(fun (el) {
+  return el > 1;
+});
+print numbersGreaterThanOne; // [2,3,4].
+
+// Reduce the elements of a list into a single element based on the provided callback function.
+// Takes three parameters:
+// 1. The list that will be used to perform the reduce operation (won't be mutated).
+// 2. A function expression that takes two positional parameters (a reference to the accumulator and a reference to the current element).
+// 3. The base value of the accumulator.
+var numbers = [1,2,3,4];
+var result = numbers 
+|> List.reduce(fun (acc, curr) { return acc + curr; }, 0);
+print result; // 10.
+
+// Sorts the elements of the provided list (mutates the original list).
+// Takes two parameters:
+// 1. The list that will be sorted.
+// 2. An optional function expression that should be provided only if the list is composed by non-primitive members.
+List.sort
 ```
