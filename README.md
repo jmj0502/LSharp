@@ -545,5 +545,23 @@ print result; // 10.
 // Takes two parameters:
 // 1. The list that will be sorted.
 // 2. An optional function expression that should be provided only if the list is composed by non-primitive members.
-List.sort
+// NOTE: Lists containing elements of different types can't be sorted.
+var unsortedList = [7,6,8,5,9,4,2,3,1];
+unsortedList |> List.sort(nil); // A comparator function is not required in this scenario.
+print unsortedList; // [1,2,3,4,5,6,7,8].
+
+// For this example a comparator function must be provided. If a user tries to sort a list of objects, or maps without
+// a comparator function a runtime error while be raised.
+var people = [%{"name": "Jesse"}, %{"name": "Zorg"}, %{"name": "Alexa"}];
+people 
+|> List.sort(fun (lhs, rhs) {
+    if (lhs["name"] > rhs["name"]) return 1;
+    if (lhs["name"] < rhs["name"]) return -1;
+    return 0;
+});
+print people; // [%{"name": "Alexa"}, %{"name": "Jesse"}, %{"name": "Zorg"}].
+
+var unsortableList = [1,"tree",4];
+unsortableList 
+|> List.sort(nil); //--> Runtime error: Can't compare elements of different types.
 ```
