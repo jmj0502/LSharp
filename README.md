@@ -399,32 +399,32 @@ Let's explore some of the native modules!
 #### String module
 Allow users to perform string manipulation.
 ```
-    String.reverse("hello") // "olleh".
-    String.substring("something else", 1); // "omething else".
-    String.trim(" test ") // "test".
-    String.len("hello") // 5.
-    String.toUpper("Something") // "SOMETHING".	
-    String.toLower("SCREEAM") // "screeam".
-    String.startsWith("test string", "te") // true.
-    String.slice("test", 0, 2) //  "tes".
-    String.endsWith("test string", "string") // true.
-    String.contains("something in the way", "in") // true.
-    String.indexOf("hello", "o") // 4.
-    String.at("hello", 0) // "h".
+String.reverse("hello") // "olleh".
+String.substring("something else", 1); // "omething else".
+String.trim(" test ") // "test".
+String.len("hello") // 5.
+String.toUpper("Something") // "SOMETHING".	
+String.toLower("SCREEAM") // "screeam".
+String.startsWith("test string", "te") // true.
+String.slice("test", 0, 2) //  "tes".
+String.endsWith("test string", "string") // true.
+String.contains("something in the way", "in") // true.
+String.indexOf("hello", "o") // 4.
+String.at("hello", 0) // "h".
 
-    // The `match` returns a list of matches based on the provided pattern. It takes the following parameters:
-    // 1. The string to match against.
-    // 2. The regex pattern we'll use to perform the match operation (expressed as a string).
-    // 3. A dictionary that will contain additional options (`insensitive` is the only supported option right now).
-    String.match("test 123", "[0-9]+", %{}); // ["123", "123"]
-    String.match("Xd123456789", "(XD)([0-9]{8,}))", %{"insensitive": true}); // ["Xd123456789", "Xd", "123456789"].
+// The `match` returns a list of matches based on the provided pattern. It takes the following parameters:
+// 1. The string to match against.
+// 2. The regex pattern we'll use to perform the match operation (expressed as a string).
+// 3. A dictionary that will contain additional options (`insensitive` is the only supported option right now).
+String.match("test 123", "[0-9]+", %{}); // ["123", "123"]
+String.match("Xd123456789", "(XD)([0-9]{8,}))", %{"insensitive": true}); // ["Xd123456789", "Xd", "123456789"].
 
-    // `replace` and `match` take similar parameters.
-    // `replace` takes:
-    // 1. The string that will be modified.
-    // 2. The pattern that will be replaced.
-    // 3. The string that will replace the specified pattern.
-    // 4. A dictionary containing addittional options (`insensitive` is the only valid option right now).
-    String.replace("The fox jumped over the bridge", "(fox)", "dog", %{}); // The dog jumped over the bridge.
-    String.replace("The Rabbit dug a hole.", "(rabbit)", "mole", %{"insensitive": true}); // The mole dug a hole.
+// `replace` and `match` take similar parameters.
+// `replace` takes:
+// 1. The string that will be modified.
+// 2. The pattern that will be replaced.
+// 3. The string that will replace the specified pattern.
+// 4. A dictionary containing addittional options (`insensitive` is the only valid option right now).
+String.replace("The fox jumped over the bridge", "(fox)", "dog", %{}); // The dog jumped over the bridge.
+String.replace("The Rabbit dug a hole.", "(rabbit)", "mole", %{"insensitive": true}); // The mole dug a hole.
 ```
