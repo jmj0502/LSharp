@@ -429,7 +429,7 @@ String.replace("The fox jumped over the bridge", "(fox)", "dog", %{}); // The do
 String.replace("The Rabbit dug a hole.", "(rabbit)", "mole", %{"insensitive": true}); // The mole dug a hole.
 ```
 
-### Result module
+#### Result module
 Allow users to perform better error handling on `Result` types.
 ```
 fun divide(a, b) {
@@ -463,7 +463,7 @@ var number = divide(2,2) |> Result.isOk(); // true.
 var number = divide(4,0) |> Result.isErr(); // true.
 ```
 
-### List module
+#### List module
 Allow users to perform different operations on lists.
 ```
 List.len([1,2,4]); // 3.
