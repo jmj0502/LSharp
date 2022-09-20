@@ -412,14 +412,14 @@ String.contains("something in the way", "in") // true.
 String.indexOf("hello", "o") // 4.
 String.at("hello", 0) // "h".
 
-// The `match` returns a list of matches based on the provided pattern. It takes the following parameters:
+// String.match: The `match` returns a list of matches based on the provided pattern. It takes the following parameters:
 // 1. The string to match against.
 // 2. The regex pattern we'll use to perform the match operation (expressed as a string).
 // 3. A dictionary that will contain additional options (`insensitive` is the only supported option right now).
 String.match("test 123", "[0-9]+", %{}); // ["123", "123"]
 String.match("Xd123456789", "(XD)([0-9]{8,})", %{"insensitive": true}); // ["Xd123456789", "Xd", "123456789"].
 
-// `replace` and `match` take similar parameters.
+// String.replace: `replace` and `match` take similar parameters.
 // `replace` takes:
 // 1. The string that will be modified.
 // 2. The pattern that will be replaced.
@@ -567,7 +567,46 @@ unsortableList
 ```
 
 #### JSON module.
-`L#` has a built-in module to serialize and deserialize JSON.
+`L#` has a built-in module that allow users to serialize and deserialize JSON.
 ```
+// JSON.parse: Turns a valid JSON string into a L# dictionary.
+// Takes one parameter:
+// 1. A string that represents a valid JSON.
+// Returns a Result Ok containing the parsed JSON as a dictionary or a Result Err containing an error message.
+var parsedJSON = '{
+  "test": 3, 
+  "test2": "xd", 
+  "boolT": true, 
+  "boolF": false, 
+  "null": null,
+  "recursive": {
+        "test": 4, 
+        "test2": "xd"}
+}' |> JSON.parse();
+print parsedJSON??;
+/*
+%{"test": 3, "test2": "xd", "boolT": true, "boolF": false, "null": nil, "recursive": %{"test": 4, "test2": "xd"}}
+*/
 
+// JSON.into: Turns a L# dictionary into a JSON string.
+// Takes one parameter:
+// 1. A non-empty dictionary.
+// Returns a Result OK containing the expected JSON string or a Result Err containing an error message.
+var dict = %{
+  "test": [
+    %{
+       "something": true,
+       "else": false,
+       "test": "yup"
+    },
+    %{
+        "something": true,
+        "else": false,
+        "test": "yup"
+    }
+  ]
+};
+
+var json = (dict |> JSON.into())??;
+print json; // '{"test":[{"something":true,"else":false,"test":"yup"},{"something":true,"else":false,"test":"yup"}]}'.
 ```
