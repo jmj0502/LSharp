@@ -566,6 +566,30 @@ unsortableList
 |> List.sort(nil); //--> Runtime error: Can't compare elements of different types.
 ```
 
+#### Dictionary module.
+```
+Dictionary.keys(%{"test": true, 5: false}); // ["test",5].
+Dictionary.values(%{"test": "indeed", "something": false}); // ["something",false].
+Dictionary.containsKey(%{"test": "something"}, "test"); // true.
+Dictionary.at(%{"test": 5}, "test"); // 5.
+
+// Dictionary.ToList: Turns a dictionary into a list composed of sublist that contain each key-value pair.
+// Takes 1 argument:
+// 1. The dictionary that will be turned into a list.
+Dictionary.toList(%{"test": "value", 1: 2, "false": false, "true": true}); //[["test","value"],[1,2],["false",false],["true",true]]. 
+
+// Dictionary.delete: Removes the specified key from the provided dictionary (mutates the original dictionary).
+// Takes two parameters:
+// 1. The dictionary that will be modified.
+// 2. The key that will be removed from the dictionary.
+Dictionary.delete(%{"test": 4, "fake": true}, "fake") // %{"test": 4}.
+
+// Dictionary.clear: Removes all the keys from the provided dictionary (mutates the original dictionary).
+// Takes one parameter:
+// 1. The dictionary that will be modified.
+Dictionary.clear(%{"some": "value", "another": 3, true: false}); // %{}.
+```
+
 #### JSON module.
 `L#` has a built-in module that allow users to serialize and deserialize JSON.
 ```
