@@ -464,7 +464,7 @@ var number = divide(4,0) |> Result.isErr(); // true.
 ```
 
 #### List module
-Allow users to perform different operations on lists.
+Allow users to perform list manipulation.
 ```
 List.len([1,2,4]); // 3.
 List.reverse([4,3,2]); // [2,3,4].
@@ -567,6 +567,7 @@ unsortableList
 ```
 
 #### Dictionary module.
+The dictionary module allow users to perform different operations on dictionaries.
 ```
 Dictionary.keys(%{"test": true, 5: false}); // ["test",5].
 Dictionary.values(%{"test": "indeed", "something": false}); // ["something",false].
@@ -633,4 +634,124 @@ var dict = %{
 
 var json = (dict |> JSON.into())??;
 print json; // '{"test":[{"something":true,"else":false,"test":"yup"},{"something":true,"else":false,"test":"yup"}]}'.
+```
+
+#### IO module
+The `IO` module allow users to get user input and deal with the file system.
+```
+// IO.readFileAsText: Reads the content of a file as text.
+// Takes 1 parameter:
+// 1. A string, that represents the path of the file.
+// Returns a Result.OK containing a string that represents the content of a file
+// or a Result.Err is something failed while trying to read the file.
+
+// text.txt
+Some string.
+
+IO.readFileAsText("./test.txt")??; // text.txt
+
+// IO.copyFile: Copy a file into a specific path.
+// Takes two parameters:
+// 1. The path where the original file is located.
+// 2. The path where the copy of the file will be placed.
+// Returns an empty Result.OK if the operation was successful and Result.Err otherwise.
+IO.copyFile("./test.txt", "../another-folder/test.txt") 
+|> Result.isOk(); // true.
+
+// IO.moveFile: Moves a file to a specific path.
+// Takes two parameters:
+// 1. The path where the file is located.
+// 2. The path where the file will be placed.
+// Returns an empty Result.OK if the operation was successful and Result.Err otherwise.
+IO.moveFile("./test.txt", "../another-file/test.txt")
+|> Result.isOk(); // true.
+
+// IO.deleteFile: Deletes a file from the file system.
+// Takes one parameter:
+// 1. The path where the file is located.
+// Returns an empty Result.OK if the operation was successful and Result.Err otherwise.
+IO.deleteFile("./test.txt")
+|> Result.isOK(); // true.
+
+// IO.createFile: Creates an empty file on the specified path.
+// Takes two parameters:
+// 1. The path where the file will be created.
+// 2. The content that will be written on the file.
+// Returns an empty Result.OK if the operation was successful and Result.Err otherwise.
+IO.createFile("./another-test.txt", '{"test": true}')
+|> Result.isOK();
+
+// IO.writeFile: Writes the provided string to the specified file.
+// Takes two parameters:
+// 1. The path of the file that will be modified.
+// 2. The content that will be written to the file.
+// Returns an empty Result.OK if the operation was successful and Result.Err otherwise.
+IO.writeFile("./test.txt", "Hello!")
+|> Result.isOK(); // true.
+
+// test.txt
+Hello!
+
+// IO.fileExists: Checks if there's file located on the specified path.
+// Takes one parameter:
+// 1. The path of the file we want to check.
+// Returns a Result.OK containing a bool (true, or false) depending
+// if the file exists and Result.Err containing an error message if
+// something goes wrong.
+IO.fileExists("./test.txt")
+|> Result.isOk(); // true.
+
+// IO.directoryExists: Checks if there's directory located on the specified path.
+// Takes one parameter:
+// 1. The path of the directory we want to check.
+// Returns a Result.OK containing a bool (true, or false) depending
+// if the directory exists and Result.Err containing an error message if
+// something goes wrong.
+IO.directoryExists("../test-folder")
+|> Result.isOK();
+
+
+// IO.createDictory: Creates an empty directory on the specified path.
+// Takes one parameter:
+// 1. The path where the new directory will be created.
+// Returns an empty Result.OK if the operation was successful and Result.Err otherwise.
+IO.createDirectory("./another-folder")
+|> Result.isOK(); // true.
+
+// IO.removeFile: Moves a directory to a specific path.
+// Takes two parameters:
+// 1. The path where the directory is located.
+// 2. The path where the directory will be placed.
+// Returns an empty Result.OK if the operation was successful and Result.Err otherwise.
+IO.moveDirectory("../test-dir, "./another-directory")
+|> Result.isOk(); // true.
+
+// IO.removeDirectory: Removes a directory located at the specified path.
+// Takes one parameter:
+// 1. The path where the new directory will be created.
+// Returns an empty Result.OK if the operation was successful and Result.Err otherwise.
+IO.deleteDirectory("./another-folder")
+|> Result.isOK(); // true.
+
+// IO.getDirectoryFiles: Get all the information of the files placed under the specified directory.
+// Takes one parameter:
+// 1. The path of the directory which information will be returned.
+// Returns a Result.OK containing a list with the paths of the files located on the specified directory
+// and Result.Err containing an Result.Err in case something went wrong.
+IO.getDirectoryFiles("./another-folder")??; // [./another-folder/test-file.txt].
+
+// IO.getParentDirectory: Gets the infomation of the parent directory of the directory located
+// under the specified path.
+// 1. The path of directory contained on the directory which info will be returned.
+// Returns a Result.OK that contains a list of dictionaries that hold the
+// information on every file, if something goes wrong a Result.Err holding an error message
+// is returned.
+IO.getParentDirectory("./")??;
+
+// IO.readLine: Prompts the provided message to the console and takes the provided
+// input.
+// Takes one parameter:
+// 1. The message that will printed before taking input.
+// Returns the string provided as a response by the user.
+IO.readLine("one.."); // Input: two -> returns "two".
 ```
