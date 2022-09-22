@@ -5,22 +5,22 @@ as a Lox implementation written in `C#`. However, after finishing the first part
 (the tree-walk interpreter project) I decided to give [@Munificent](https://github.com/munificent)'s challenge a shot and try to come up with features that I
 thought `Lox` is missing.
 
-Despite the fact that this project is still a work in progress, it feels like a huge achivement. I've always been interested in language programming, mainly because I 
+Despite the fact that this project is still a work in progress, it feels like a huge achievement. I've always been interested in language programming, mainly because I 
 always wondered how the programing languages that I use on a daily basis interact with the different components of my machine (I know that this implementation
 only scratch the surface of what can be done but still). On the other hand, language design results particularly interesting to me; on my spare time I like to write
 multiple implementations of a program using different programming languages since I really like to contrast the approach taken in each one of them to achieve the
 same goal.
 
 When I discovered **Crafting Interpreters And Compilers** I was truly amazed! The book had everything I needed to learn in order to get started on this
-field and I'm trully grateful for that, in fact the book is so good that I was able to understand the key concepts behind scanners, grammars, parsers and even some 
+field and I'm truly grateful for that, in fact the book is so good that I was able to understand the key concepts behind scanners, grammars, parsers and even some 
 design decision that led to interesting features in popular languages. Before discovering **CIAC** the only compiler design book I knew about was the Dragon Book and that 
-wasn't a good place to start my journey in the field of language programming (I'm still planning to tackle it in the future tho'), mainly because I didn't even had a clear
+wasn't a good place to start my journey in the field of language programming (I'm still planning to tackle it in the future tho'), mainly because I didn't even have a clear
 idea of the different components involved in this kind of project.
 
 ## Scope
 
 L# aims to become a multi-paradigm scripting language that can be used to generate scripts that interact with the `File System`, gather
-data from a resource hosted on the cloud (through HTTP) or both. Right now I don't think the language can be used for extremely complex tasks 
+data from a resource hosted on the cloud (through HTTP) or both. Right now, I don't think the language can be used for extremely complex tasks 
 (That may change as the language improves), but I would like to see if its use cases actually go beyond the fields of application I initially ambitioned.
 
 ## Features
@@ -237,7 +237,7 @@ print sum(2,2) |> multiply(2) |> divide(2); // 4
 The pipe operator is just syntactic sugar for function composition. The following expression `f(g(r(x)))` can be turned into
 `r(x) |> g() |> f()`. In simple terms, the pipe operator will turn a value into the first positional parameter
 of the next function on the pipe chain. If a function takes more than one parameter, each one of them should be provided in the
-appropiate order.
+appropriate order.
 
 ### L# supports hex notation for numbers and bitwise operations.
 ```javascript
@@ -285,7 +285,7 @@ module Example {
 ```
 
 Modules are basically an environment, so variables, classes, and functions can be defined inside them.
-Modules allow you to avoid namespace collitions and to efficiently encapsulate the behaviour related to a 
+Modules allow you to avoid namespace collisions and to efficiently encapsulate the behavior related to a 
 certain functionality.
 
 ### L# supports multi-file imports.
@@ -390,13 +390,13 @@ The error propagation approach is inspired by Rust's `Result` enum. There are ot
 on the standard library, keep reading in order to find out about all of them.
 
 ### L# also has a standard library composed by native modules.
-`L#`'s standard library is composed of different modules that expose functions that can be used to perform operations
+`L#`'s standard library is composed of different modules that expose functions that can be used to perform multiple operations
 on the different data types available, and the file system. This approach was inspired by languages like F# and Elixir.
-However, I'm planning to add native classes as well (for Strings, FS, etc), since that will allow users to take the approach
-the like/need the most (I would really like `L#` to be trully multiparadigm).
+However, I'm planning to add native classes as well (for Strings, FS, etc.), since that will allow users to take the approach
+they like/need the most (I would really like `L#` to be truly multiparadigm).
 
 Let's explore some of the native modules!
-#### String module
+#### String module.
 Allow users to perform string manipulation.
 ```
 String.reverse("hello") // "olleh".
@@ -429,7 +429,7 @@ String.replace("The fox jumped over the bridge", "(fox)", "dog", %{}); // The do
 String.replace("The Rabbit dug a hole.", "(rabbit)", "mole", %{"insensitive": true}); // The mole dug a hole.
 ```
 
-#### Result module
+#### Result module.
 Allow users to perform better error handling on `Result` types.
 ```
 fun divide(a, b) {
@@ -463,7 +463,7 @@ var number = divide(2,2) |> Result.isOk(); // true.
 var number = divide(4,0) |> Result.isErr(); // true.
 ```
 
-#### List module
+#### List module.
 Allow users to perform list manipulation.
 ```
 List.len([1,2,4]); // 3.
@@ -636,7 +636,7 @@ var json = (dict |> JSON.into())??;
 print json; // '{"test":[{"something":true,"else":false,"test":"yup"},{"something":true,"else":false,"test":"yup"}]}'.
 ```
 
-#### IO module
+#### IO module.
 The `IO` module allow users to get user input and deal with the file system.
 ```
 // IO.readFileAsText: Reads the content of a file as text.
@@ -789,3 +789,15 @@ IO.getParentDirectory("./")??;
 // Returns the string provided as a response by the user.
 IO.readLine("one.."); // Input: two -> returns "two".
 ```
+
+### Pending points
+There are some features (and fixes) I would like to add to the language. Here are some of them:
+- [ ] Add an HTTP Client.
+- [ ] Add native classes (as an alternative to modules).
+- [ ] Add basic IDE support (this would be part of a different project).
+- [ ] Identify bugs an proceed to fix them.
+- [ ] Add other useful functionalites through modules (like a Math module, other useful functions on the string module, etc.).
+- [ ] Add CI/CD to generate automated releases.
+
+This is the first programming language I've ever written so I don't expect it to be perfect. I'm still planning to tackle the 
+Byte Code Interpreter project of **CI**, so I may even re-write this language using a non-garbage collected language.
