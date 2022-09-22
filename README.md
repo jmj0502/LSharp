@@ -17,6 +17,11 @@ design decision that led to interesting features in popular languages. Before di
 wasn't a good place to start my journey in the field of language programming (I'm still planning to tackle it in the future tho'), mainly because I didn't even have a clear
 idea of the different components involved in this kind of project.
 
+## How to build from source
+
+The only requirement to build this language is `.NET >= 5.0`. Right now I'm not using any dependencies so the process is really easy (it's
+just building a common CLI with `.NET`).
+
 ## Scope
 
 L# aims to become a multi-paradigm scripting language that can be used to generate scripts that interact with the `File System`, gather
@@ -797,6 +802,7 @@ There are some features (and fixes) I would like to add to the language. Here ar
 - [ ] Add basic IDE support (this would be part of a different project).
 - [ ] Identify bugs an proceed to fix them.
 - [ ] Add other useful functionalites through modules (like a Math module, other useful functions on the string module, etc.).
+- [ ] Different tests cases for the language.
 - [ ] Add CI/CD to generate automated releases.
 
 This is the first programming language I've ever written so I don't expect it to be perfect. I'm still planning to tackle the 
