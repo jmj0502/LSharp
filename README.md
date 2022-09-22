@@ -747,6 +747,39 @@ IO.getDirectoryFiles("./another-folder")??; // [./another-folder/test-file.txt].
 // information on every file, if something goes wrong a Result.Err holding an error message
 // is returned.
 IO.getParentDirectory("./")??;
+/*
+%{
+    "directory":"C:\Users\jmj_0\source\repos\LSharp\bin\Debug\net5.0\test-dir", 
+    "exists":True, 
+    "creationDate":9/22/2022 12:05:08 PM, 
+    "files":[
+        %{
+            "extension":".json", 
+            "name":"json-copy.json", 
+            "path":"C:\Users\jmj_0\source\repos\LSharp\bin\Debug\net5.0\test-dir", 
+            "creationDate":9/22/2022 12:08:31 PM, 
+            "exists":True, 
+            "lastUpdate":9/22/2022 12:08:31 PM
+        }, 
+        %{
+            "extension":".json", 
+            "name":"json.json", 
+            "path":"C:\Users\jmj_0\source\repos\LSharp\bin\Debug\net5.0\test-dir", 
+            "creationDate":9/22/2022 12:08:31 PM,
+            "exists":True, 
+            "lastUpdate":9/22/2022 12:08:31 PM
+        }
+   ], 
+   "subdirectories":[
+        %{
+            "directory":"C:\Users\jmj_0\source\repos\LSharp\bin\Debug\net5.0\test-dir\inner-dir", 
+            "exists":True, 
+            "creationDate":9/22/2022 12:05:23 PM, 
+            "files":[], 
+            "subdirectories":[]
+        }
+   ]
+} */
 
 // IO.readLine: Prompts the provided message to the console and takes the provided
 // input.

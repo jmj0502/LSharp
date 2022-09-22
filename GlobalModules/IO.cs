@@ -375,7 +375,7 @@ namespace LSharp.GlobalModules
                 {
                     filePaths.Add(dirFile);
                 }
-                return new ResultOK().Call(interpreter, filePaths);
+                return new ResultOK().Call(interpreter, new List<object> { filePaths });
             }
             catch(Exception e)
             {
