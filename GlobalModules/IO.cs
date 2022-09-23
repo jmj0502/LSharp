@@ -153,7 +153,7 @@ namespace LSharp.GlobalModules
     {
         public int Arity()
         {
-            return 1;
+            return 2;
         }
 
         public object Call(Interpreter.Interpreter interpreter, List<object> arguments)
@@ -184,7 +184,7 @@ namespace LSharp.GlobalModules
     {
         public int Arity()
         {
-            return 1;
+            return 2;
         }
 
         public object Call(Interpreter.Interpreter interpreter, List<object> arguments)
@@ -370,7 +370,12 @@ namespace LSharp.GlobalModules
             try
             {
                 var dirFiles = System.IO.Directory.GetFiles(path);
-                return new ResultOK().Call(interpreter, new List<object> { dirFiles });
+                var filePaths = new List<object>();
+                foreach (string dirFile in dirFiles)
+                {
+                    filePaths.Add(dirFile);
+                }
+                return new ResultOK().Call(interpreter, new List<object> { filePaths });
             }
             catch(Exception e)
             {
