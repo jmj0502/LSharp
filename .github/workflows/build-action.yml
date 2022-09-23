@@ -1,0 +1,12 @@
+﻿name: Build Project
+on:
+  push:
+    branches:
+      - feature/ci-cd
+
+jobs:
+  build_project:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          ls ${{ github.workspace }}

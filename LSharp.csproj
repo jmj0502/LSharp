@@ -6,4 +6,8 @@
     <StartupObject>LSharp.Lox</StartupObject>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Content Include=".github\workflows\build-action.yml" />
+  </ItemGroup>
+
 </Project>
