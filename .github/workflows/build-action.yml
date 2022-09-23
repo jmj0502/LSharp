@@ -8,5 +8,6 @@ jobs:
   build_project:
     runs-on: ubuntu-latest
     steps:
-      - run: |
+      - name: List files in the repository
+        run: |
           ls ${{ github.workspace }}
