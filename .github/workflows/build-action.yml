@@ -8,6 +8,8 @@ jobs:
   build_project:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout to repository
+        uses: actions/checkout@v3
       - name: List files in the repository
         run: |
           ls ${{ github.workspace }}
