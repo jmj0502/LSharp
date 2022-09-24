@@ -22,9 +22,8 @@ jobs:
         run: dotnet restore
       - name: Build
         run: dotnet build --configuration Release --no-restore
+      - name: Set Env Var For Version
+      - run: echo "DOTNET_VERSION={${{ matrix.dotnet_version }}:0:2}" >> $GITHUB_ENV
       - name: List files in the repository
         run: |
-          dotnet_version = {${{ matrix.dotnet-version }}:0:2}
-          ls ${{ github.workspace }}/bin/Release/net${{ dotnet_version }}
-
-
+          ls ${{ github.workspace }}/bin/Release/net$DOTNET_VERSION
