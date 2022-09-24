@@ -24,7 +24,5 @@ jobs:
         run: dotnet build --configuration Release --no-restore
       - name: List files in the repository
         run: |
-          VERSION = cut -c 0-2
-          ls ${{ github.workspace }}/bin/Release/net${VERSION}
-
+          ls ${{ github.workspace }}/bin/Release/net5.0
 
