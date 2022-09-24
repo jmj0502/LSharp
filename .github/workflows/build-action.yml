@@ -24,6 +24,6 @@ jobs:
         run: dotnet build --configuration Release --no-restore
       - name: List files in the repository
         run: |
-          ls ${{ github.workspace }}
+          ls ${{ github.workspace }}/bin/Release/${{ matrix.dotnet-version }}
 
 
