@@ -18,6 +18,8 @@ jobs:
         uses: actions/setup-dotnet@v2
         with:
           dotnet-version: ${{ matrix.dotnet-version }}
+      - name: Setup Dependencies
+        run: dotnet restore
       - name: Build
         run: dotnet build --configuration Release --no-restore
       - name: List files in the repository
