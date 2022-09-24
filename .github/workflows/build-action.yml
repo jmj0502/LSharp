@@ -7,9 +7,21 @@ on:
 jobs:
   build_project:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        dotnet-version: ['5.0.x', '6.0.x']
+
     steps:
       - name: Checkout to repository
         uses: actions/checkout@v3
+      - name: Setup .NET Core SDK ${{ matrix.dotnet-version }}
+        uses: actions/setup-dotnet@v2
+        with:
+          dotnet-version: $${{ matrix.dotnet-version }}
+      - name: Build
+        run: dotnet build --configuration Release --no-restore
       - name: List files in the repository
         run: |
           ls ${{ github.workspace }}
+
+
