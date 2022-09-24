@@ -24,9 +24,7 @@ jobs:
         run: dotnet build --configuration Release --no-restore
       - name: List files in the repository
         run: |
-          VERSION = {${{ matrix.dotnet-version }}:0:2}
-          ls ${{ github.workspace }}/bin/Release/net${{ VERSION }}
-      - name: Zip Release
-        run: |
+          dotnet_version = {${{ matrix.dotnet-version }}:0:2}
+          ls ${{ github.workspace }}/bin/Release/net${{ dotnet_version }}
 
 
