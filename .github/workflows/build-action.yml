@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        dotnet-version: ['5.0.x', 6.0.x]
+        dotnet-version: [6.0.x]
 
     steps:
       - name: Checkout to repository
@@ -24,7 +24,7 @@ jobs:
         run: dotnet build --configuration Release --no-restore
       - name: List files in the repository
         run: |
-          ls ${{ github.workspace }}/bin/Release/net5.0
+          ls ${{ github.workspace }}/bin/Release
       - name: Zip
         run: |
           # if zip is not found
