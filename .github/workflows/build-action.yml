@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        dotnet-version: ['5.0.x', '6.0.x']
+        dotnet-version: ['5.0.x']
 
     steps:
       - name: Checkout to repository
@@ -25,4 +25,27 @@ jobs:
       - name: List files in the repository
         run: |
           ls ${{ github.workspace }}/bin/Release/net5.0
-          ls ${{ runner.temp }}
+      - name: Zip
+        run: |
+          # if zip is not found
+          if [ ! -x "$(command -v zip)" ]; then
+            sudo apt-get update && sudo apt-get install -y zip --no-install-recommends
+          fi
+
+          zip -r LSharp.zip ${{ github.workspace }}/bin/Release/net5.0
+      - name: Create New Release
+        id: create_new_release
+        uses: softprops/action-gh-release@v1
+        with:
+          token: ${{ github.token }}
+          tag_name: v0.1.${{ github.run_number }}
+          name: v0.1.${{ github.run_number }} Unstable L# Release.
+          body: |
+            # L# Unstable Release
+            This is an automated released that contains the most recent changes added to L#.
+            Such changes may include - Breaking and non-breaking features/bugfixes.
+          draft: false
+          prerelease: false
+          files: |
+            LSharp.zip
+
