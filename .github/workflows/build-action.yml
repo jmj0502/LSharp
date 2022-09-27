@@ -35,9 +35,10 @@ jobs:
           fi
 
           # checkout into dir.
-          cd ${{ runner.temp }}
-          ls
-          zip -r LSharp-${{ matrix.tag }}.zip ${{ github.workspace }}/bin/Release
+          cd ${{ github.workspace }}/bin/Release
+          
+          # Zip the runtime folder
+          zip -r LSharp-${{ matrix.tag }}.zip ./net6.0/linux-x64
       - name: Create New Release
         id: create_new_release
         uses: softprops/action-gh-release@v1
