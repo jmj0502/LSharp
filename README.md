@@ -803,7 +803,8 @@ There are some features (and fixes) I would like to add to the language. Here ar
 - [ ] Identify bugs an proceed to fix them.
 - [ ] Add other useful functionalites through modules (like a Math module, other useful functions on the string module, etc.).
 - [ ] Different tests cases for the language.
-- [ ] Add CI/CD to generate automated releases.
+- [X] Add CI/CD to generate automated releases.
+- [ ] Add Unit and Integration Tests.
 
 This is the first programming language I've ever written so I don't expect it to be perfect. I'm still planning to tackle the 
 Byte Code Interpreter project of **CI**, so I may even re-write this language using a non-garbage collected language.
