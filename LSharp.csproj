@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include=".github\workflows\build-action.yml" />
+    <Content Include=".github\workflows\lsharp-linux-build.yml" />
   </ItemGroup>
 
 </Project>
