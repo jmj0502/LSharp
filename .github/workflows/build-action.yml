@@ -10,6 +10,8 @@ jobs:
     strategy:
       matrix:
         dotnet-version: [6.0.x]
+        include:
+          - tag: linux-x64
 
     steps:
       - name: Checkout to repository
@@ -47,5 +49,5 @@ jobs:
           draft: false
           prerelease: false
           files: |
-            LSharp.zip
+            LSharp-${{ matrix.tag }}.zip
 
