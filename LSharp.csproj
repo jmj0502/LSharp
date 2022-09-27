@@ -4,6 +4,7 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>net6.0</TargetFramework>
     <StartupObject>LSharp.Lox</StartupObject>
+	<SelfContained>true</SelfContained>
   </PropertyGroup>
 
   <ItemGroup>
