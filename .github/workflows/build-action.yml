@@ -39,7 +39,8 @@ jobs:
           
           # Zip the runtime folder
           zip -r lsharp-${{ matrix.tag }}.zip ./net6.0/linux-x64
-          mv ./lsharp-${{ matrix.tag }} ${{ github.workspace }}
+          ls
+          # mv ./lsharp-${{ matrix.tag }} ${{ github.workspace }}
       - name: Create New Release
         id: create_new_release
         uses: softprops/action-gh-release@v1
