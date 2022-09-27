@@ -53,5 +53,5 @@ jobs:
           draft: false
           prerelease: false
           files: |
-            LSharp-${{ matrix.tag }}.zip
+            ${{gitub.workspace}}/Bin/Release/LSharp-${{ matrix.tag }}.zip
 
