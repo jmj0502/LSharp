@@ -38,7 +38,8 @@ jobs:
           cd ${{ github.workspace }}/bin/Release
           
           # Zip the runtime folder
-          zip -r LSharp-${{ matrix.tag }}.zip ./net6.0/linux-x64
+          zip -r lsharp-${{ matrix.tag }}.zip ./net6.0/linux-x64
+          mv lsharp-${{ matrix.tag }} ${{ github.workspace }}
       - name: Create New Release
         id: create_new_release
         uses: softprops/action-gh-release@v1
@@ -53,5 +54,5 @@ jobs:
           draft: false
           prerelease: false
           files: |
-            ${{ github.workspace }}/Bin/Release/LSharp-${{ matrix.tag }}.zip
+            lsharp-${{ matrix.tag }}.zip
 
