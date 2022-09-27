@@ -34,6 +34,9 @@ jobs:
             sudo apt-get update && sudo apt-get install -y zip --no-install-recommends
           fi
 
+          # checkout into dir.
+          cd ${{ runner.temp }}
+          ls
           zip -r LSharp-${{ matrix.tag }}.zip ${{ github.workspace }}/bin/Release
       - name: Create New Release
         id: create_new_release
