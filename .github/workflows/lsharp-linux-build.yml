@@ -41,7 +41,9 @@ jobs:
           
           # Zip the runtime folder
           zip -r lsharp-${{ matrix.tag }}.zip ./linux-x64
+          zip -r lsharp-win10-x64.zip ./win10-x64
           mv ./lsharp-${{ matrix.tag }}.zip ${{ github.workspace }}
+          mv ./lsharp-win10-x64.zip ${{ github.workspace }}
       - name: Create New Release
         id: create_new_release
         uses: softprops/action-gh-release@v1
@@ -57,4 +59,5 @@ jobs:
           prerelease: false
           files: |
             lsharp-${{ matrix.tag }}.zip
+            lsharp-win10-x64.zip
 
