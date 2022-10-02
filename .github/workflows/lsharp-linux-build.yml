@@ -2,7 +2,7 @@
 on:
   push:
     branches:
-      - master
+      - feature/ci-cd
 
 jobs:
   build_project:
