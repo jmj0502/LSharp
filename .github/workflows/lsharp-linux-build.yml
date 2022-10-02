@@ -28,7 +28,7 @@ jobs:
         run: dotnet publish --configuration Release --runtime win10-x64 --self-contained
       - name: List files in the repository
         run: |
-          ls ${{ github.workspace }}/bin/Release
+          ls ${{ github.workspace }}/bin/Release/net6.0
       - name: Zip
         run: |
           # if zip is not found
