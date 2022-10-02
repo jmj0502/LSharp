@@ -77,6 +77,7 @@ namespace LSharp
         /// </summary>
         private static void RunPrompt()
         {
+            WriteLine("Welcome to L# REPL\nTo exit press Ctrl+C, or type 'exit'");
             for (; ; )
             {
                 Write(">");

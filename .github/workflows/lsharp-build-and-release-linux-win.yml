@@ -1,0 +1,63 @@
+﻿name: Build Project
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build_and_release_project:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        dotnet-version: [6.0.x]
+        include:
+          - tag: linux-x64
+
+    steps:
+      - name: Checkout to repository
+        uses: actions/checkout@v3
+      - name: Setup .NET Core SDK ${{ matrix.dotnet-version }}
+        uses: actions/setup-dotnet@v2
+        with:
+          dotnet-version: ${{ matrix.dotnet-version }}
+      - name: Setup Dependencies
+        run: dotnet restore
+      - name: Build For Linux
+        run: dotnet publish --configuration Release --runtime linux-x64 --self-contained
+      - name: Build For Windows
+        run: dotnet publish --configuration Release --runtime win10-x64 --self-contained
+      - name: List files in the repository
+        run: |
+          ls ${{ github.workspace }}/bin/Release/net6.0
+      - name: Zip
+        run: |
+          # if zip is not found
+          if [ ! -x "$(command -v zip)" ]; then
+            sudo apt-get update && sudo apt-get install -y zip --no-install-recommends
+          fi
+
+          # checkout into dir.
+          cd ${{ github.workspace }}/bin/Release/net6.0
+          
+          # Zip the runtime folder
+          zip -r lsharp-${{ matrix.tag }}.zip ./linux-x64
+          zip -r lsharp-win10-x64.zip ./win10-x64
+          mv ./lsharp-${{ matrix.tag }}.zip ${{ github.workspace }}
+          mv ./lsharp-win10-x64.zip ${{ github.workspace }}
+      - name: Create New Release
+        id: create_new_release
+        uses: softprops/action-gh-release@v1
+        with:
+          token: ${{ github.token }}
+          tag_name: v0.1.${{ github.run_number }}
+          name: v0.1.${{ github.run_number }} Unstable L# Release.
+          body: |
+            # L# Unstable Release
+            This is an automated released that contains the most recent changes added to L#.
+            Such changes may include - Breaking and non-breaking features/bugfixes.
+          draft: false
+          prerelease: false
+          files: |
+            lsharp-${{ matrix.tag }}.zip
+            lsharp-win10-x64.zip
+

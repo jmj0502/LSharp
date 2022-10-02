@@ -1,8 +1,7 @@
 {
   "profiles": {
     "LSharp": {
-      "commandName": "Project",
-      "commandLineArgs": "IO.ls"
+      "commandName": "Project"
     }
   }
 }
