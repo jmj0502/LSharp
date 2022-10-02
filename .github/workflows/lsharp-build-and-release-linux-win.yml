@@ -5,7 +5,7 @@ on:
       - feature/ci-cd
 
 jobs:
-  build_project:
+  build_and_release_project:
     runs-on: ubuntu-latest
     strategy:
       matrix:
