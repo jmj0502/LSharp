@@ -25,7 +25,7 @@ jobs:
       - name: Build For Linux
         run: dotnet publish --configuration Release --runtime linux-x64 --self-contained
       - name: Build For Windows
-        run: dotnet publish --configutation Release --runtime win10-x64 --self-contained
+        run: dotnet publish --configuration Release --runtime win10-x64 --self-contained
       - name: List files in the repository
         run: |
           ls ${{ github.workspace }}/bin/Release
