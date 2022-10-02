@@ -19,7 +19,7 @@ idea of the different components involved in this kind of project.
 
 ## How to build from source
 
-The only requirement to build this language is `.NET >= 5.0`. Right now I'm not using any dependencies so the process is really easy (it's
+The only requirement to build this language is `.NET 6.0.x`. Right now I'm not using any dependencies so the process is really easy (it's
 just building a common CLI with `.NET`).
 
 ## Scope
