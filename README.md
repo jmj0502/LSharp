@@ -795,6 +795,12 @@ IO.getParentDirectory("./")??;
 IO.readLine("one.."); // Input: two -> returns "two".
 ```
 
+### Contributing
+Right now there is not an official guide on how to contribute to the project (i'll be working on that as soon as I can). However,
+you can help a lot by creating issues, since there's probably a lot of bugs that I haven't discovered. By the time being, I could
+provide a detailed explanation on how to solve certain problems. So, if you happen to feel adventurous and want to give a bugfix
+a shot, feel free to do so.
+
 ### Pending points
 There are some features (and fixes) I would like to add to the language. Here are some of them:
 - [ ] Add an HTTP Client.
