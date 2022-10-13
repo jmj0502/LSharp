@@ -24,9 +24,9 @@ jobs:
       - name: Setup Dependencies
         run: dotnet restore
       - name: Build For Linux
-        run: dotnet publish -c Release -r linux-x64 -p PublishReadyToRun=true -p PublishSingleFile=true --self-contained
+        run: dotnet publish -r linux-x64 -c Release -p:PublishReadyToRun=true -p:PublishSingleFile=true --self-contained
       - name: Build For Windows
-        run: dotnet publish -c Release -r win10-x64 -p PublishReadyToRun=true -p PublishSingleFile=true --self-contained
+        run: dotnet publish -r win10-x64 -c Release -p:PublishReadyToRun=true -p:PublishSingleFile=true --self-contained
       - name: List files in the repository
         run: |
           ls ${{ github.workspace }}/bin/Release/net6.0
