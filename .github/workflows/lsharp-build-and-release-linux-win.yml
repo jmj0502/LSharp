@@ -41,9 +41,11 @@ jobs:
           cd ${{ github.workspace }}/bin/Release/net6.0
           
           # Zip the runtime folder
-          zip -r lsharp-${{ matrix.tag }}.zip ./linux-x64
-          zip -r lsharp-win10-x64.zip ./win10-x64
+          cd ./linux-x64
+          zip -r lsharp-${{ matrix.tag }}.zip ./publish/
           mv ./lsharp-${{ matrix.tag }}.zip ${{ github.workspace }}
+          cd ../win10-x64
+          zip -r lsharp-win10-x64.zip ./publish/
           mv ./lsharp-win10-x64.zip ${{ github.workspace }}
       - name: Create New Release
         id: create_new_release
