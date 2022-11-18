@@ -44,7 +44,7 @@ jobs:
           cd ./linux-x64
           zip -r lsharp-${{ matrix.tag }}.zip ./publish/
           mv ./lsharp-${{ matrix.tag }}.zip ${{ github.workspace }}
-          cd ../win10-x64
+          cd ./win10-x64
           zip -r lsharp-win10-x64.zip ./publish/
           mv ./lsharp-win10-x64.zip ${{ github.workspace }}
       - name: Create New Release
