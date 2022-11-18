@@ -2,8 +2,8 @@
 on:
   push:
     branches:
-      # - master
-      - feature/single-file-exec
+      - master
+      #- feature/single-file-exec
 
 jobs:
   build_and_release_project:
