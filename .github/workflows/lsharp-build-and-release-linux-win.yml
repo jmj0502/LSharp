@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - master
+      #- feature/single-file-exec
 
 jobs:
   build_and_release_project:
@@ -23,9 +24,9 @@ jobs:
       - name: Setup Dependencies
         run: dotnet restore
       - name: Build For Linux
-        run: dotnet publish --configuration Release --runtime linux-x64 --self-contained
+        run: dotnet publish -r linux-x64 -c Release -p:PublishReadyToRun=true -p:PublishSingleFile=true --self-contained
       - name: Build For Windows
-        run: dotnet publish --configuration Release --runtime win10-x64 --self-contained
+        run: dotnet publish -r win10-x64 -c Release -p:PublishReadyToRun=true -p:PublishSingleFile=true --self-contained
       - name: List files in the repository
         run: |
           ls ${{ github.workspace }}/bin/Release/net6.0
@@ -40,9 +41,11 @@ jobs:
           cd ${{ github.workspace }}/bin/Release/net6.0
           
           # Zip the runtime folder
-          zip -r lsharp-${{ matrix.tag }}.zip ./linux-x64
-          zip -r lsharp-win10-x64.zip ./win10-x64
+          cd ./linux-x64
+          zip -r lsharp-${{ matrix.tag }}.zip ./publish/
           mv ./lsharp-${{ matrix.tag }}.zip ${{ github.workspace }}
+          cd ../win10-x64
+          zip -r lsharp-win10-x64.zip ./publish/
           mv ./lsharp-win10-x64.zip ${{ github.workspace }}
       - name: Create New Release
         id: create_new_release
